@@ -144,7 +144,7 @@ i.e. all web apps in examples listed also exist as mobile apps
 The user-facing platform of choice for this project is a web application. Almost
 all modern personal devices have access to an internet browser. Users will
 be able to use the service both on desktop and mobile devices, as long as they
-are connected to the internet (a necessary prerequisite for flat search to
+are connected to the internet (a prerequisite for flat search to
 work). Studies show that mobile devices have been capable of reasonable web
 browsing for over 10 years (Schmiedl, Seidl and Temper, 2009), which means that
 combined with desktop browsing, the largest number of users possible would be
@@ -152,15 +152,15 @@ able to access our app. Building a cross-platform app will keep the costs of
 development relatively low.
 
 Another advantage of going for a web application as opposed to a mobile
-application, is that the user will not be responsible for updating any software;
+application is that the user will not be responsible for updating any software;
 all updates will happen on our side and all users will always be using
 up-to-date software. This will prevent inconsistencies resulting from users on
-different versions as well as increase security of the service, as
-vulnerabilities patching will require no user input. The National Cyber Security
+different versions as well as increase the security of the service, as
+vulnerability patching will require no user input. The National Cyber Security
 Centre (n.d.) recommends keeping software up to date to keep corporate data
 safe. Studies have shown that about 41% of survey responders neglect software
 updates, one of the reasons being that they are associated with the addition of
-unnecessary new features (Armerding, 2012). A common solution to this problem,
+unnecessary new features (Armerding, 2012). A common solution to this problem
 is to indeed develop web applications, a technique used by companies such as
 Facebook (Abraham, 2016).
 
@@ -168,18 +168,18 @@ Furthermore, with the now mature concept of responsive web design including
 techniques such as mobile-first design, the user experience of web apps on
 mobile devices can be enhanced while keeping costs low, compared to having to
 develop separate applications for each platform (Gardner, 2011). Another
-increasing popular practice is the development of Progressive Web Apps (PWAs),
+increasingly popular practice is the development of Progressive Web Apps (PWAs),
 used by successful companies such as Twitter, offering "fast, compelling
 journeys similar to what can be achieved with a native app", whilst retaining
 the benefits of a web app (e.g. instant updates) (Hume, 2017). Shipping a PWA
 can be considered in later phases of the project, if there is user demand for
 it.
 
-Commercially successful flat finding services are offered as web applications,
+Commercially successful flat-finding services are offered as web applications,
 such as Zoopla, Rightmove, OpenRent and SpareRoom. A hypothesised reason for
 this is that the activity of searching for a place to live is regarded in most
 societies as a serious task that can have a significant impact on the quality of
-one's life, as a result of which, becomes a stressful endeavor for many
+one's life, as a result of which, becomes a stressful endeavour for many
 adolescents (Raviv et al. 1990). Stressful activities such as these are likely
 to be performed more often on desktop devices than casual activities such as
 browsing social media, as many users act and feel more organised with access to
@@ -189,15 +189,15 @@ users access the platform only via its mobile application (Techjury, 2023). This
 is why good desktop support is just as important as good mobile support, and
 developing a web app allows for both with little compromises. 
 
-On the other hand, all four of the above mentioned commercial flat finding
+On the other hand, all four of the above-mentioned commercial flat-finding
 services are also offered as mobile applications. This is primarily to extend
 their reach to predominantly mobile users via app stores such as Google Play or
 Apple's App Store. The ratio of mobile to desktop users for property searches
-had been on the rise in the recent years, meaning that if the commercial apps
+had been on the rise in recent years, meaning that if the commercial apps
 wanted to stay competitive, they needed to also go mobile (Kan, 2016). While
-this is perfectly understanding from the point of view of those businesses, our
-use case is different in the sense that the application does not need be be a
-commercial success, but rather but rather be as convenient as possible for
+this is perfectly understandable from the point of view of those businesses, our
+use case is different in the sense that the application does not need to be a
+commercial success, but rather be as convenient as possible for
 internal company usage. In addition, since our users will be tech consultants,
 they will find a web application experience comfortable as they will be able to
 use the service straight from their work devices (likely to be laptops), with
