@@ -202,3 +202,16 @@ internal company usage. In addition, since our users will be tech consultants,
 they will find a web application experience comfortable as they will be able to
 use the service straight from their work devices (likely to be laptops), with
 the option of accessing the app via their mobile web browser if needed.
+
+## References
+
+- Abraham, B. (2016). Why software updates are a problem, and how you can solve it. [online] Interactive Mind. Available at: https://medium.com/interactive-mind/why-software-updates-are-a-problem-and-how-you-can-solve-it-3fb4b1241aa4 [Accessed 27 Jan. 2023].
+- Armerding, T. (2012). Why users don’t often upgrade software when they should. [online] CSO Online. Available at: https://www.csoonline.com/article/2132061/why-users-don-t-often-upgrade-software-when-they-should.html [Accessed 27 Jan. 2023]
+- Gardner, B.S., 2011. Responsive web design: Enriching the user experience. Sigma Journal: Inside the Digital Ecosystem, 11(1), pp.13-19.
+- Hume, A. (2017) Progressive Web Apps. New York, NY: Manning Publications.
+- Kan, R. (2016). Why Mobile Apps Are Essential For Real Estate Business. [online] Available at: https://www.linkedin.com/pulse/why-mobile-apps-important-real-estate-business-apps-lodge/ [Accessed 27 Jan. 2023].
+- Leaxcoin (LEAX), L.F. - (2020). The Impact Of Technology Towards The Real Estate Industry. [online] Medium. Available at: https://medium.com/@LeaxFoundation/the-impact-of-technology-towards-the-real-estate-industry-50428376c261 [Accessed 27 Jan. 2023].
+- National Cyber Security Centre (n.d.). Keeping devices and software up to date. [online] www.ncsc.gov.uk. Available at: https://www.ncsc.gov.uk/collection/device-security-guidance/managing-deployed-devices/keeping-devices-and-software-up-to-date [Accessed 27 Jan. 2023].
+- Raviv, A., Keinan, G., Abazon, Y. and Raviv, A. (1990). Moving as a stressful life event for adolescents. Journal of Community Psychology, 18: 130-140. doi: 10.1002/1520-6629(199004)18:2<130::AID-JCOP2290180205>3.0.CO;2-V https://doi.org/10.1002/1520-6629(199004)18:2<130::AID-JCOP2290180205>3.0.CO;2-V
+- Schmiedl, G., Seidl, M. and Temper, K. (2009). Mobile phone web browsing. Proceedings of the 11th International Conference on Human-Computer Interaction with Mobile Devices and Services - MobileHCI ’09. doi:10.1145/1613858.1613942.
+- Techjury. (2023). 51 Mobile vs. Desktop Usage Statistics For 2023. [online] Available at: https://techjury.net/blog/mobile-vs-desktop-usage/#toc-31-81-8-of-facebook-users-access-the-media-only-via-smartphone [Accessed 27 Jan. 2023].
