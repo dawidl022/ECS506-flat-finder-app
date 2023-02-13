@@ -9,7 +9,7 @@
 | |Users will log in using Single Sign On (SSO) with their corporate accounts|Functional|Core|Login|
 | |Users will be registered in the system the first time they log in using Single Sign On|Functional|Core|Login|
 | |Upon first logging into the system, consultants should be prompted to complete their profile (Work site, Slack member ID, optional photo)|Functional (D)|Core|Complete Profile|
-| |Profiles can be completed later by any type of user, but no listing may be posted without a complete profile|Functional|Core|Complete Profile|
+| |Profiles can be completed later, but no listing may be posted without a complete profile|Functional|Core|Complete Profile|
 | |Users must be able to logout|Functional|Core|Logout|
 | |Admins should be able to view users registered in the system|Functional|Core|View users
 | |Admins should be able to make other users admins, either by selecting from the list of users of by manually entering their corporate email address|Functional|Core|Make user admin|
@@ -36,16 +36,18 @@
 | 32|The detailed accommodation listing view must have a title, full description, gallery of photos, rating, source, price breakdown, full address, number of rooms, contact information, link to the original external listing (if applicable)|Functional|Core|View Accommodation Listing Details|
 | 33|The detailed seeking accommodation listing view must have a title, full description, contact information and preferred location|Functional|Core|View Seeking Listing Details|
 | |Users should be able to return from a detailed listing view to where they were in the search results|Functional|Core|View Listings|
-| |Users should have the option of adding a listing to their favourites|Functional|Optional|Add Listing to Favourites|
-| |Users should have the option of viewing their favourited listings|Functional|Optional|View Favourite Listings|
-| |Users should have the option of removing a listing from their favourites|Functional|Optional|Remove Listing from Favourites|
-| |Users should be able to leave a textual review along with a rating (0-5) on any accommodation listing|Functional|Optional|Leave Review|
-| |Users should be able to leave a textual review along with a rating (0-5) on any listing author|Functional|Optional|Leave Review|
-| |Users should be able to create listings about an accommodation, providing all the details specified in RQ32|Functional|Core|Create Accommodation Listing|
-| |When creating an accommodation listing, users should be able to upload 0-15 photos|Functional (D)|Core|Create Accommodation Listing
-| |Users should be able to create listings about seeking accommodation, providing all the details specified in RQ33|Functional|Core|Create Seeking Listing|
-| |Users should be able to view the profiles of other users that have posted a listing|Functional|Core|View Profile|
-| |User profiles should show their name, optionally a photo, the site they currently work at and links to their corporate chat (Slack/Teams)|Functional (D)|Core|View Profile|
+| |Consultants should have the option of adding a listing to their favourites|Functional|Optional|Add Listing to Favourites|
+| |Consultants should have the option of viewing their favourited listings|Functional|Optional|View Favourite Listings|
+| |Consultants should have the option of removing a listing from their favourites|Functional|Optional|Remove Listing from Favourites|
+| |Consultants should be able to leave a textual review along with a rating (0-5) on any accommodation listing|Functional|Optional|Leave Review|
+| |Consultants should be able to leave a textual review along with a rating (0-5) on any listing author|Functional|Optional|Leave Review|
+| |Consultants should be able to create listings about an accommodation, providing all the details specified in RQ32|Functional|Core|Create Accommodation Listing|
+| |When creating an accommodation listing, consultants should be able to upload 0-15 photos|Functional (D)|Core|Create Accommodation Listing
+| |Consultants should be able to create listings about seeking accommodation, providing all the details specified in RQ33|Functional|Core|Create Seeking Listing|
+| |Consultants should be able to edit the listings they have created|Functional|Core|Edit Listing|
+| |Consultants should be able to delete the listings they have created|Functional|Core|Delete Listing|
+| |Consultants should be able to view the profiles of other consultants that have posted a listing|Functional|Core|View Profile|
+| |Consultant profiles should show their name, optionally a photo, the site they currently work at and links to their corporate chat (Slack/Teams)|Functional (D)|Core|View Profile|
 | |Admins should be able to enable/disable corporate chat integrations (Slack/Teams)|Functional|Optional|Administrate Chat Integrations|
 | |The system must not allow performing any activities without authentication|Non-functional Security|Core|-|
 | |The database should be backup up once per day|Non-functional Backup|Core|-|
