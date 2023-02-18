@@ -35,7 +35,7 @@
 |31|Users should be able to sort accommodation listings by distance from the specified location|Functional|Core|Sort Accommodation Listings|
 |32|Users should be able to enter a detailed view of a selected listing from the search results|Functional|Core|View Listing Details|
 |33|The detailed listing view should have a Google Maps integration with the location of the listing|Functional|Core|View Listing Details|
-|34|The detailed accommodation listing view must have a title, full description, gallery of photos, living condition information (e.g. pets, smoking, number of tenants) rating, source, price breakdown, full address, number of rooms, contact information, link to the original external listing (if applicable)|Functional (D)|Core|View Accommodation Listing Details|
+|34|The detailed accommodation listing view must have a title, full description, gallery of photos, living condition information (e.g. pets, smoking, number of tenants) rating, source, price breakdown, full address, number of rooms, a list of amenities, contact information, link to the original external listing (if applicable), and a list of reviews for the property and listing author|Functional (D)|Core|View Accommodation Listing Details|
 |35|The detailed seeking accommodation listing view must have a title, full description, contact information and preferred location|Functional (D)|Core|View Seeking Listing Details|
 |36|Users should be able to return from a detailed listing view to where they were in the search results|Functional|Core|View Listings|
 |37|Users should be able to compare the features of two accommodation listings feature (e.g. price, location, conditions etc.)|Functional|Optional|Compare Accommodation Listings|
@@ -52,13 +52,12 @@
 |48|Consultants should be able to remove the listings they have created|Functional|Core|Remove Listing|
 |49|Admins should be able to remove any listing|Functional|Core|Remove Listing|
 |50|Consultants should be able to view the profiles of other consultants that have posted a listing|Functional|Core|View Profile|
-|51|Consultant profiles should show their name, optionally a photo, the site they currently work at and links to their corporate chat (Slack/Teams)|Functional (D)|Core|View Profile|
+|51|Consultant profiles should show their name, optionally a photo, the site they currently work at and links to their corporate chat (Slack/Teams) and a list of reviews left by other consultants|Functional (D)|Core|View Profile|
 |52|Admins should be able to enable/disable corporate chat integrations (Slack/Teams)|Functional|Optional|Administrate Chat Integrations|
 |53|The system must not allow performing any activities without authentication|Non-functional Security|Core|-|
-|54|The database should be backup up once per day|Non-functional Backup|Core|-|
 |55|The application should comply with the Web Content Accessibility Guidelines (WCAG) 2.1 level AA|Non-functional Accessibility|Core|-|
 |56|The application must support all major web browsers: Google Chrome, Mozilla Firefox, Microsoft Edge and Safari|Non-functional Compatibility|Core|-|
-|57|The application should have a responsive web design, allowing it to adjust its visuals based on the screen size|Non-functional Usability|Core|-|
+|57|The application should have a responsive web design, allowing it to adjust its visuals based on the screen size, from resolutions of 320x240px with no upper bound|Non-functional Usability|Core|-|
 |58|The system must be able to support 1000-1500 simultaneous users|Non-functional Scalability|Core|-|
 |59|Each photo uploaded by a user must have a maximum file size of 5MB|Non-functional Resource constraints|Core|-|
 |60|The database should be backed up once a day|Non-functional Backup|Core|-|
