@@ -28,7 +28,6 @@
 |24|Seeking listings should be sorted by distance from specified location|Functional|Core|View Seeking Listings|
 |25|Admins should be able to remove any listings from the system|Functional|Core|Remove Listing|
 |26|Users should be prompted to specify the location they wish to search near to, and select a maximum distance from this location|Functional|Core|Filter Listings|
-|26a|Users should be able to select from a list of FDM Work Sites as the location for search|Functional|Optional|Filter Listings|
 |27|Users should have the option of filtering accommodation listings by maximum distance from specified location|Functional|Optional|Filter Accommodation Listings
 |28|Users should have the option of filtering accommodation listings by source (internal/external/both)|Functional|Optional|Filter Accommodation Listings|
 |29|Users should have the option of filtering accommodation listings by maximum price|Functional|Optional|Filter Accommodation Listings|
@@ -37,7 +36,6 @@
 |32|Users should be able to enter a detailed view of a selected listing from the search results|Functional|Core|View Listing Details|
 |33|The detailed listing view should have a Google Maps integration with the location of the listing|Functional|Core|View Listing Details|
 |34|The detailed accommodation listing view must have a title, full description, gallery of photos, living condition information (e.g. pets, smoking, number of tenants) rating, source, price breakdown, full address, number of rooms, a list of amenities, contact information, link to the original external listing (if applicable), and a list of reviews for the property and listing author|Functional (D)|Core|View Accommodation Listing Details|
-|54|FDM Work Sites should be marked on the Google Maps integration view|Functional|Optional|View Listing Details|
 |35|The detailed seeking accommodation listing view must have a title, full description, contact information and preferred location|Functional (D)|Core|View Seeking Listing Details|
 |36|Users should be able to return from a detailed listing view to where they were in the search results|Functional|Core|View Listings|
 |37|Users should be able to compare the features of two accommodation listings feature (e.g. price, location, conditions etc.)|Functional|Optional|Compare Accommodation Listings|
@@ -56,7 +54,6 @@
 |50|Consultants should be able to view the profiles of other consultants that have posted a listing|Functional|Core|View Profile|
 |51|Consultant profiles should show their name, optionally a photo, the site they currently work at and links to their corporate chat (Slack/Teams) and a list of reviews left by other consultants|Functional (D)|Core|View Profile|
 |52|Admins should be able to enable/disable corporate chat integrations (Slack/Teams)|Functional|Optional|Administrate Chat Integrations|
-<!-- TODO admin crud for FDM Work Sites -->
 |53|The system must not allow performing any activities without authentication|Non-functional Security|Core|-|
 |55|The application should comply with the Web Content Accessibility Guidelines (WCAG) 2.1 level AA|Non-functional Accessibility|Core|-|
 |56|The application must support all major web browsers: Google Chrome, Mozilla Firefox, Microsoft Edge and Safari|Non-functional Compatibility|Core|-|
