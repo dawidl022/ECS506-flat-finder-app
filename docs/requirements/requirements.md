@@ -5,7 +5,7 @@
 |1 |Each user must be identified with their corporate email address|Functional (D)|Core|-|
 |2 |The system must have two types of users: consultant and system administrator.|Functional|Core|-|
 |3 |Only admins should be able to access the admin portal|Functional|Core|-|
-|4 |The system should periodically fetch listings from external APIs and update the listings cached in the system|Functional|Core|-|
+|4 |The system should periodically fetch listings from external APIs and update the listings cached in the system|Functional|Optional|-|
 |5 |The application's interface must have multi-language support based on different regions with FDM centres|Functional|Core|-|
 |6 |Users will log in using Single Sign On (SSO) with their corporate accounts|Functional|Core|Login|
 |7 |Users will be registered in the system the first time they log in using Single Sign On|Functional|Core|Login|
@@ -27,6 +27,7 @@
 |24|Seeking listings should be sorted by distance from specified location|Functional|Core|View Seeking Listings|
 |25|Admins should be able to remove any listings from the system|Functional|Core|Remove Listing|
 |26|Users should be prompted to specify the location they wish to search near, and select a maximum distance from this location|Functional|Core|Filter Listings|
+|26a|Admins should be able to filter listings by "FDM" to view all internal listings in order to bypass specifying the location|Functional|Optional|Filter Listings|
 |28|Users should have the option of filtering accommodation listings by source (internal/external/both)|Functional|Optional|Filter Accommodation Listings|
 |29|Users should have the option of filtering accommodation listings by maximum price|Functional|Optional|Filter Accommodation Listings|
 |30|Users should be able to sort accommodation listings by price|Functional|Core|Sort Accommodation Listings|
