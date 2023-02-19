@@ -56,12 +56,12 @@
 |53|The system must not allow performing any activities without authentication|Functional|Core|-|
 |55|The application should comply with the Web Content Accessibility Guidelines (WCAG) 2.1 level AA|Non-functional Accessibility|Core|-|
 |56|The application must support all major web browsers: Google Chrome, Mozilla Firefox, Microsoft Edge and Safari|Non-functional Compatibility|Core|-|
-|57|The application should have a responsive web design, allowing it to adjust its visuals based on the screen size, from resolutions of 320x240px with no upper bound|Non-functional Usability|Core|-|
+|57|The application should have a responsive web design, allowing it to adjust its visuals based on the screen size, supporting resolutions from 320x240px with no upper bound|Non-functional Usability|Core|-|
 |58|The system must be able to support 1000-1500 simultaneous users|Non-functional Scalability|Core|-|
 |59|Each photo uploaded by a user must have a maximum file size of 5MB|Non-functional Resource constraints|Core|-|
 |60|The database should be backed up once a day|Non-functional Backup|Core|-|
 |61|The system must have an administrator's manual specifying how to use the admin features|Non-functional Documentation|Core|-|
 |62|The system must have a user manual and a FAQ section specifying how to use the non-admin features and a high-level overview of how the app works|Non-functional Documentation|Core|-|
 |63|It should be possible to reconfigure the system, including changing the database name, login, and password|Non-functional Configuration management|Core|-|
-|64|The system must have a 99.9% uptime|Non-functional Reliability|Core|-|
+|64|The system must have a 99.9% uptime|Non-functional Availability|Core|-|
 |65|User data stored by the system should be encrypted at rest|Non-functional Security|Core|-|
