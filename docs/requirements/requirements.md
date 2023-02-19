@@ -5,7 +5,7 @@
 |1 |Each user must be identified with their corporate email address|Functional (D)|Core|-|
 |2 |The system must have two types of users: consultant and system administrator.|Functional|Core|-|
 |3 |Only admins should be able to access the admin portal|Functional|Core|-|
-|4 |The system should periodically fetch listings from external APIs and update the listings catalogue in the system|Functional|Core|-|
+|4 |The system should periodically fetch listings from external APIs and update the listings cached in the system|Functional|Core|-|
 |5 |The application's interface must have multi-language support based on different regions with FDM centres|Functional|Core|-|
 |6 |Users will log in using Single Sign On (SSO) with their corporate accounts|Functional|Core|Login|
 |7 |Users will be registered in the system the first time they log in using Single Sign On|Functional|Core|Login|
@@ -19,9 +19,8 @@
 |15|By default all external sources should be enabled|Functional|Core|Configure external sources|
 |16|Admins should be able to enable external sources for pulling listings|Functional|Optional|Configure external sources|
 |17|Admins should be able to disable external sources for pulling listings|Functional|Optional|Configure external sources|
-|18|Disabling an external source should hide all listings from that source from non-admin users and pause the automatic pulling of listings from that source|Functional|Optional|Configure external sources|
+|18|Disabling an external source should hide all listings from that source and pause the automatic pulling of listings from that source|Functional|Optional|Configure external sources|
 |19|Users should be able to view all non-hidden listings in the system|Functional|Core|View Listings|
-|20|Admins should be able to view listings from disabled external sources which should be clearly labelled as "Hidden"|Functional|Optional|View Listings|
 |21|Listings should be paginated|Functional|Core|View Listings|
 |22|Each accommodation listing in the list must have a title, photo, brief description, rating, source, price, distance from the specified location, postal code, accommodation type, and "favourite" indicator|Functional (D)|Core|View Accommodation Listings|
 |23|Each seeking listing in the list must have a title, brief description, distance from the specified location, and "favourite" indicator|Functional (D)|Core|View Seeking Listings|
@@ -39,8 +38,10 @@
 |36|Users should be able to return from a detailed listing view to where they were in the search results|Functional|Core|View Listings|
 |37|Users should be able to compare the features of two accommodation listings feature (e.g. price, location, conditions etc.)|Functional|Optional|Compare Accommodation Listings|
 |38|Consultants should have the option of adding a listing to their favourites|Functional|Optional|Add Listing to Favourites|
+|38a|If an external listing is favourited by at least 1 consultant, it is cached in the system|Functional|Optional|Add Listing to Favourites|
 |39|Consultants should have the option of viewing their favourited listings|Functional|Optional|View Favourite Listings|
 |40|Consultants should have the option of removing a listing from their favourites|Functional|Optional|Remove Listing from Favourites|
+|40a|If an external listing is no longer favourited by any consultant, it is removed from the system cache|Functional|Optional|Remove Listing from Favourites|
 |41|Consultants should be able to leave a textual review along with a rating (0-5) on any accommodation listing|Functional|Optional|Leave Review|
 |42|Consultants should be able to leave a textual review along with a rating (0-5) on any listing author|Functional|Optional|Leave Review|
 |43|Consultants should be able to create listings about an accommodation, providing all the details specified in RQ34|Functional|Core|Create Accommodation Listing|
