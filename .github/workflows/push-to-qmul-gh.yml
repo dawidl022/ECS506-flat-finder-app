@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: main
       - name: Push to QMUL GitHub
         run: |
           git remote add upstream "https://${{ secrets.QMUL_GH_PAT }}@${{ vars.QMUL_GH_URL }}"
