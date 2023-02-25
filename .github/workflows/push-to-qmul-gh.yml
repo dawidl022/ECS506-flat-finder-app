@@ -15,8 +15,5 @@ jobs:
       - uses: actions/checkout@v3
       - name: Push to QMUL GitHub
         run: |
-          git remote add upstream "https://$PAT@$URL"
+          git remote add upstream "https://${{ secrets.QMUL_GH_PAT }}@${{ env.QMUL_GH_URL }}"
           git push upstream main
-        env:
-          PAT: ${{ secrets.QMUL_GH_PAT }}
-          URL: ${{ env.QMUL_GH_URL }}
