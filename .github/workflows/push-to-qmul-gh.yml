@@ -1,0 +1,22 @@
+name: push-to-qmul-gh
+
+on:
+  push:
+    branches:
+      - main
+  pull_request: # TODO remove after testing
+    branches:
+      - main
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Push to QMUL GitHub
+        run: |
+          git remote add upstream "https://$PAT@$URL"
+          git push upstream main
+        env:
+          PAT: ${{ secrets.QMUL_GH_PAT }}
+          URL: ${{ env.QMUL_GH_URL }}
