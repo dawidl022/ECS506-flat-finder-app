@@ -1,4 +1,4 @@
-# ECS506U Software Engineering Project - Flat Finder Application
+# Flat Finder Application - ECS506U Software Engineering Project
 
 [Full Requirements](docs/requirements/requirements.md)
 
