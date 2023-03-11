@@ -6,7 +6,7 @@
 
 ### Use Case Diagram
 
-![](docs/domain-analysis/use-case.svg)
+![](docs/requirements/use-case.svg)
 
 ### Class Diagram
 
