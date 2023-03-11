@@ -1,5 +1,7 @@
 # ECS506U Software Engineering Project - Flat Finder Application
 
+[Full Requirements](docs/requirements/requirements.md)
+
 ## UML Diagrams
 
 ### Use Case Diagram
