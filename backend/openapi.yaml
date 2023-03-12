@@ -23,6 +23,21 @@ paths:
               schema:
                 $ref: "#/components/schemas/accommodationSearchResults"
 
+  /api/v1/listings/accommodation/{listingId}:
+    get:
+      summary: Get the details of an accommodation listing
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/accommodationDetails"
+        "404":
+          description: Listing not found
+
   /api/v1/listings/seeking:
     get:
       summary: Get a list of seeking listings
@@ -73,6 +88,17 @@ components:
           accommodation:
             $ref: "#/components/schemas/seekingSummary"
 
+    accommodationDetails:
+      type: object
+      required:
+        - isFavourite
+        - accommodation
+      properties:
+        isFavourite:
+          $ref: "#/components/schemas/isFavourite"
+        accommodation:
+          $ref: "#/components/schemas/accommodation"
+
     distance:
       type: number
       description: Listing's distance in km from search location
@@ -84,6 +110,7 @@ components:
     accommodationSummary:
       type: object
       required:
+        - id
         - title
         - shortDescription
         - thumbnailUrl
@@ -93,6 +120,8 @@ components:
         - price
         - postCode
       properties:
+        id:
+          $ref: "#/components/schemas/listingId"
         title:
           $ref: "#/components/schemas/listingTitle"
         shortDescription:
@@ -100,28 +129,71 @@ components:
         thumbnailUrl:
           $ref: "#/components/schemas/listingThumbnailUrl"
         accommodationType:
-          type: string
+          $ref: "#/components/schemas/accommodationType"
+        numberOfRooms:
+          $ref: "#/components/schemas/accommodationNumberOfRooms"
+        source:
+          $ref: "#/components/schemas/listingSource"
+        price:
+          $ref: "#/components/schemas/accommodationPrice"
+        postCode:
+          $ref: "#/components/schemas/accommodationPostCode"
+
+    accommodation:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - photoUrls
+        - accommodationType
+        - numberOfRooms
+        - source
+        - price
+        - address
+        - author
+      properties:
+        id:
+          $ref: "#/components/schemas/listingId"
+        title:
+          $ref: "#/components/schemas/listingTitle"
+        description:
+          $ref: "#/components/schemas/listingDescription"
+        photoUrls:
+          $ref: "#/components/schemas/listingPhotoUrls"
+        accommodationType:
+          $ref: "#/components/schemas/accommodationType"
         numberOfRooms:
           type: integer
         source:
           type: string
         price:
           type: number
-        postCode:
-          type: string
+        address:
+          $ref: "#/components/schemas/accommodationAddress"
+        author:
+          $ref: "#/components/schemas/listingAuthor"
+        originalListingUrl:
+          $ref: "#/components/schemas/listingOriginalUrl"
 
     seekingSummary:
       type: object
       required:
+        - id
         - title
         - shortDescription
       properties:
+        id:
+          $ref: "#/components/schemas/listingId"
         title:
           $ref: "#/components/schemas/listingTitle"
         shortDescription:
           $ref: "#/components/schemas/listingShortDescription"
         thumbnailUrl:
           $ref: "#/components/schemas/listingThumbnailUrl"
+
+    listingId:
+      type: string
 
     listingTitle:
       type: string
@@ -131,6 +203,62 @@ components:
 
     listingThumbnailUrl:
       type: string
+
+    listingSource:
+      type: string
+
+    listingDescription:
+      type: string
+
+    listingPhotoUrls:
+      type: array
+      items:
+        type: string
+
+    listingAuthor:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+
+    listingOriginalUrl:
+      type: string
+
+    accommodationType:
+      type: string
+
+    accommodationNumberOfRooms:
+      type: integer
+      minimum: 1
+
+    accommodationPrice:
+      type: number
+      minimum: 0
+
+    accommodationAddress:
+      anyOf:
+        - $ref: "#/components/schemas/UKAddress"
+
+    accommodationPostCode:
+      type: string
+
+    UKAddress:
+      type: object
+      required:
+        - line1
+        - town
+        - postCode
+      properties:
+        line1:
+          type: string
+        line2:
+          type: string
+        town:
+          type: string
+        postCode:
+          type: string
 
   parameters:
     searchLocation:
@@ -155,7 +283,7 @@ components:
       required: false
       description: Maximum monthly price of accommodations
       schema:
-        type: number
+        $ref: "#/components/schemas/accommodationPrice"
 
     sourcesFilter:
       name: sources
@@ -209,3 +337,11 @@ components:
         minimum: 1
         maximum: 100
         default: 10
+
+    listingId:
+      name: listingId
+      in: path
+      required: true
+      description: ID of the listing to fetch or apply the operation on
+      schema:
+        $ref: "#/components/schemas/listingId"
