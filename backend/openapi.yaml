@@ -13,8 +13,8 @@ paths:
         - $ref: "#/components/parameters/maxPriceFilter"
         - $ref: "#/components/parameters/sourcesFilter"
         - $ref: "#/components/parameters/sortAccommodationsBy"
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/size'
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/size"
       responses:
         "200":
           description: OK
@@ -26,6 +26,18 @@ paths:
   /api/v1/listings/seeking:
     get:
       summary: Get a list of seeking listings
+      parameters:
+        - $ref: "#/components/parameters/searchLocation"
+        - $ref: "#/components/parameters/searchRadius"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/size"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/seekingSearchResults"
 
 components:
   schemas:
@@ -45,6 +57,22 @@ components:
           accommodation:
             $ref: "#/components/schemas/accommodationSummary"
 
+    seekingSearchResults:
+      type: array
+      items:
+        type: object
+        required:
+          - distance
+          - isFavourite
+          - seeking
+        properties:
+          distance:
+            $ref: "#/components/schemas/distance"
+          isFavourite:
+            $ref: "#/components/schemas/isFavourite"
+          accommodation:
+            $ref: "#/components/schemas/seekingSummary"
+
     distance:
       type: number
       description: Listing's distance in km from search location
@@ -59,18 +87,18 @@ components:
         - title
         - shortDescription
         - thumbnailUrl
-        - accomodationType
+        - accommodationType
         - numberOfRooms
         - source
         - price
         - postCode
       properties:
         title:
-          type: string
+          $ref: "#/components/schemas/listingTitle"
         shortDescription:
-          type: string
+          $ref: "#/components/schemas/listingShortDescription"
         thumbnailUrl:
-          type: string
+          $ref: "#/components/schemas/listingThumbnailUrl"
         accommodationType:
           type: string
         numberOfRooms:
@@ -81,6 +109,28 @@ components:
           type: number
         postCode:
           type: string
+
+    seekingSummary:
+      type: object
+      required:
+        - title
+        - shortDescription
+      properties:
+        title:
+          $ref: "#/components/schemas/listingTitle"
+        shortDescription:
+          $ref: "#/components/schemas/listingShortDescription"
+        thumbnailUrl:
+          $ref: "#/components/schemas/listingThumbnailUrl"
+
+    listingTitle:
+      type: string
+
+    listingShortDescription:
+      type: string
+
+    listingThumbnailUrl:
+      type: string
 
   parameters:
     searchLocation:
@@ -147,6 +197,7 @@ components:
       schema:
         type: integer
         minimum: 0
+        default: 0
 
     size:
       name: size
@@ -157,3 +208,4 @@ components:
         type: integer
         minimum: 1
         maximum: 100
+        default: 10
