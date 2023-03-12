@@ -54,6 +54,21 @@ paths:
               schema:
                 $ref: "#/components/schemas/seekingSearchResults"
 
+  /api/v1/listings/seeking/{listingId}:
+    get:
+      summary: Get the details of a seeking listing
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/seekingDetails"
+        "404":
+          description: Listing not found
+
 components:
   schemas:
     accommodationSearchResults:
@@ -152,6 +167,7 @@ components:
         - price
         - address
         - author
+        - contactInfo
       properties:
         id:
           $ref: "#/components/schemas/listingId"
@@ -164,17 +180,19 @@ components:
         accommodationType:
           $ref: "#/components/schemas/accommodationType"
         numberOfRooms:
-          type: integer
+          $ref: "#/components/schemas/accommodationNumberOfRooms"
         source:
-          type: string
+          $ref: "#/components/schemas/listingSource"
         price:
-          type: number
+          $ref: "#/components/schemas/accommodationPrice"
         address:
           $ref: "#/components/schemas/accommodationAddress"
         author:
           $ref: "#/components/schemas/listingAuthor"
         originalListingUrl:
           $ref: "#/components/schemas/listingOriginalUrl"
+        contactInfo:
+          $ref: "#/components/schemas/listingContactInfo"
 
     seekingSummary:
       type: object
@@ -191,6 +209,42 @@ components:
           $ref: "#/components/schemas/listingShortDescription"
         thumbnailUrl:
           $ref: "#/components/schemas/listingThumbnailUrl"
+
+    seekingDetails:
+      type: object
+      required:
+        - isFavourite
+        - seeking
+      properties:
+        isFavourite:
+          $ref: "#/components/schemas/isFavourite"
+        accommodation:
+          $ref: "#/components/schemas/seeking"
+
+    seeking:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - preferredLocation
+        - author
+        - contactInfo
+      properties:
+        id:
+          $ref: "#/components/schemas/listingId"
+        title:
+          $ref: "#/components/schemas/listingTitle"
+        description:
+          $ref: "#/components/schemas/listingDescription"
+        photoUrls:
+          $ref: "#/components/schemas/listingPhotoUrls"
+        preferredLocation:
+          $ref: "#/components/schemas/location"
+        author:
+          $ref: "#/components/schemas/listingAuthor"
+        contactInfo:
+          $ref: "#/components/schemas/listingContactInfo"
 
     listingId:
       type: string
@@ -225,6 +279,38 @@ components:
 
     listingOriginalUrl:
       type: string
+
+    listingContactInfo:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+        email:
+          type: string
+
+    location:
+      type: object
+      required:
+        - name
+        - coordinates
+      properties:
+        name:
+          type: string
+        coordinates:
+          $ref: "#/components/schemas/coordinates"
+
+    coordinates:
+      type: object
+      required:
+        - lat
+        - long
+      properties:
+        lat:
+          type: number
+          description: Latitude
+        long:
+          type: number
+          description: Longitude
 
     accommodationType:
       type: string
