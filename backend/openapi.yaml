@@ -72,7 +72,7 @@ paths:
 components:
   schemas:
     accommodationSearchResults:
-      type: blah
+      type: array
       items:
         type: object
         required:
