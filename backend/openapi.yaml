@@ -127,6 +127,55 @@ paths:
         "404":
           description: Listing not found
 
+  /api/v1/listings/{listingId}/photos:
+    post:
+      summary: Upload new photo for a listing
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+      requestBody:
+        content:
+          image:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "204":
+          description: Photo uploaded successfully. No content to return.
+        "403":
+          description: Forbidden. User has no rights to edit listing photos.
+        "404":
+          description: Listing not found
+
+  /api/v1/listings/{listingId}/photos/{photoId}:
+    get:
+      summary: Get a listing photo
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+        - $ref: "#/components/parameters/photoId"
+      responses:
+        "200":
+          description: OK
+          content:
+            image:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Listing or photo not found
+
+    delete:
+      summary: Delete a listing photo
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+        - $ref: "#/components/parameters/photoId"
+      responses:
+        "204":
+          description: Photo deleted successfully. No content to return.
+        "403":
+          description: Forbidden. User has no rights to edit listing photos.
+        "404":
+          description: Listing or photo not found
+
 components:
   schemas:
     accommodationSearchResults:
@@ -356,6 +405,9 @@ components:
     listingId:
       type: string
 
+    photoId:
+      type: string
+
     listingTitle:
       type: string
 
@@ -546,3 +598,11 @@ components:
       description: ID of the listing to fetch or apply the operation on
       schema:
         $ref: "#/components/schemas/listingId"
+
+    photoId:
+      name: photoId
+      in: path
+      required: true
+      description: ID of the photo to fetch or apply the operation on
+      schema:
+        $ref: "#/components/schemas/photoId"
