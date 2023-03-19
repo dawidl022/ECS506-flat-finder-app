@@ -56,6 +56,31 @@ paths:
         "404":
           description: Listing not found
 
+    put:
+      summary: Update an accommodation listing
+      description: >-
+        Update specified accommodation listing if owner is currently logged in
+        user. Does not allow for updating photos to save bandwidth. Use
+        dedicated photos endpoint for this use case.
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/accommodationFormBase"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/accommodationDetails"
+        "403":
+          description: Forbidden. User has no rights to edit listing.
+        "404":
+          description: Listing not found
+
     delete:
       summary: Delete an accommodation listing
       description: >-
@@ -244,6 +269,29 @@ components:
           $ref: "#/components/schemas/listingDescription"
         photos:
           $ref: "#/components/schemas/listingPhotos"
+        accommodationType:
+          $ref: "#/components/schemas/accommodationType"
+        numberOfRooms:
+          $ref: "#/components/schemas/accommodationNumberOfRooms"
+        price:
+          $ref: "#/components/schemas/accommodationPrice"
+        address:
+          $ref: "#/components/schemas/accommodationAddress"
+
+    accommodationFormBase:
+      type: object
+      required:
+        - title
+        - description
+        - accommodationType
+        - numberOfRooms
+        - price
+        - address
+      properties:
+        title:
+          $ref: "#/components/schemas/listingTitle"
+        description:
+          $ref: "#/components/schemas/listingDescription"
         accommodationType:
           $ref: "#/components/schemas/accommodationType"
         numberOfRooms:
