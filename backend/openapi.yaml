@@ -179,6 +179,23 @@ paths:
         "404":
           description: User not found.
 
+  /api/v1/users/{userId}/listings:
+    get:
+      summary: Get all listings created by a user
+      description: >-
+        Get all accommodation and seeking listings created by given user
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/userListings"
+        "404":
+          description: User not found.
+
   /api/v1/admins/{userId}:
     put:
       summary: Grant admin privileges to user
@@ -545,6 +562,27 @@ components:
       properties:
         phoneNumber:
           type: string
+
+    userListings:
+      type: array
+      description: >-
+        Array containing both seeking and accommodation listings. The listing
+        type can be identified by the 'type' property
+      items:
+        type: object
+        required:
+          - type
+          - listing
+        properties:
+          type:
+            type: string
+            enum:
+              - accommodation
+              - seeking
+          listing:
+            anyOf:
+              - $ref: "#/components/schemas/accommodationSummary"
+              - $ref: "#/components/schemas/seekingSummary"
 
   parameters:
     searchLocation:
