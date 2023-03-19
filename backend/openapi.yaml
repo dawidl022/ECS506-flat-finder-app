@@ -88,9 +88,34 @@ paths:
       description: >-
         Deleting a user deletes all of their data, but does not prevent the
         user with the email address from registering again.
+      parameters:
+        - $ref: "#/components/parameters/userId"
       responses:
         "204":
           description: User deleted successfully. No content to return.
+        "403":
+          description: Forbidden. Logged in user is not an admin.
+
+  /api/v1/admins/{userId}:
+    put:
+      summary: Grant admin privileges to user
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      responses:
+        "204":
+          description: >-
+            User granted admin privileges successfully. No content to return.
+        "403":
+          description: Forbidden. Logged in user is not an admin.
+
+    delete:
+      summary: Revoke admin privileges from user
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      responses:
+        "204":
+          description: >-
+            User revoked admin privileges successfully. No content to return.
         "403":
           description: Forbidden. Logged in user is not an admin.
 
@@ -381,14 +406,20 @@ components:
       required:
         - id
         - email
+        - isAdmin
       properties:
         id:
-          type: string
+          $ref: "#/components/schemas/userId"
         email:
           type: string
           format: email
         name:
           type: string
+        isAdmin:
+          type: boolean
+
+    userId:
+      type: string
 
   parameters:
     searchLocation:
@@ -475,3 +506,11 @@ components:
       description: ID of the listing to fetch or apply the operation on
       schema:
         $ref: "#/components/schemas/listingId"
+
+    userId:
+      name: userId
+      in: path
+      required: true
+      description: ID of the user to fetch or apply the operation on
+      schema:
+        $ref: "#/components/schemas/userId"
