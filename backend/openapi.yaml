@@ -96,6 +96,40 @@ paths:
         "403":
           description: Forbidden. Logged in user is not an admin.
 
+  /api/v1/users/{userId}/profile:
+    get:
+      summary: Get the profile of a user
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/userProfile"
+        "404":
+          description: User with given ID not found.
+    put:
+      summary: Update user profile
+      description:
+        Can be used to both complete for the first time as well as update the
+        profile of the currently logged in user.
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/userProfileForm"
+      responses:
+        "204":
+          description: Profile updated successfully. No content to return.
+        "403":
+          description: Forbidden. Logged in user does not own the profile.
+        "404":
+          description: User with given ID not found.
+
   /api/v1/admins/{userId}:
     put:
       summary: Grant admin privileges to user
@@ -411,15 +445,57 @@ components:
         id:
           $ref: "#/components/schemas/userId"
         email:
-          type: string
-          format: email
+          $ref: "#/components/schemas/userEmail"
         name:
-          type: string
+          $ref: "#/components/schemas/userName"
         isAdmin:
           type: boolean
 
+    userProfile:
+      type: object
+      required:
+        - id
+        - email
+        - name
+        - contactDetails
+      properties:
+        id:
+          $ref: "#/components/schemas/userId"
+        email:
+          $ref: "#/components/schemas/userEmail"
+        name:
+          $ref: "#/components/schemas/userName"
+        contactDetails:
+          $ref: "#/components/schemas/userContactDetails"
+
+    userProfileForm:
+      type: object
+      required:
+        - name
+        - contactDetails
+      properties:
+        name:
+          $ref: "#/components/schemas/userName"
+        contactDetails:
+          $ref: "#/components/schemas/userContactDetails"
+
     userId:
       type: string
+
+    userEmail:
+      type: string
+      format: email
+
+    userName:
+      type: string
+
+    userContactDetails:
+      type: object
+      required:
+        - phoneNumber
+      properties:
+        phoneNumber:
+          type: string
 
   parameters:
     searchLocation:
