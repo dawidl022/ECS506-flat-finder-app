@@ -196,6 +196,63 @@ paths:
         "404":
           description: User not found.
 
+  /api/v1/users/{userId}/favourites:
+    get:
+      summary: Get all listings favourited by a user
+      description: >-
+        Get all accommodation and seeking listings favourited by given user.
+        Favourite lists are private to each user, so only account owner can
+        retrieve this list.
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/userListings"
+        "403":
+          description: Forbidden. Logged in user does not own the favourites list.
+        "404":
+          description: User not found.
+
+  /api/v1/users/{userId}/favourites/{listingId}:
+    put:
+      summary: Add listing to user favourites
+      description: >-
+        Add listing with the given listingId to the user's favourites. This
+        operation is a noop if the user already has the listing in their favourites.
+        Favourite lists are private to each user, so only account owner can
+        add the favourite to the list.
+      parameters:
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/listingId"
+      responses:
+        "204":
+          description: Favourite added. No content to return.
+        "403":
+          description: Forbidden. Logged in user does not own the favourites list.
+        "404":
+          description: User not found.
+    delete:
+      summary: Remove listing from user favourites
+      description: >-
+        Remove listing with the given listingId from the user's favourites. This
+        operation is a noop if the user doesn't have the listing in their favourites.
+        Favourite lists are private to each user, so only account owner can
+        remove the favourite from the list.
+      parameters:
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/listingId"
+      responses:
+        "204":
+          description: Favourite removed. No content to return.
+        "403":
+          description: Forbidden. Logged in user does not own the favourites list.
+        "404":
+          description: User not found.
+
   /api/v1/admins/{userId}:
     put:
       summary: Grant admin privileges to user
