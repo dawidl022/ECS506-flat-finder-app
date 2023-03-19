@@ -112,6 +112,24 @@ paths:
               schema:
                 $ref: "#/components/schemas/seekingSearchResults"
 
+    post:
+      summary: Create a new seeking listing
+      description: >-
+        Create an seeking listing as the currently logged in user.
+        Listing will be made visible to other users.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/seekingForm"
+      responses:
+        "201":
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/seekingDetails"
+
   /api/v1/listings/seeking/{listingId}:
     get:
       summary: Get the details of a seeking listing
@@ -124,6 +142,46 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/seekingDetails"
+        "404":
+          description: Listing not found
+
+    put:
+      summary: Update an seeking listing
+      description: >-
+        Update specified seeking listing if owner is currently logged in
+        user. Does not allow for updating photos to save bandwidth. Use
+        dedicated photos endpoint for this use case.
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/seekingFormBase"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/seekingDetails"
+        "403":
+          description: Forbidden. User has no rights to edit listing.
+        "404":
+          description: Listing not found
+
+    delete:
+      summary: Delete an seeking listing
+      description: >-
+        Delete specified seeking listing if owner is currently logged in
+        user
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+      responses:
+        "204":
+          description: Listing deleted successfully. No content to return.
+        "403":
+          description: Forbidden. User has no rights to delete listing.
         "404":
           description: Listing not found
 
@@ -401,6 +459,36 @@ components:
           $ref: "#/components/schemas/listingAuthor"
         contactInfo:
           $ref: "#/components/schemas/listingContactInfo"
+
+    seekingForm:
+      type: object
+      required:
+        - title
+        - description
+        - preferredLocation
+      properties:
+        title:
+          $ref: "#/components/schemas/listingTitle"
+        description:
+          $ref: "#/components/schemas/listingDescription"
+        photos:
+          $ref: "#/components/schemas/listingPhotos"
+        preferredLocation:
+          $ref: "#/components/schemas/location"
+
+    seekingFormBase:
+      type: object
+      required:
+        - title
+        - description
+        - preferredLocation
+      properties:
+        title:
+          $ref: "#/components/schemas/listingTitle"
+        description:
+          $ref: "#/components/schemas/listingDescription"
+        preferredLocation:
+          $ref: "#/components/schemas/location"
 
     listingId:
       type: string
