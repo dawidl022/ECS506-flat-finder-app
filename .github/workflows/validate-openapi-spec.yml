@@ -6,11 +6,13 @@ on:
       - main
     paths:
       - "backend/openapi.yaml"
+      - ".github/workflows/validate-openapi-spec.yml"
   pull_request:
     branches:
       - main
     paths:
       - "backend/openapi.yaml"
+      - ".github/workflows/validate-openapi-spec.yml"
 
 jobs:
   validate_openapi:
