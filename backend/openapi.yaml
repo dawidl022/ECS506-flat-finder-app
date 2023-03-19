@@ -56,6 +56,21 @@ paths:
         "404":
           description: Listing not found
 
+    delete:
+      summary: Delete an accommodation listing
+      description: >-
+        Delete specified accommodation listing if owner is currently logged in
+        user
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+      responses:
+        "204":
+          description: Listing deleted successfully. No content to return.
+        "403":
+          description: Forbidden. User has no rights to delete listing.
+        "404":
+          description: Listing not found
+
   /api/v1/listings/seeking:
     get:
       summary: Get a list of seeking listings
