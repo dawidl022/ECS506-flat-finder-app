@@ -69,6 +69,31 @@ paths:
         "404":
           description: Listing not found
 
+  /api/v1/users:
+    get:
+      summary: Get all users registered in system
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/usersList"
+        "403":
+          description: Forbidden. Logged in user is not an admin.
+
+  /api/v1/users/{userId}:
+    delete:
+      summary: Delete a user from the system
+      description: >-
+        Deleting a user deletes all of their data, but does not prevent the
+        user with the email address from registering again.
+      responses:
+        "204":
+          description: User deleted successfully. No content to return.
+        "403":
+          description: Forbidden. Logged in user is not an admin.
+
 components:
   schemas:
     accommodationSearchResults:
@@ -344,6 +369,25 @@ components:
         town:
           type: string
         postCode:
+          type: string
+
+    usersList:
+      type: array
+      items:
+        $ref: "#/components/schemas/user"
+
+    user:
+      type: object
+      required:
+        - id
+        - email
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        name:
           type: string
 
   parameters:
