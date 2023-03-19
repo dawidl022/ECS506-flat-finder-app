@@ -130,6 +130,55 @@ paths:
         "404":
           description: User with given ID not found.
 
+  /api/v1/users/{userId}/profile/photo:
+    get:
+      summary: Get the profile picture of a user
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      responses:
+        "200":
+          description: OK
+          content:
+            image:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: User or profile photo not found.
+
+    put:
+      summary: Upload the user's profile picture
+      description:
+        Can be used to both upload for the first time as well as update the
+        profile photo of the currently logged in user.
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      requestBody:
+        content:
+          image:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "204":
+          description: Photo updated. No content to return.
+        "403":
+          description: Forbidden. Logged in user does not own the profile.
+        "404":
+          description: User not found.
+
+    delete:
+      summary: Delete the user's profile picture
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      responses:
+        "204":
+          description: Photo deleted successfully. No content to return.
+        "403":
+          description: Forbidden. Logged in user does not own the profile.
+        "404":
+          description: User not found.
+
   /api/v1/admins/{userId}:
     put:
       summary: Grant admin privileges to user
