@@ -97,6 +97,25 @@ paths:
           description: Forbidden. Logged in user is not an admin.
 
   /api/v1/admins/{userId}:
+    get:
+      summary: Check if user has admin privileges
+      description: >-
+        Check if user with given id has admin privileges. Can be called by the 
+        if the userId parameter matches the logged in user's userId. Admins
+        can always call this endpoint.
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      responses:
+        "204":
+          description: >-
+            User has admin privileges. No content to return.
+        "403":
+          description: >-
+            Forbidden. Logged in user is neither the account owner nor an admin.
+        "404":
+          description: >-
+            User does not have admin privileges or does not exist.
+
     put:
       summary: Grant admin privileges to user
       parameters:
