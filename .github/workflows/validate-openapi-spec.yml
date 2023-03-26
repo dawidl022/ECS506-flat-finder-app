@@ -6,22 +6,48 @@ on:
       - main
     paths:
       - "backend/openapi.yaml"
+      - "client/src/generated"
       - ".github/workflows/validate-openapi-spec.yml"
   pull_request:
     branches:
       - main
     paths:
       - "backend/openapi.yaml"
+      - "client/src/generated"
       - ".github/workflows/validate-openapi-spec.yml"
 
 jobs:
   validate_openapi:
     runs-on: ubuntu-latest
-    name: Swagger Editor Validator Remote
+    name: Validate OpenAPI spec
 
     steps:
       - uses: actions/checkout@v2
+
       - name: Validate OpenAPI definition
         uses: char0n/swagger-editor-validate@v1
         with:
           definition-file: backend/openapi.yaml
+
+  validate_client_codegen:
+    runs-on: ubuntu-latest
+    name: Validate OpenAPI generated client code
+    needs: validate_openapi
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install npm dependencies
+        working-directory: client
+        run: npm install
+
+      - name: Generate OpenAPI client code
+        working-directory: client
+        run: npm run openapi:gen
+
+      - name: Compare generated files with HEAD
+        run: git diff --exit-code
