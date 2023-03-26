@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "openapi:gen": "openapi-generator-cli generate -i ../backend/openapi.yaml -g typescript-fetch -o src/generated"
+    "openapi:gen": "rm -rf src/generated && openapi-generator-cli generate -i ../backend/openapi.yaml -g typescript-fetch -o src/generated"
   },
   "dependencies": {
     "@next/font": "13.1.6",
