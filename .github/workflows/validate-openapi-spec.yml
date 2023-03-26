@@ -45,7 +45,7 @@ jobs:
 
       - name: Install npm dependencies
         working-directory: client
-        run: npm ci
+        run: npm install
 
       - name: Generate OpenAPI client code
         working-directory: client
