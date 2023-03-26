@@ -15,7 +15,7 @@ on:
       - ".github/workflows/**"
 
 jobs:
-  typecheck_and_test:
+  build_and_format:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,6 +31,7 @@ jobs:
         run: npm install
 
       - name: Build frontend
+        working-directory: client
         run: npm run build
 
       - name: Check formatting
