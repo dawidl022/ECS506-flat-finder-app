@@ -50,4 +50,4 @@ jobs:
         run: npm run openapi:gen
 
       - name: Compare generated files with HEAD
-        run: git diff --exit-code
+        run: '[ -z "$(git status --porcelain)" ]'
