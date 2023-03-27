@@ -1,0 +1,12 @@
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    # Workflow does nothing as it's only in place to enable the "Require
+    # branches to be up to date before merging" check on GitHub as it requires
+    # at least 1 status check to run.
