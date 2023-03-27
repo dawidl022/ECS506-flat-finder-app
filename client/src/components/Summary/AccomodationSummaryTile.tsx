@@ -1,7 +1,8 @@
 import { FC } from 'react';
 import Link from 'next/link';
-//import from generated/models
-import AccomodationSummary  from '../../generated/models/AccomodationSummary';
+//import from generated/models for AccomodationSummary
+import AccomodationSummary from '../../generated/models/AccommodationSummary';
+
 interface accomodationSummaryProps {
     accomodation: AccomodationSummary;
 }
@@ -16,6 +17,8 @@ const AccomodationSummaryTile: FC<accomodationSummaryProps> = ({ accomodation })
                 <p> { accomodation.shortDescription } </p>
                 <p> { accomodation.accommodationType } </p>
                 <p> { accomodation.numberOfRooms } </p>
+                <p> { accomodation.postCode }  </p>
+                <p> { accomodation.source } </p>
             </Link>
         </div>
     );
