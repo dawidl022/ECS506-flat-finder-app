@@ -96,6 +96,163 @@ paths:
         "403":
           description: Forbidden. Logged in user is not an admin.
 
+  /api/v1/users/{userId}/profile:
+    get:
+      summary: Get the profile of a user
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/userProfile"
+        "404":
+          description: User with given ID not found.
+    put:
+      summary: Update user profile
+      description:
+        Can be used to both complete for the first time as well as update the
+        profile of the currently logged in user.
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/userProfileForm"
+      responses:
+        "204":
+          description: Profile updated successfully. No content to return.
+        "403":
+          description: Forbidden. Logged in user does not own the profile.
+        "404":
+          description: User with given ID not found.
+
+  /api/v1/users/{userId}/profile/photo:
+    get:
+      summary: Get the profile picture of a user
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      responses:
+        "200":
+          description: OK
+          content:
+            image:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: User or profile photo not found.
+
+    put:
+      summary: Upload the user's profile picture
+      description:
+        Can be used to both upload for the first time as well as update the
+        profile photo of the currently logged in user.
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      requestBody:
+        content:
+          image:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "204":
+          description: Photo updated. No content to return.
+        "403":
+          description: Forbidden. Logged in user does not own the profile.
+        "404":
+          description: User not found.
+
+    delete:
+      summary: Delete the user's profile picture
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      responses:
+        "204":
+          description: Photo deleted successfully. No content to return.
+        "403":
+          description: Forbidden. Logged in user does not own the profile.
+        "404":
+          description: User not found.
+
+  /api/v1/users/{userId}/listings:
+    get:
+      summary: Get all listings created by a user
+      description: >-
+        Get all accommodation and seeking listings created by given user
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/userListings"
+        "404":
+          description: User not found.
+
+  /api/v1/users/{userId}/favourites:
+    get:
+      summary: Get all listings favourited by a user
+      description: >-
+        Get all accommodation and seeking listings favourited by given user.
+        Favourite lists are private to each user, so only account owner can
+        retrieve this list.
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/userListings"
+        "403":
+          description: Forbidden. Logged in user does not own the favourites list.
+        "404":
+          description: User not found.
+
+  /api/v1/users/{userId}/favourites/{listingId}:
+    put:
+      summary: Add listing to user favourites
+      description: >-
+        Add listing with the given listingId to the user's favourites. This
+        operation is a noop if the user already has the listing in their favourites.
+        Favourite lists are private to each user, so only account owner can
+        add the favourite to the list.
+      parameters:
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/listingId"
+      responses:
+        "204":
+          description: Favourite added. No content to return.
+        "403":
+          description: Forbidden. Logged in user does not own the favourites list.
+        "404":
+          description: User not found.
+    delete:
+      summary: Remove listing from user favourites
+      description: >-
+        Remove listing with the given listingId from the user's favourites. This
+        operation is a noop if the user doesn't have the listing in their favourites.
+        Favourite lists are private to each user, so only account owner can
+        remove the favourite from the list.
+      parameters:
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/listingId"
+      responses:
+        "204":
+          description: Favourite removed. No content to return.
+        "403":
+          description: Forbidden. Logged in user does not own the favourites list.
+        "404":
+          description: User not found.
+
   /api/v1/admins/{userId}:
     get:
       summary: Check if user has admin privileges
@@ -115,7 +272,6 @@ paths:
         "404":
           description: >-
             User does not have admin privileges or does not exist.
-
     put:
       summary: Grant admin privileges to user
       parameters:
@@ -430,15 +586,78 @@ components:
         id:
           $ref: "#/components/schemas/userId"
         email:
-          type: string
-          format: email
+          $ref: "#/components/schemas/userEmail"
         name:
-          type: string
+          $ref: "#/components/schemas/userName"
         isAdmin:
           type: boolean
 
+    userProfile:
+      type: object
+      required:
+        - id
+        - email
+        - name
+        - contactDetails
+      properties:
+        id:
+          $ref: "#/components/schemas/userId"
+        email:
+          $ref: "#/components/schemas/userEmail"
+        name:
+          $ref: "#/components/schemas/userName"
+        contactDetails:
+          $ref: "#/components/schemas/userContactDetails"
+
+    userProfileForm:
+      type: object
+      required:
+        - name
+        - contactDetails
+      properties:
+        name:
+          $ref: "#/components/schemas/userName"
+        contactDetails:
+          $ref: "#/components/schemas/userContactDetails"
+
     userId:
       type: string
+
+    userEmail:
+      type: string
+      format: email
+
+    userName:
+      type: string
+
+    userContactDetails:
+      type: object
+      required:
+        - phoneNumber
+      properties:
+        phoneNumber:
+          type: string
+
+    userListings:
+      type: array
+      description: >-
+        Array containing both seeking and accommodation listings. The listing
+        type can be identified by the 'type' property
+      items:
+        type: object
+        required:
+          - type
+          - listing
+        properties:
+          type:
+            type: string
+            enum:
+              - accommodation
+              - seeking
+          listing:
+            anyOf:
+              - $ref: "#/components/schemas/accommodationSummary"
+              - $ref: "#/components/schemas/seekingSummary"
 
   parameters:
     searchLocation:
