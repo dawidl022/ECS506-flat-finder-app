@@ -18,7 +18,7 @@ import { exists, mapValues } from '../runtime';
  * @export
  * @interface AccommodationSummary
  */
-export default interface AccommodationSummary {
+export interface AccommodationSummary {
     /**
      * 
      * @type {string}
