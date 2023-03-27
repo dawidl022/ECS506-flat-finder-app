@@ -1,10 +1,7 @@
 import { FC } from 'react';
 import Link from 'next/link';
-//import from generated/models for AccomodationSummary
 import { AccommodationSummary } from '@/generated/models/AccommodationSummary';
 
-//where is this file
- 
 interface accomodationSummaryProps {
     accomodation: AccommodationSummary;
 }
