@@ -1,5 +1,1 @@
-from flask import Blueprint
-
-bp = Blueprint('listings', __name__)
-
-from app.listings import routes
+from .routes import bp as listings_bp

@@ -1,4 +1,6 @@
-from app.listings import bp
+from flask import Blueprint
+
+bp = Blueprint('listings', __name__)
 
 
 @bp.route('/')

@@ -9,7 +9,7 @@ def create_app(config_class=Config) -> Flask:
     # Initialize Flask extensions here
 
     # Register blueprints
-    from app.listings import bp as listings_bp
+    from app.listings import listings_bp
     app.register_blueprint(listings_bp)
 
     return app
