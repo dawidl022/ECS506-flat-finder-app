@@ -1,10 +1,12 @@
+name: Enable branch up to date with main check
+
 on:
   pull_request:
     branches:
       - main
 
 jobs:
-  check:
+  check_branch_up_to_date:
     runs-on: ubuntu-latest
 
     steps:
