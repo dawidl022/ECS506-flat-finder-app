@@ -2,5 +2,5 @@ from app.listings import bp
 
 
 @bp.route('/')
-def index():
+def index() -> str:
     return "Hello world!"
