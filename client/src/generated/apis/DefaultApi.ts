@@ -59,6 +59,10 @@ export interface ApiV1AdminsUserIdDeleteRequest {
     userId: string;
 }
 
+export interface ApiV1AdminsUserIdGetRequest {
+    userId: string;
+}
+
 export interface ApiV1AdminsUserIdPutRequest {
     userId: string;
 }
@@ -214,6 +218,37 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async apiV1AdminsUserIdDelete(requestParameters: ApiV1AdminsUserIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.apiV1AdminsUserIdDeleteRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Check if user with given id has admin privileges. Can be called by the  if the userId parameter matches the logged in user\'s userId. Admins can always call this endpoint.
+     * Check if user has admin privileges
+     */
+    async apiV1AdminsUserIdGetRaw(requestParameters: ApiV1AdminsUserIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1AdminsUserIdGet.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/admins/{userId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Check if user with given id has admin privileges. Can be called by the  if the userId parameter matches the logged in user\'s userId. Admins can always call this endpoint.
+     * Check if user has admin privileges
+     */
+    async apiV1AdminsUserIdGet(requestParameters: ApiV1AdminsUserIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1AdminsUserIdGetRaw(requestParameters, initOverrides);
     }
 
     /**
