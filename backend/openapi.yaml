@@ -23,6 +23,24 @@ paths:
               schema:
                 $ref: "#/components/schemas/accommodationSearchResults"
 
+    post:
+      summary: Create a new accommodation listing
+      description: >-
+        Create an accommodation listing as the currently logged in user.
+        Listing will be made visible to other users.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/accommodationForm"
+      responses:
+        "201":
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/accommodationDetails"
+
   /api/v1/listings/accommodation/{listingId}:
     get:
       summary: Get the details of an accommodation listing
@@ -35,6 +53,46 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/accommodationDetails"
+        "404":
+          description: Listing not found
+
+    put:
+      summary: Update an accommodation listing
+      description: >-
+        Update specified accommodation listing if owner is currently logged in
+        user. Does not allow for updating photos to save bandwidth. Use
+        dedicated photos endpoint for this use case.
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/accommodationFormBase"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/accommodationDetails"
+        "403":
+          description: Forbidden. User has no rights to edit listing.
+        "404":
+          description: Listing not found
+
+    delete:
+      summary: Delete an accommodation listing
+      description: >-
+        Delete specified accommodation listing if owner is currently logged in
+        user
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+      responses:
+        "204":
+          description: Listing deleted successfully. No content to return.
+        "403":
+          description: Forbidden. User has no rights to delete listing.
         "404":
           description: Listing not found
 
@@ -54,6 +112,24 @@ paths:
               schema:
                 $ref: "#/components/schemas/seekingSearchResults"
 
+    post:
+      summary: Create a new seeking listing
+      description: >-
+        Create an seeking listing as the currently logged in user.
+        Listing will be made visible to other users.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/seekingForm"
+      responses:
+        "201":
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/seekingDetails"
+
   /api/v1/listings/seeking/{listingId}:
     get:
       summary: Get the details of a seeking listing
@@ -68,6 +144,95 @@ paths:
                 $ref: "#/components/schemas/seekingDetails"
         "404":
           description: Listing not found
+
+    put:
+      summary: Update an seeking listing
+      description: >-
+        Update specified seeking listing if owner is currently logged in
+        user. Does not allow for updating photos to save bandwidth. Use
+        dedicated photos endpoint for this use case.
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/seekingFormBase"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/seekingDetails"
+        "403":
+          description: Forbidden. User has no rights to edit listing.
+        "404":
+          description: Listing not found
+
+    delete:
+      summary: Delete a seeking listing
+      description: >-
+        Delete specified seeking listing if owner is currently logged in
+        user
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+      responses:
+        "204":
+          description: Listing deleted successfully. No content to return.
+        "403":
+          description: Forbidden. User has no rights to delete listing.
+        "404":
+          description: Listing not found
+
+  /api/v1/listings/{listingId}/photos:
+    post:
+      summary: Upload new photo for a listing
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+      requestBody:
+        content:
+          image:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "204":
+          description: Photo uploaded successfully. No content to return.
+        "403":
+          description: Forbidden. User has no rights to edit listing photos.
+        "404":
+          description: Listing not found
+
+  /api/v1/listings/{listingId}/photos/{photoId}:
+    get:
+      summary: Get a listing photo
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+        - $ref: "#/components/parameters/photoId"
+      responses:
+        "200":
+          description: OK
+          content:
+            image:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Listing or photo not found
+
+    delete:
+      summary: Delete a listing photo
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+        - $ref: "#/components/parameters/photoId"
+      responses:
+        "204":
+          description: Photo deleted successfully. No content to return.
+        "403":
+          description: Forbidden. User has no rights to edit listing photos.
+        "404":
+          description: Listing or photo not found
 
   /api/v1/users:
     get:
@@ -272,6 +437,7 @@ paths:
         "404":
           description: >-
             User does not have admin privileges or does not exist.
+
     put:
       summary: Grant admin privileges to user
       parameters:
@@ -419,6 +585,55 @@ components:
         contactInfo:
           $ref: "#/components/schemas/listingContactInfo"
 
+    accommodationForm:
+      type: object
+      required:
+        - title
+        - description
+        - photos
+        - accommodationType
+        - numberOfRooms
+        - price
+        - address
+      properties:
+        title:
+          $ref: "#/components/schemas/listingTitle"
+        description:
+          $ref: "#/components/schemas/listingDescription"
+        photos:
+          $ref: "#/components/schemas/listingPhotos"
+        accommodationType:
+          $ref: "#/components/schemas/accommodationType"
+        numberOfRooms:
+          $ref: "#/components/schemas/accommodationNumberOfRooms"
+        price:
+          $ref: "#/components/schemas/accommodationPrice"
+        address:
+          $ref: "#/components/schemas/accommodationAddress"
+
+    accommodationFormBase:
+      type: object
+      required:
+        - title
+        - description
+        - accommodationType
+        - numberOfRooms
+        - price
+        - address
+      properties:
+        title:
+          $ref: "#/components/schemas/listingTitle"
+        description:
+          $ref: "#/components/schemas/listingDescription"
+        accommodationType:
+          $ref: "#/components/schemas/accommodationType"
+        numberOfRooms:
+          $ref: "#/components/schemas/accommodationNumberOfRooms"
+        price:
+          $ref: "#/components/schemas/accommodationPrice"
+        address:
+          $ref: "#/components/schemas/accommodationAddress"
+
     seekingSummary:
       type: object
       required:
@@ -471,7 +686,40 @@ components:
         contactInfo:
           $ref: "#/components/schemas/listingContactInfo"
 
+    seekingForm:
+      type: object
+      required:
+        - title
+        - description
+        - preferredLocation
+      properties:
+        title:
+          $ref: "#/components/schemas/listingTitle"
+        description:
+          $ref: "#/components/schemas/listingDescription"
+        photos:
+          $ref: "#/components/schemas/listingPhotos"
+        preferredLocation:
+          $ref: "#/components/schemas/location"
+
+    seekingFormBase:
+      type: object
+      required:
+        - title
+        - description
+        - preferredLocation
+      properties:
+        title:
+          $ref: "#/components/schemas/listingTitle"
+        description:
+          $ref: "#/components/schemas/listingDescription"
+        preferredLocation:
+          $ref: "#/components/schemas/location"
+
     listingId:
+      type: string
+
+    photoId:
       type: string
 
     listingTitle:
@@ -493,6 +741,14 @@ components:
       type: array
       items:
         type: string
+
+    listingPhotos:
+      type: array
+      items:
+        type: string
+        format: binary
+      minItems: 1
+      maxItems: 15
 
     listingAuthor:
       type: object
@@ -744,6 +1000,14 @@ components:
       description: ID of the listing to fetch or apply the operation on
       schema:
         $ref: "#/components/schemas/listingId"
+
+    photoId:
+      name: photoId
+      in: path
+      required: true
+      description: ID of the photo to fetch or apply the operation on
+      schema:
+        $ref: "#/components/schemas/photoId"
 
     userId:
       name: userId
