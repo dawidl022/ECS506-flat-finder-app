@@ -10,7 +10,7 @@ interface AccommodationDetailsProps {
 const AccommodationDetails: FC<AccommodationDetailsProps> = ({ 
     listingId 
 }) => {
-    const [data, setData] = useState<AccommodationDetailsModel | null>(null);;
+    const [data, setData] = useState<AccommodationDetailsModel | null>(null);
     const [error, setError] = useState(false);
     const { title, description, accommodationType, numberOfRooms, source, price, address, originalListingUrl, contactInfo } = data?.accommodation ?? {};
 
