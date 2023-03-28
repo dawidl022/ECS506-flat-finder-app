@@ -27,7 +27,7 @@ const AccommodationDetails: FC<AccommodationDetailsProps> = ({ listingId }) => {
       .apiV1ListingsAccommodationListingIdGet({
         listingId: listingId,
       })
-      .then(res => setData(res as AccommodationDetailsModel))
+      .then(res => setData(res))
       .catch(() => setError(true));
   }, [listingId]);
 
