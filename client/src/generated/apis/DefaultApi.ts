@@ -15,21 +15,57 @@
 
 import * as runtime from '../runtime';
 import type {
+  AccommodationAddress,
   AccommodationDetails,
+  AccommodationFormBase,
   AccommodationSearchResultsInner,
+  Location,
   SeekingDetails,
+  SeekingFormBase,
   SeekingSearchResultsInner,
+  User,
+  UserListingsInner,
+  UserProfile,
+  UserProfileForm,
 } from '../models';
 import {
+    AccommodationAddressFromJSON,
+    AccommodationAddressToJSON,
     AccommodationDetailsFromJSON,
     AccommodationDetailsToJSON,
+    AccommodationFormBaseFromJSON,
+    AccommodationFormBaseToJSON,
     AccommodationSearchResultsInnerFromJSON,
     AccommodationSearchResultsInnerToJSON,
+    LocationFromJSON,
+    LocationToJSON,
     SeekingDetailsFromJSON,
     SeekingDetailsToJSON,
+    SeekingFormBaseFromJSON,
+    SeekingFormBaseToJSON,
     SeekingSearchResultsInnerFromJSON,
     SeekingSearchResultsInnerToJSON,
+    UserFromJSON,
+    UserToJSON,
+    UserListingsInnerFromJSON,
+    UserListingsInnerToJSON,
+    UserProfileFromJSON,
+    UserProfileToJSON,
+    UserProfileFormFromJSON,
+    UserProfileFormToJSON,
 } from '../models';
+
+export interface ApiV1AdminsUserIdDeleteRequest {
+    userId: string;
+}
+
+export interface ApiV1AdminsUserIdGetRequest {
+    userId: string;
+}
+
+export interface ApiV1AdminsUserIdPutRequest {
+    userId: string;
+}
 
 export interface ApiV1ListingsAccommodationGetRequest {
     location: string;
@@ -41,8 +77,42 @@ export interface ApiV1ListingsAccommodationGetRequest {
     size?: number;
 }
 
+export interface ApiV1ListingsAccommodationListingIdDeleteRequest {
+    listingId: string;
+}
+
 export interface ApiV1ListingsAccommodationListingIdGetRequest {
     listingId: string;
+}
+
+export interface ApiV1ListingsAccommodationListingIdPutRequest {
+    listingId: string;
+    accommodationFormBase?: AccommodationFormBase;
+}
+
+export interface ApiV1ListingsAccommodationPostRequest {
+    title: string;
+    description: string;
+    photos: Array<Blob>;
+    accommodationType: string;
+    numberOfRooms: number;
+    price: number;
+    address: AccommodationAddress;
+}
+
+export interface ApiV1ListingsListingIdPhotosPhotoIdDeleteRequest {
+    listingId: string;
+    photoId: string;
+}
+
+export interface ApiV1ListingsListingIdPhotosPhotoIdGetRequest {
+    listingId: string;
+    photoId: string;
+}
+
+export interface ApiV1ListingsListingIdPhotosPostRequest {
+    listingId: string;
+    body?: Blob;
 }
 
 export interface ApiV1ListingsSeekingGetRequest {
@@ -52,14 +122,163 @@ export interface ApiV1ListingsSeekingGetRequest {
     size?: number;
 }
 
+export interface ApiV1ListingsSeekingListingIdDeleteRequest {
+    listingId: string;
+}
+
 export interface ApiV1ListingsSeekingListingIdGetRequest {
     listingId: string;
+}
+
+export interface ApiV1ListingsSeekingListingIdPutRequest {
+    listingId: string;
+    seekingFormBase?: SeekingFormBase;
+}
+
+export interface ApiV1ListingsSeekingPostRequest {
+    title: string;
+    description: string;
+    preferredLocation: Location;
+    photos?: Array<Blob>;
+}
+
+export interface ApiV1UsersUserIdDeleteRequest {
+    userId: string;
+}
+
+export interface ApiV1UsersUserIdFavouritesGetRequest {
+    userId: string;
+}
+
+export interface ApiV1UsersUserIdFavouritesListingIdDeleteRequest {
+    userId: string;
+    listingId: string;
+}
+
+export interface ApiV1UsersUserIdFavouritesListingIdPutRequest {
+    userId: string;
+    listingId: string;
+}
+
+export interface ApiV1UsersUserIdListingsGetRequest {
+    userId: string;
+}
+
+export interface ApiV1UsersUserIdProfileGetRequest {
+    userId: string;
+}
+
+export interface ApiV1UsersUserIdProfilePhotoDeleteRequest {
+    userId: string;
+}
+
+export interface ApiV1UsersUserIdProfilePhotoGetRequest {
+    userId: string;
+}
+
+export interface ApiV1UsersUserIdProfilePhotoPutRequest {
+    userId: string;
+    body?: Blob;
+}
+
+export interface ApiV1UsersUserIdProfilePutRequest {
+    userId: string;
+    userProfileForm?: UserProfileForm;
 }
 
 /**
  * 
  */
 export class DefaultApi extends runtime.BaseAPI {
+
+    /**
+     * Revoke admin privileges from user
+     */
+    async apiV1AdminsUserIdDeleteRaw(requestParameters: ApiV1AdminsUserIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1AdminsUserIdDelete.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/admins/{userId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Revoke admin privileges from user
+     */
+    async apiV1AdminsUserIdDelete(requestParameters: ApiV1AdminsUserIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1AdminsUserIdDeleteRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Check if user with given id has admin privileges. Can be called by the  if the userId parameter matches the logged in user\'s userId. Admins can always call this endpoint.
+     * Check if user has admin privileges
+     */
+    async apiV1AdminsUserIdGetRaw(requestParameters: ApiV1AdminsUserIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1AdminsUserIdGet.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/admins/{userId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Check if user with given id has admin privileges. Can be called by the  if the userId parameter matches the logged in user\'s userId. Admins can always call this endpoint.
+     * Check if user has admin privileges
+     */
+    async apiV1AdminsUserIdGet(requestParameters: ApiV1AdminsUserIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1AdminsUserIdGetRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Grant admin privileges to user
+     */
+    async apiV1AdminsUserIdPutRaw(requestParameters: ApiV1AdminsUserIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1AdminsUserIdPut.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/admins/{userId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Grant admin privileges to user
+     */
+    async apiV1AdminsUserIdPut(requestParameters: ApiV1AdminsUserIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1AdminsUserIdPutRaw(requestParameters, initOverrides);
+    }
 
     /**
      * Get a list of accommodation listings, optionally filtered and sorted
@@ -124,6 +343,37 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * Delete specified accommodation listing if owner is currently logged in user
+     * Delete an accommodation listing
+     */
+    async apiV1ListingsAccommodationListingIdDeleteRaw(requestParameters: ApiV1ListingsAccommodationListingIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.listingId === null || requestParameters.listingId === undefined) {
+            throw new runtime.RequiredError('listingId','Required parameter requestParameters.listingId was null or undefined when calling apiV1ListingsAccommodationListingIdDelete.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/listings/accommodation/{listingId}`.replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Delete specified accommodation listing if owner is currently logged in user
+     * Delete an accommodation listing
+     */
+    async apiV1ListingsAccommodationListingIdDelete(requestParameters: ApiV1ListingsAccommodationListingIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1ListingsAccommodationListingIdDeleteRaw(requestParameters, initOverrides);
+    }
+
+    /**
      * Get the details of an accommodation listing
      */
     async apiV1ListingsAccommodationListingIdGetRaw(requestParameters: ApiV1ListingsAccommodationListingIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccommodationDetails>> {
@@ -151,6 +401,243 @@ export class DefaultApi extends runtime.BaseAPI {
     async apiV1ListingsAccommodationListingIdGet(requestParameters: ApiV1ListingsAccommodationListingIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccommodationDetails> {
         const response = await this.apiV1ListingsAccommodationListingIdGetRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Update specified accommodation listing if owner is currently logged in user. Does not allow for updating photos to save bandwidth. Use dedicated photos endpoint for this use case.
+     * Update an accommodation listing
+     */
+    async apiV1ListingsAccommodationListingIdPutRaw(requestParameters: ApiV1ListingsAccommodationListingIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccommodationDetails>> {
+        if (requestParameters.listingId === null || requestParameters.listingId === undefined) {
+            throw new runtime.RequiredError('listingId','Required parameter requestParameters.listingId was null or undefined when calling apiV1ListingsAccommodationListingIdPut.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/v1/listings/accommodation/{listingId}`.replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: AccommodationFormBaseToJSON(requestParameters.accommodationFormBase),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AccommodationDetailsFromJSON(jsonValue));
+    }
+
+    /**
+     * Update specified accommodation listing if owner is currently logged in user. Does not allow for updating photos to save bandwidth. Use dedicated photos endpoint for this use case.
+     * Update an accommodation listing
+     */
+    async apiV1ListingsAccommodationListingIdPut(requestParameters: ApiV1ListingsAccommodationListingIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccommodationDetails> {
+        const response = await this.apiV1ListingsAccommodationListingIdPutRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Create an accommodation listing as the currently logged in user. Listing will be made visible to other users.
+     * Create a new accommodation listing
+     */
+    async apiV1ListingsAccommodationPostRaw(requestParameters: ApiV1ListingsAccommodationPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccommodationDetails>> {
+        if (requestParameters.title === null || requestParameters.title === undefined) {
+            throw new runtime.RequiredError('title','Required parameter requestParameters.title was null or undefined when calling apiV1ListingsAccommodationPost.');
+        }
+
+        if (requestParameters.description === null || requestParameters.description === undefined) {
+            throw new runtime.RequiredError('description','Required parameter requestParameters.description was null or undefined when calling apiV1ListingsAccommodationPost.');
+        }
+
+        if (requestParameters.photos === null || requestParameters.photos === undefined) {
+            throw new runtime.RequiredError('photos','Required parameter requestParameters.photos was null or undefined when calling apiV1ListingsAccommodationPost.');
+        }
+
+        if (requestParameters.accommodationType === null || requestParameters.accommodationType === undefined) {
+            throw new runtime.RequiredError('accommodationType','Required parameter requestParameters.accommodationType was null or undefined when calling apiV1ListingsAccommodationPost.');
+        }
+
+        if (requestParameters.numberOfRooms === null || requestParameters.numberOfRooms === undefined) {
+            throw new runtime.RequiredError('numberOfRooms','Required parameter requestParameters.numberOfRooms was null or undefined when calling apiV1ListingsAccommodationPost.');
+        }
+
+        if (requestParameters.price === null || requestParameters.price === undefined) {
+            throw new runtime.RequiredError('price','Required parameter requestParameters.price was null or undefined when calling apiV1ListingsAccommodationPost.');
+        }
+
+        if (requestParameters.address === null || requestParameters.address === undefined) {
+            throw new runtime.RequiredError('address','Required parameter requestParameters.address was null or undefined when calling apiV1ListingsAccommodationPost.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters.title !== undefined) {
+            formParams.append('title', requestParameters.title as any);
+        }
+
+        if (requestParameters.description !== undefined) {
+            formParams.append('description', requestParameters.description as any);
+        }
+
+        if (requestParameters.photos) {
+            requestParameters.photos.forEach((element) => {
+                formParams.append('photos', element as any);
+            })
+        }
+
+        if (requestParameters.accommodationType !== undefined) {
+            formParams.append('accommodationType', requestParameters.accommodationType as any);
+        }
+
+        if (requestParameters.numberOfRooms !== undefined) {
+            formParams.append('numberOfRooms', requestParameters.numberOfRooms as any);
+        }
+
+        if (requestParameters.price !== undefined) {
+            formParams.append('price', requestParameters.price as any);
+        }
+
+        if (requestParameters.address !== undefined) {
+            formParams.append('address', new Blob([JSON.stringify(AccommodationAddressToJSON(requestParameters.address))], { type: "application/json", }));
+                    }
+
+        const response = await this.request({
+            path: `/api/v1/listings/accommodation`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AccommodationDetailsFromJSON(jsonValue));
+    }
+
+    /**
+     * Create an accommodation listing as the currently logged in user. Listing will be made visible to other users.
+     * Create a new accommodation listing
+     */
+    async apiV1ListingsAccommodationPost(requestParameters: ApiV1ListingsAccommodationPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccommodationDetails> {
+        const response = await this.apiV1ListingsAccommodationPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Delete a listing photo
+     */
+    async apiV1ListingsListingIdPhotosPhotoIdDeleteRaw(requestParameters: ApiV1ListingsListingIdPhotosPhotoIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.listingId === null || requestParameters.listingId === undefined) {
+            throw new runtime.RequiredError('listingId','Required parameter requestParameters.listingId was null or undefined when calling apiV1ListingsListingIdPhotosPhotoIdDelete.');
+        }
+
+        if (requestParameters.photoId === null || requestParameters.photoId === undefined) {
+            throw new runtime.RequiredError('photoId','Required parameter requestParameters.photoId was null or undefined when calling apiV1ListingsListingIdPhotosPhotoIdDelete.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/listings/{listingId}/photos/{photoId}`.replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))).replace(`{${"photoId"}}`, encodeURIComponent(String(requestParameters.photoId))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Delete a listing photo
+     */
+    async apiV1ListingsListingIdPhotosPhotoIdDelete(requestParameters: ApiV1ListingsListingIdPhotosPhotoIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1ListingsListingIdPhotosPhotoIdDeleteRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Get a listing photo
+     */
+    async apiV1ListingsListingIdPhotosPhotoIdGetRaw(requestParameters: ApiV1ListingsListingIdPhotosPhotoIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Blob>> {
+        if (requestParameters.listingId === null || requestParameters.listingId === undefined) {
+            throw new runtime.RequiredError('listingId','Required parameter requestParameters.listingId was null or undefined when calling apiV1ListingsListingIdPhotosPhotoIdGet.');
+        }
+
+        if (requestParameters.photoId === null || requestParameters.photoId === undefined) {
+            throw new runtime.RequiredError('photoId','Required parameter requestParameters.photoId was null or undefined when calling apiV1ListingsListingIdPhotosPhotoIdGet.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/listings/{listingId}/photos/{photoId}`.replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))).replace(`{${"photoId"}}`, encodeURIComponent(String(requestParameters.photoId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.BlobApiResponse(response);
+    }
+
+    /**
+     * Get a listing photo
+     */
+    async apiV1ListingsListingIdPhotosPhotoIdGet(requestParameters: ApiV1ListingsListingIdPhotosPhotoIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Blob> {
+        const response = await this.apiV1ListingsListingIdPhotosPhotoIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Upload new photo for a listing
+     */
+    async apiV1ListingsListingIdPhotosPostRaw(requestParameters: ApiV1ListingsListingIdPhotosPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.listingId === null || requestParameters.listingId === undefined) {
+            throw new runtime.RequiredError('listingId','Required parameter requestParameters.listingId was null or undefined when calling apiV1ListingsListingIdPhotosPost.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'image';
+
+        const response = await this.request({
+            path: `/api/v1/listings/{listingId}/photos`.replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: requestParameters.body as any,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Upload new photo for a listing
+     */
+    async apiV1ListingsListingIdPhotosPost(requestParameters: ApiV1ListingsListingIdPhotosPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1ListingsListingIdPhotosPostRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -204,6 +691,37 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * Delete specified seeking listing if owner is currently logged in user
+     * Delete a seeking listing
+     */
+    async apiV1ListingsSeekingListingIdDeleteRaw(requestParameters: ApiV1ListingsSeekingListingIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.listingId === null || requestParameters.listingId === undefined) {
+            throw new runtime.RequiredError('listingId','Required parameter requestParameters.listingId was null or undefined when calling apiV1ListingsSeekingListingIdDelete.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/listings/seeking/{listingId}`.replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Delete specified seeking listing if owner is currently logged in user
+     * Delete a seeking listing
+     */
+    async apiV1ListingsSeekingListingIdDelete(requestParameters: ApiV1ListingsSeekingListingIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1ListingsSeekingListingIdDeleteRaw(requestParameters, initOverrides);
+    }
+
+    /**
      * Get the details of a seeking listing
      */
     async apiV1ListingsSeekingListingIdGetRaw(requestParameters: ApiV1ListingsSeekingListingIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SeekingDetails>> {
@@ -231,6 +749,464 @@ export class DefaultApi extends runtime.BaseAPI {
     async apiV1ListingsSeekingListingIdGet(requestParameters: ApiV1ListingsSeekingListingIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SeekingDetails> {
         const response = await this.apiV1ListingsSeekingListingIdGetRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Update specified seeking listing if owner is currently logged in user. Does not allow for updating photos to save bandwidth. Use dedicated photos endpoint for this use case.
+     * Update an seeking listing
+     */
+    async apiV1ListingsSeekingListingIdPutRaw(requestParameters: ApiV1ListingsSeekingListingIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SeekingDetails>> {
+        if (requestParameters.listingId === null || requestParameters.listingId === undefined) {
+            throw new runtime.RequiredError('listingId','Required parameter requestParameters.listingId was null or undefined when calling apiV1ListingsSeekingListingIdPut.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/v1/listings/seeking/{listingId}`.replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: SeekingFormBaseToJSON(requestParameters.seekingFormBase),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SeekingDetailsFromJSON(jsonValue));
+    }
+
+    /**
+     * Update specified seeking listing if owner is currently logged in user. Does not allow for updating photos to save bandwidth. Use dedicated photos endpoint for this use case.
+     * Update an seeking listing
+     */
+    async apiV1ListingsSeekingListingIdPut(requestParameters: ApiV1ListingsSeekingListingIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SeekingDetails> {
+        const response = await this.apiV1ListingsSeekingListingIdPutRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Create an seeking listing as the currently logged in user. Listing will be made visible to other users.
+     * Create a new seeking listing
+     */
+    async apiV1ListingsSeekingPostRaw(requestParameters: ApiV1ListingsSeekingPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SeekingDetails>> {
+        if (requestParameters.title === null || requestParameters.title === undefined) {
+            throw new runtime.RequiredError('title','Required parameter requestParameters.title was null or undefined when calling apiV1ListingsSeekingPost.');
+        }
+
+        if (requestParameters.description === null || requestParameters.description === undefined) {
+            throw new runtime.RequiredError('description','Required parameter requestParameters.description was null or undefined when calling apiV1ListingsSeekingPost.');
+        }
+
+        if (requestParameters.preferredLocation === null || requestParameters.preferredLocation === undefined) {
+            throw new runtime.RequiredError('preferredLocation','Required parameter requestParameters.preferredLocation was null or undefined when calling apiV1ListingsSeekingPost.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters.title !== undefined) {
+            formParams.append('title', requestParameters.title as any);
+        }
+
+        if (requestParameters.description !== undefined) {
+            formParams.append('description', requestParameters.description as any);
+        }
+
+        if (requestParameters.photos) {
+            requestParameters.photos.forEach((element) => {
+                formParams.append('photos', element as any);
+            })
+        }
+
+        if (requestParameters.preferredLocation !== undefined) {
+            formParams.append('preferredLocation', new Blob([JSON.stringify(LocationToJSON(requestParameters.preferredLocation))], { type: "application/json", }));
+                    }
+
+        const response = await this.request({
+            path: `/api/v1/listings/seeking`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SeekingDetailsFromJSON(jsonValue));
+    }
+
+    /**
+     * Create an seeking listing as the currently logged in user. Listing will be made visible to other users.
+     * Create a new seeking listing
+     */
+    async apiV1ListingsSeekingPost(requestParameters: ApiV1ListingsSeekingPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SeekingDetails> {
+        const response = await this.apiV1ListingsSeekingPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get all users registered in system
+     */
+    async apiV1UsersGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<User>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/users`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(UserFromJSON));
+    }
+
+    /**
+     * Get all users registered in system
+     */
+    async apiV1UsersGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<User>> {
+        const response = await this.apiV1UsersGetRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Deleting a user deletes all of their data, but does not prevent the user with the email address from registering again.
+     * Delete a user from the system
+     */
+    async apiV1UsersUserIdDeleteRaw(requestParameters: ApiV1UsersUserIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdDelete.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Deleting a user deletes all of their data, but does not prevent the user with the email address from registering again.
+     * Delete a user from the system
+     */
+    async apiV1UsersUserIdDelete(requestParameters: ApiV1UsersUserIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1UsersUserIdDeleteRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Get all accommodation and seeking listings favourited by given user. Favourite lists are private to each user, so only account owner can retrieve this list.
+     * Get all listings favourited by a user
+     */
+    async apiV1UsersUserIdFavouritesGetRaw(requestParameters: ApiV1UsersUserIdFavouritesGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<UserListingsInner>>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdFavouritesGet.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}/favourites`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(UserListingsInnerFromJSON));
+    }
+
+    /**
+     * Get all accommodation and seeking listings favourited by given user. Favourite lists are private to each user, so only account owner can retrieve this list.
+     * Get all listings favourited by a user
+     */
+    async apiV1UsersUserIdFavouritesGet(requestParameters: ApiV1UsersUserIdFavouritesGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<UserListingsInner>> {
+        const response = await this.apiV1UsersUserIdFavouritesGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Remove listing with the given listingId from the user\'s favourites. This operation is a noop if the user doesn\'t have the listing in their favourites. Favourite lists are private to each user, so only account owner can remove the favourite from the list.
+     * Remove listing from user favourites
+     */
+    async apiV1UsersUserIdFavouritesListingIdDeleteRaw(requestParameters: ApiV1UsersUserIdFavouritesListingIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdFavouritesListingIdDelete.');
+        }
+
+        if (requestParameters.listingId === null || requestParameters.listingId === undefined) {
+            throw new runtime.RequiredError('listingId','Required parameter requestParameters.listingId was null or undefined when calling apiV1UsersUserIdFavouritesListingIdDelete.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}/favourites/{listingId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))).replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Remove listing with the given listingId from the user\'s favourites. This operation is a noop if the user doesn\'t have the listing in their favourites. Favourite lists are private to each user, so only account owner can remove the favourite from the list.
+     * Remove listing from user favourites
+     */
+    async apiV1UsersUserIdFavouritesListingIdDelete(requestParameters: ApiV1UsersUserIdFavouritesListingIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1UsersUserIdFavouritesListingIdDeleteRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Add listing with the given listingId to the user\'s favourites. This operation is a noop if the user already has the listing in their favourites. Favourite lists are private to each user, so only account owner can add the favourite to the list.
+     * Add listing to user favourites
+     */
+    async apiV1UsersUserIdFavouritesListingIdPutRaw(requestParameters: ApiV1UsersUserIdFavouritesListingIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdFavouritesListingIdPut.');
+        }
+
+        if (requestParameters.listingId === null || requestParameters.listingId === undefined) {
+            throw new runtime.RequiredError('listingId','Required parameter requestParameters.listingId was null or undefined when calling apiV1UsersUserIdFavouritesListingIdPut.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}/favourites/{listingId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))).replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Add listing with the given listingId to the user\'s favourites. This operation is a noop if the user already has the listing in their favourites. Favourite lists are private to each user, so only account owner can add the favourite to the list.
+     * Add listing to user favourites
+     */
+    async apiV1UsersUserIdFavouritesListingIdPut(requestParameters: ApiV1UsersUserIdFavouritesListingIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1UsersUserIdFavouritesListingIdPutRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Get all accommodation and seeking listings created by given user
+     * Get all listings created by a user
+     */
+    async apiV1UsersUserIdListingsGetRaw(requestParameters: ApiV1UsersUserIdListingsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<UserListingsInner>>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdListingsGet.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}/listings`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(UserListingsInnerFromJSON));
+    }
+
+    /**
+     * Get all accommodation and seeking listings created by given user
+     * Get all listings created by a user
+     */
+    async apiV1UsersUserIdListingsGet(requestParameters: ApiV1UsersUserIdListingsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<UserListingsInner>> {
+        const response = await this.apiV1UsersUserIdListingsGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get the profile of a user
+     */
+    async apiV1UsersUserIdProfileGetRaw(requestParameters: ApiV1UsersUserIdProfileGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserProfile>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdProfileGet.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}/profile`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserProfileFromJSON(jsonValue));
+    }
+
+    /**
+     * Get the profile of a user
+     */
+    async apiV1UsersUserIdProfileGet(requestParameters: ApiV1UsersUserIdProfileGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserProfile> {
+        const response = await this.apiV1UsersUserIdProfileGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Delete the user\'s profile picture
+     */
+    async apiV1UsersUserIdProfilePhotoDeleteRaw(requestParameters: ApiV1UsersUserIdProfilePhotoDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdProfilePhotoDelete.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}/profile/photo`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Delete the user\'s profile picture
+     */
+    async apiV1UsersUserIdProfilePhotoDelete(requestParameters: ApiV1UsersUserIdProfilePhotoDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1UsersUserIdProfilePhotoDeleteRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Get the profile picture of a user
+     */
+    async apiV1UsersUserIdProfilePhotoGetRaw(requestParameters: ApiV1UsersUserIdProfilePhotoGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Blob>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdProfilePhotoGet.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}/profile/photo`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.BlobApiResponse(response);
+    }
+
+    /**
+     * Get the profile picture of a user
+     */
+    async apiV1UsersUserIdProfilePhotoGet(requestParameters: ApiV1UsersUserIdProfilePhotoGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Blob> {
+        const response = await this.apiV1UsersUserIdProfilePhotoGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Can be used to both upload for the first time as well as update the profile photo of the currently logged in user.
+     * Upload the user\'s profile picture
+     */
+    async apiV1UsersUserIdProfilePhotoPutRaw(requestParameters: ApiV1UsersUserIdProfilePhotoPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdProfilePhotoPut.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'image';
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}/profile/photo`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: requestParameters.body as any,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Can be used to both upload for the first time as well as update the profile photo of the currently logged in user.
+     * Upload the user\'s profile picture
+     */
+    async apiV1UsersUserIdProfilePhotoPut(requestParameters: ApiV1UsersUserIdProfilePhotoPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1UsersUserIdProfilePhotoPutRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Can be used to both complete for the first time as well as update the profile of the currently logged in user.
+     * Update user profile
+     */
+    async apiV1UsersUserIdProfilePutRaw(requestParameters: ApiV1UsersUserIdProfilePutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdProfilePut.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}/profile`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UserProfileFormToJSON(requestParameters.userProfileForm),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Can be used to both complete for the first time as well as update the profile of the currently logged in user.
+     * Update user profile
+     */
+    async apiV1UsersUserIdProfilePut(requestParameters: ApiV1UsersUserIdProfilePutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1UsersUserIdProfilePutRaw(requestParameters, initOverrides);
     }
 
 }
