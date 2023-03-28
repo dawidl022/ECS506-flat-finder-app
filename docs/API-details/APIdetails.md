@@ -49,7 +49,7 @@ response.json() will allow us to use the results and will be in the format:
         ]
     }
 response is quite long so here is a file of an example one:
-https://github.com/dawidl022/ECS506-flat-finder-app/blob/docs/19-investigate-uk-accomodation-apis/docs/API-details/rapidapi_sample_response.json
+[rapidapi_sample_response.json](./rapidapi_sample_response.json)
 
 
 <br> <br>
