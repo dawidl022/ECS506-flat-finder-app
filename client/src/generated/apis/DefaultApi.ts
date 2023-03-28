@@ -19,6 +19,10 @@ import type {
   AccommodationSearchResultsInner,
   SeekingDetails,
   SeekingSearchResultsInner,
+  User,
+  UserListingsInner,
+  UserProfile,
+  UserProfileForm,
 } from '../models';
 import {
     AccommodationDetailsFromJSON,
@@ -29,7 +33,23 @@ import {
     SeekingDetailsToJSON,
     SeekingSearchResultsInnerFromJSON,
     SeekingSearchResultsInnerToJSON,
+    UserFromJSON,
+    UserToJSON,
+    UserListingsInnerFromJSON,
+    UserListingsInnerToJSON,
+    UserProfileFromJSON,
+    UserProfileToJSON,
+    UserProfileFormFromJSON,
+    UserProfileFormToJSON,
 } from '../models';
+
+export interface ApiV1AdminsUserIdDeleteRequest {
+    userId: string;
+}
+
+export interface ApiV1AdminsUserIdPutRequest {
+    userId: string;
+}
 
 export interface ApiV1ListingsAccommodationGetRequest {
     location: string;
@@ -56,10 +76,112 @@ export interface ApiV1ListingsSeekingListingIdGetRequest {
     listingId: string;
 }
 
+export interface ApiV1UsersUserIdDeleteRequest {
+    userId: string;
+}
+
+export interface ApiV1UsersUserIdFavouritesGetRequest {
+    userId: string;
+}
+
+export interface ApiV1UsersUserIdFavouritesListingIdDeleteRequest {
+    userId: string;
+    listingId: string;
+}
+
+export interface ApiV1UsersUserIdFavouritesListingIdPutRequest {
+    userId: string;
+    listingId: string;
+}
+
+export interface ApiV1UsersUserIdListingsGetRequest {
+    userId: string;
+}
+
+export interface ApiV1UsersUserIdProfileGetRequest {
+    userId: string;
+}
+
+export interface ApiV1UsersUserIdProfilePhotoDeleteRequest {
+    userId: string;
+}
+
+export interface ApiV1UsersUserIdProfilePhotoGetRequest {
+    userId: string;
+}
+
+export interface ApiV1UsersUserIdProfilePhotoPutRequest {
+    userId: string;
+    body?: Blob;
+}
+
+export interface ApiV1UsersUserIdProfilePutRequest {
+    userId: string;
+    userProfileForm?: UserProfileForm;
+}
+
 /**
  * 
  */
 export class DefaultApi extends runtime.BaseAPI {
+
+    /**
+     * Revoke admin privileges from user
+     */
+    async apiV1AdminsUserIdDeleteRaw(requestParameters: ApiV1AdminsUserIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1AdminsUserIdDelete.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/admins/{userId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Revoke admin privileges from user
+     */
+    async apiV1AdminsUserIdDelete(requestParameters: ApiV1AdminsUserIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1AdminsUserIdDeleteRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Grant admin privileges to user
+     */
+    async apiV1AdminsUserIdPutRaw(requestParameters: ApiV1AdminsUserIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1AdminsUserIdPut.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/admins/{userId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Grant admin privileges to user
+     */
+    async apiV1AdminsUserIdPut(requestParameters: ApiV1AdminsUserIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1AdminsUserIdPutRaw(requestParameters, initOverrides);
+    }
 
     /**
      * Get a list of accommodation listings, optionally filtered and sorted
@@ -231,6 +353,354 @@ export class DefaultApi extends runtime.BaseAPI {
     async apiV1ListingsSeekingListingIdGet(requestParameters: ApiV1ListingsSeekingListingIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SeekingDetails> {
         const response = await this.apiV1ListingsSeekingListingIdGetRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Get all users registered in system
+     */
+    async apiV1UsersGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<User>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/users`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(UserFromJSON));
+    }
+
+    /**
+     * Get all users registered in system
+     */
+    async apiV1UsersGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<User>> {
+        const response = await this.apiV1UsersGetRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Deleting a user deletes all of their data, but does not prevent the user with the email address from registering again.
+     * Delete a user from the system
+     */
+    async apiV1UsersUserIdDeleteRaw(requestParameters: ApiV1UsersUserIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdDelete.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Deleting a user deletes all of their data, but does not prevent the user with the email address from registering again.
+     * Delete a user from the system
+     */
+    async apiV1UsersUserIdDelete(requestParameters: ApiV1UsersUserIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1UsersUserIdDeleteRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Get all accommodation and seeking listings favourited by given user. Favourite lists are private to each user, so only account owner can retrieve this list.
+     * Get all listings favourited by a user
+     */
+    async apiV1UsersUserIdFavouritesGetRaw(requestParameters: ApiV1UsersUserIdFavouritesGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<UserListingsInner>>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdFavouritesGet.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}/favourites`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(UserListingsInnerFromJSON));
+    }
+
+    /**
+     * Get all accommodation and seeking listings favourited by given user. Favourite lists are private to each user, so only account owner can retrieve this list.
+     * Get all listings favourited by a user
+     */
+    async apiV1UsersUserIdFavouritesGet(requestParameters: ApiV1UsersUserIdFavouritesGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<UserListingsInner>> {
+        const response = await this.apiV1UsersUserIdFavouritesGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Remove listing with the given listingId from the user\'s favourites. This operation is a noop if the user doesn\'t have the listing in their favourites. Favourite lists are private to each user, so only account owner can remove the favourite from the list.
+     * Remove listing from user favourites
+     */
+    async apiV1UsersUserIdFavouritesListingIdDeleteRaw(requestParameters: ApiV1UsersUserIdFavouritesListingIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdFavouritesListingIdDelete.');
+        }
+
+        if (requestParameters.listingId === null || requestParameters.listingId === undefined) {
+            throw new runtime.RequiredError('listingId','Required parameter requestParameters.listingId was null or undefined when calling apiV1UsersUserIdFavouritesListingIdDelete.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}/favourites/{listingId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))).replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Remove listing with the given listingId from the user\'s favourites. This operation is a noop if the user doesn\'t have the listing in their favourites. Favourite lists are private to each user, so only account owner can remove the favourite from the list.
+     * Remove listing from user favourites
+     */
+    async apiV1UsersUserIdFavouritesListingIdDelete(requestParameters: ApiV1UsersUserIdFavouritesListingIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1UsersUserIdFavouritesListingIdDeleteRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Add listing with the given listingId to the user\'s favourites. This operation is a noop if the user already has the listing in their favourites. Favourite lists are private to each user, so only account owner can add the favourite to the list.
+     * Add listing to user favourites
+     */
+    async apiV1UsersUserIdFavouritesListingIdPutRaw(requestParameters: ApiV1UsersUserIdFavouritesListingIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdFavouritesListingIdPut.');
+        }
+
+        if (requestParameters.listingId === null || requestParameters.listingId === undefined) {
+            throw new runtime.RequiredError('listingId','Required parameter requestParameters.listingId was null or undefined when calling apiV1UsersUserIdFavouritesListingIdPut.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}/favourites/{listingId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))).replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Add listing with the given listingId to the user\'s favourites. This operation is a noop if the user already has the listing in their favourites. Favourite lists are private to each user, so only account owner can add the favourite to the list.
+     * Add listing to user favourites
+     */
+    async apiV1UsersUserIdFavouritesListingIdPut(requestParameters: ApiV1UsersUserIdFavouritesListingIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1UsersUserIdFavouritesListingIdPutRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Get all accommodation and seeking listings created by given user
+     * Get all listings created by a user
+     */
+    async apiV1UsersUserIdListingsGetRaw(requestParameters: ApiV1UsersUserIdListingsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<UserListingsInner>>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdListingsGet.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}/listings`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(UserListingsInnerFromJSON));
+    }
+
+    /**
+     * Get all accommodation and seeking listings created by given user
+     * Get all listings created by a user
+     */
+    async apiV1UsersUserIdListingsGet(requestParameters: ApiV1UsersUserIdListingsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<UserListingsInner>> {
+        const response = await this.apiV1UsersUserIdListingsGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get the profile of a user
+     */
+    async apiV1UsersUserIdProfileGetRaw(requestParameters: ApiV1UsersUserIdProfileGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserProfile>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdProfileGet.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}/profile`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserProfileFromJSON(jsonValue));
+    }
+
+    /**
+     * Get the profile of a user
+     */
+    async apiV1UsersUserIdProfileGet(requestParameters: ApiV1UsersUserIdProfileGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserProfile> {
+        const response = await this.apiV1UsersUserIdProfileGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Delete the user\'s profile picture
+     */
+    async apiV1UsersUserIdProfilePhotoDeleteRaw(requestParameters: ApiV1UsersUserIdProfilePhotoDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdProfilePhotoDelete.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}/profile/photo`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Delete the user\'s profile picture
+     */
+    async apiV1UsersUserIdProfilePhotoDelete(requestParameters: ApiV1UsersUserIdProfilePhotoDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1UsersUserIdProfilePhotoDeleteRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Get the profile picture of a user
+     */
+    async apiV1UsersUserIdProfilePhotoGetRaw(requestParameters: ApiV1UsersUserIdProfilePhotoGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Blob>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdProfilePhotoGet.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}/profile/photo`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.BlobApiResponse(response);
+    }
+
+    /**
+     * Get the profile picture of a user
+     */
+    async apiV1UsersUserIdProfilePhotoGet(requestParameters: ApiV1UsersUserIdProfilePhotoGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Blob> {
+        const response = await this.apiV1UsersUserIdProfilePhotoGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Can be used to both upload for the first time as well as update the profile photo of the currently logged in user.
+     * Upload the user\'s profile picture
+     */
+    async apiV1UsersUserIdProfilePhotoPutRaw(requestParameters: ApiV1UsersUserIdProfilePhotoPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdProfilePhotoPut.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'image';
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}/profile/photo`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: requestParameters.body as any,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Can be used to both upload for the first time as well as update the profile photo of the currently logged in user.
+     * Upload the user\'s profile picture
+     */
+    async apiV1UsersUserIdProfilePhotoPut(requestParameters: ApiV1UsersUserIdProfilePhotoPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1UsersUserIdProfilePhotoPutRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Can be used to both complete for the first time as well as update the profile of the currently logged in user.
+     * Update user profile
+     */
+    async apiV1UsersUserIdProfilePutRaw(requestParameters: ApiV1UsersUserIdProfilePutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userId === null || requestParameters.userId === undefined) {
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdProfilePut.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/v1/users/{userId}/profile`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UserProfileFormToJSON(requestParameters.userProfileForm),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Can be used to both complete for the first time as well as update the profile of the currently logged in user.
+     * Update user profile
+     */
+    async apiV1UsersUserIdProfilePut(requestParameters: ApiV1UsersUserIdProfilePutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1UsersUserIdProfilePutRaw(requestParameters, initOverrides);
     }
 
 }
