@@ -27,7 +27,7 @@ const Tabs: FC<TabsComponentProps> = ({ tabs }) => {
   const router = useRouter();
   const { push, query, pathname } = router;
 
-  const test = (v: string) => {
+  const onSelect = (v: string) => {
     if (v === 'all') return push(pathname, undefined, { shallow: true });
     push({ query: { ...query, listing: v } }, undefined, { shallow: true });
   };
@@ -39,7 +39,7 @@ const Tabs: FC<TabsComponentProps> = ({ tabs }) => {
           isActive={
             tab.toLowerCase() === query.listing || (tab === 'All' && query.listing === undefined)
           }
-          onClick={(v) => test(v)}
+          onClick={(v) => onSelect(v)}
           title={tab}
           key={index}
         />
