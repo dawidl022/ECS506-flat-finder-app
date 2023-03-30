@@ -1,7 +1,9 @@
+
 import { useRouter } from "next/router";
 import React, { FC } from "react";
 
 import styles from "./Tabs.module.scss";
+
 
 interface TabProps {
   isActive: boolean;
@@ -15,6 +17,7 @@ const TabItem: FC<TabProps> = ({ title, onClick, isActive }) => {
       onClick={() => onClick(title.toLowerCase())}
       className={isActive ? styles.activeTabCon : styles.tabCon}
     >
+
       {title}
     </div>
   );
@@ -30,6 +33,7 @@ const Tabs: FC<TabsComponentProps> = ({ tabs }) => {
 
   const onSelect = (v: string) => {
     if (v === "all") return push(pathname, undefined, { shallow: true });
+
     push({ query: { ...query, listing: v } }, undefined, { shallow: true });
   };
 
