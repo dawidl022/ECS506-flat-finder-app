@@ -1,7 +1,7 @@
-import { useRouter } from 'next/router';
-import React, { FC } from 'react';
+import { useRouter } from "next/router";
+import React, { FC } from "react";
 
-import styles from './Tabs.module.scss';
+import styles from "./Tabs.module.scss";
 
 interface TabProps {
   isActive: boolean;
@@ -13,7 +13,8 @@ const TabItem: FC<TabProps> = ({ title, onClick, isActive }) => {
   return (
     <div
       onClick={() => onClick(title.toLowerCase())}
-      className={isActive ? styles.activeTabCon : styles.tabCon}>
+      className={isActive ? styles.activeTabCon : styles.tabCon}
+    >
       {title}
     </div>
   );
@@ -28,7 +29,7 @@ const Tabs: FC<TabsComponentProps> = ({ tabs }) => {
   const { push, query, pathname } = router;
 
   const onSelect = (v: string) => {
-    if (v === 'all') return push(pathname, undefined, { shallow: true });
+    if (v === "all") return push(pathname, undefined, { shallow: true });
     push({ query: { ...query, listing: v } }, undefined, { shallow: true });
   };
 
@@ -37,9 +38,10 @@ const Tabs: FC<TabsComponentProps> = ({ tabs }) => {
       {tabs?.map((tab: string, index: number) => (
         <TabItem
           isActive={
-            tab.toLowerCase() === query.listing || (tab === 'All' && query.listing === undefined)
+            tab.toLowerCase() === query.listing ||
+            (tab === "All" && query.listing === undefined)
           }
-          onClick={(v) => onSelect(v)}
+          onClick={v => onSelect(v)}
           title={tab}
           key={index}
         />
