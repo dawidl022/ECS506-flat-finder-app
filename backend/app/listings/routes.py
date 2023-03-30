@@ -9,7 +9,7 @@ from config import Config
 bp = Blueprint("listings", __name__)
 
 
-@bp.route(f"{Config.ROOT}")
+@bp.get(f"{Config.ROOT}/listings/accommodation")
 def get_accommodation_listings() -> Response:
     params = get_params(AccommodationSearchParams)
 
