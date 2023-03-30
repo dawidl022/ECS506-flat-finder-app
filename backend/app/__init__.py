@@ -1,5 +1,5 @@
 from flask import Flask
-from app.util.schema import CamelCaseEncoder
+from app.util.encoding import CamelCaseEncoder
 from config import Config
 
 

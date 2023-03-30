@@ -38,6 +38,21 @@ class AccommodationSearchParams(Schemable):
         return self.sources.split(",") if self.sources else []
 
 
-@dataclass()
+@dataclass
+class AccommodationSummary:
+    id: str
+    title: str
+    short_description: str
+    thumbnail_url: str
+    accommodation_type: str
+    number_of_rooms: int
+    source: str
+    price: float
+    post_code: str
+
+
+@dataclass
 class AccommodationSearchResult:
-    pass
+    distance: float
+    is_favourite: bool
+    accommodation: AccommodationSummary

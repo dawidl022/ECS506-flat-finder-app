@@ -1,16 +1,13 @@
 
 import abc
-import json
 from marshmallow import Schema
+from marshmallow.fields import Field
+
+from app.util.encoding import camel_case
 
 
 class Schemable(abc.ABC):
     schema: Schema
-
-
-def camel_case(s):
-    parts = iter(s.split("_"))
-    return next(parts) + "".join(i.title() for i in parts)
 
 
 class CamelCaseSchema(Schema):
@@ -19,19 +16,5 @@ class CamelCaseSchema(Schema):
     and snake-case for its internal representation.
     """
 
-    def on_bind_field(self, field_name, field_obj):
+    def on_bind_field(self, field_name: str, field_obj: Field) -> None:
         field_obj.data_key = camel_case(field_obj.data_key or field_name)
-
-
-class CamelCaseEncoder(json.JSONEncoder):
-    """
-    Custom encoder that converts all snake_case object property names into
-    camelCase to conform with the naming convention used in our API spec
-    """
-
-    def encode(self, obj: object):
-        obj = {camel_case(k): v for k, v in obj.__dict__.items()}
-        for key, value in obj.items():
-            if hasattr(value, "__dict__"):
-                obj[key] = json.loads(self.encode(value))
-        return super().encode(obj)
