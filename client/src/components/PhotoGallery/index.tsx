@@ -15,11 +15,10 @@ interface PhotoGalleryProps {
   width?: String;
 }
 
-const PhotoGallery: FC<PhotoGalleryProps> = ({ photoUrls, width }) => {
-  if (typeof width === "undefined") {
-    width = "350px";
-  }
-
+const PhotoGallery: FC<PhotoGalleryProps> = ({
+  photoUrls,
+  width = "350px",
+}) => {
   return (
     <div style={{ width: width.toString() }}>
       <Slide transitionDuration={200}>
