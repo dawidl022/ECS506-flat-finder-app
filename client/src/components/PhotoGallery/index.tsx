@@ -11,8 +11,8 @@ const divSettings = {
 };
 
 interface PhotoGalleryProps {
-  photoUrls: Array<String>;
-  width?: String;
+  photoUrls: string[];
+  width?: string;
 }
 
 const PhotoGallery: FC<PhotoGalleryProps> = ({
@@ -20,15 +20,11 @@ const PhotoGallery: FC<PhotoGalleryProps> = ({
   width = "350px",
 }) => {
   return (
-    <div style={{ width: width.toString() }}>
+    <div style={{ width: width }}>
       <Slide transitionDuration={200}>
         {photoUrls.map((photoUrls, index) => (
           <div style={divSettings} key={index}>
-            <img
-              src={photoUrls.toString()}
-              width={"100%"}
-              alt={"Photo: " + index}
-            />
+            <img src={photoUrls} width={"100%"} alt={"Photo: " + index} />
           </div>
         ))}
       </Slide>
