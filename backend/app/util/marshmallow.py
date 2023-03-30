@@ -16,6 +16,9 @@ def get_params(type: Type[T]) -> T:
     if error:
         abort(make_response(error, BAD_REQUEST))
     params = dacite.from_dict(
-        data_class=type, data=request.args, config=dacite.Config(cast=[float, int, StrEnum]))
+        data_class=type,
+        data=request.args,
+        config=dacite.Config(cast=[float, int, StrEnum])
+    )
 
     return params
