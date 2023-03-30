@@ -1,4 +1,4 @@
-from enum import Enum, StrEnum
+from enum import StrEnum
 from http.client import BAD_REQUEST
 from typing import Type, TypeVar
 import dacite
