@@ -12,7 +12,7 @@ interface TabProps {
 const TabItem: FC<TabProps> = ({ title, onClick, isActive }) => {
   return (
     <button
-    type="button"
+      type="button"
       onClick={() => onClick()}
       className={isActive ? styles.activeTabCon : styles.tabCon}
     >
@@ -32,7 +32,9 @@ const Tabs: FC<TabsComponentProps> = ({ tabs }) => {
   const routeToTab = (tabName: string) => {
     if (tabName === "all") return push(pathname, undefined, { shallow: true });
 
-    push({ query: { ...query, listingType: tabName } }, undefined, { shallow: true });
+    push({ query: { ...query, listingType: tabName } }, undefined, {
+      shallow: true,
+    });
   };
 
   return (
