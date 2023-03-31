@@ -24,7 +24,7 @@ def create_app(config_class: type = Config) -> Flask:
     return app
 
 
-def configure_dependencies(binder: Binder):
+def configure_dependencies(binder: Binder) -> None:
     binder.bind(
         ListingsService, to=ListingsService()
     )

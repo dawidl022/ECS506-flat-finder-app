@@ -9,6 +9,12 @@ class ListingsService():
         TODO implement business logic
         :returns stub response
         """
+        thumbnail_urls = [
+            "https://fastly.picsum.photos/id/308/1200/1200"
+            ".jpg?hmac=2c1705rmBMgsQTZ1I9Uu74cRpA4Fxdl0THWV8wfV5VQ",
+            "https://fastly.picsum.photos/id/163/1200/1200"
+            ".jpg?hmac=ZOvAYvHz98oGUbqnNC_qldUszdxrzrNdmZjkyxzukt8",
+        ]
         return [
             AccommodationSearchResult(
                 distance=1.2,
@@ -16,9 +22,8 @@ class ListingsService():
                 accommodation=AccommodationSummary(
                     id="internal-1",
                     title="Flat",
-                    short_description="Very nice flat to live in, beautiful views",
-                    thumbnail_url="https://fastly.picsum.photos/id/308/1200/1200"
-                    ".jpg?hmac=2c1705rmBMgsQTZ1I9Uu74cRpA4Fxdl0THWV8wfV5VQ",
+                    short_description="Very nice beautiful flat to live in",
+                    thumbnail_url=thumbnail_urls[0],
                     accommodation_type="flat",
                     number_of_rooms=2,
                     source="internal",
@@ -32,9 +37,8 @@ class ListingsService():
                 accommodation=AccommodationSummary(
                     id="zoopla-1",
                     title="Room",
-                    short_description="A small cozy room, perfect for students",
-                    thumbnail_url="https://fastly.picsum.photos/id/163/1200/1200"
-                    ".jpg?hmac=ZOvAYvHz98oGUbqnNC_qldUszdxrzrNdmZjkyxzukt8",
+                    short_description="A small cozy room perfect for students",
+                    thumbnail_url=thumbnail_urls[1],
                     accommodation_type="room",
                     number_of_rooms=1,
                     source="zoopla",
