@@ -1,4 +1,4 @@
-
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap");
 
 * {
   box-sizing: border-box;
@@ -10,10 +10,9 @@ html,
 body {
   max-width: 100vw;
   min-height: 100vh;
+  font-family: "Roboto", sans-serif;
   /* overflow-x: hidden; */
 }
-
-
 
 a {
   color: inherit;
@@ -25,9 +24,9 @@ button {
   border: none;
 }
 
-.container{
+.container {
   width: 100%;
   max-width: 1080px;
-  padding: 0 16px ;
+  padding: 0 16px;
   margin: 0 auto;
 }
