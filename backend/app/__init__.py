@@ -17,6 +17,8 @@ def create_app(config_class: type = Config) -> Flask:
     from app.listings import listings_bp
     app.register_blueprint(listings_bp)
 
+    # Initialize Flask-Injector. This needs to be run *after* you attached all
+    # views, handlers, context processors and template globals.
     FlaskInjector(app=app, modules=[configure_dependencies])
 
     return app
@@ -26,7 +28,3 @@ def configure_dependencies(binder: Binder):
     binder.bind(
         ListingsService, to=ListingsService()
     )
-
-
-# Initialize Flask-Injector. This needs to be run *after* you attached all
-# views, handlers, context processors and template globals.
