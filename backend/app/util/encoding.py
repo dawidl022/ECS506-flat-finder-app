@@ -18,7 +18,11 @@ class CamelCaseEncoder(json.JSONEncoder):
                 [json.loads(self.encode(item)) for item in obj]
             )
 
-        obj = {camel_case(k): v for k, v in obj.__dict__.items()}
+        if isinstance(obj, dict):
+            obj = {camel_case(k): v for k, v in obj.items()}
+        else:
+            obj = {camel_case(k): v for k, v in obj.__dict__.items()}
+
         for key, value in obj.items():
             if hasattr(value, "__dict__"):
                 obj[key] = json.loads(self.encode(value))
