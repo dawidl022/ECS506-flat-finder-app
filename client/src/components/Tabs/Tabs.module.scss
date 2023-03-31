@@ -28,7 +28,7 @@
     flex-wrap: nowrap;
     white-space: nowrap;
 
-    &:hover {
+    &:hover, &:focus-visible {
       background-color: #202020;
       color: #fff;
     }

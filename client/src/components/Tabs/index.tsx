@@ -6,17 +6,18 @@ import styles from "./Tabs.module.scss";
 interface TabProps {
   isActive: boolean;
   title: string;
-  onClick: (v: string) => void;
+  onClick: () => void;
 }
 
 const TabItem: FC<TabProps> = ({ title, onClick, isActive }) => {
   return (
-    <div
-      onClick={() => onClick(title.toLowerCase())}
+    <button
+    type="button"
+      onClick={() => onClick()}
       className={isActive ? styles.activeTabCon : styles.tabCon}
     >
       {title}
-    </div>
+    </button>
   );
 };
 
@@ -28,10 +29,10 @@ const Tabs: FC<TabsComponentProps> = ({ tabs }) => {
   const router = useRouter();
   const { push, query, pathname } = router;
 
-  const onSelect = (v: string) => {
-    if (v === "all") return push(pathname, undefined, { shallow: true });
+  const routeToTab = (tabName: string) => {
+    if (tabName === "all") return push(pathname, undefined, { shallow: true });
 
-    push({ query: { ...query, listing: v } }, undefined, { shallow: true });
+    push({ query: { ...query, listingType: tabName } }, undefined, { shallow: true });
   };
 
   return (
@@ -39,10 +40,10 @@ const Tabs: FC<TabsComponentProps> = ({ tabs }) => {
       {tabs?.map((tab: string, index: number) => (
         <TabItem
           isActive={
-            tab.toLowerCase() === query.listing ||
-            (tab === "All" && query.listing === undefined)
+            tab.toLowerCase() === query.listingType ||
+            (tab === "All" && query.listingType === undefined)
           }
-          onClick={v => onSelect(v)}
+          onClick={() => routeToTab(tab.toLowerCase())}
           title={tab}
           key={index}
         />
