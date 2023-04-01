@@ -40,7 +40,7 @@ def google_authenticate():
 @jwt_required()
 def protected_endpoint():
     current_user_id = get_jwt_identity()
-    # Do something with the current user ID, like retrieve their data from your database
+    # Do something with the current user ID, like retrieve data from database
     # ...
     print(current_user_id)
     return {'message': 'This endpoint is protected with JWT authentication'}
