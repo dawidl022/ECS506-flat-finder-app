@@ -14,7 +14,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ userData }) => {
         <div className={styles.avaCon}>
           <div className={styles.ava}></div>
         </div>
-        <p className={styles.name}>{userData.name}</p>
+        <h1 className={styles.name}>{userData.name}</h1>
 
         <div className={styles.detailsCon}>
           <div className={styles.detailsRow}>
@@ -36,7 +36,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ userData }) => {
 
       {/* If user has listings */}
       <section className={styles.listingsCon}>
-        <h3 className={styles.title}>Listings:</h3>
+        <h2 className={styles.title}>Listings:</h2>
         <div className={styles.listings}>
           {/* TODO: */}
           {/* Listings card from figma */}
