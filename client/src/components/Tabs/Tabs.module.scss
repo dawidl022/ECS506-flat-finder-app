@@ -1,0 +1,37 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+
+  .activeTabCon {
+    padding: 10px 12px;
+    border: 1px solid #a1a1a1;
+    border-radius: 20px;
+    font-size: 15px;
+    transition: all 0.1s ease-in-out;
+    cursor: pointer;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    background-color: #202020;
+    color: #fff;
+  }
+
+  .tabCon {
+    padding: 10px 12px;
+    border: 1px solid #a1a1a1;
+    border-radius: 20px;
+    font-size: 15px;
+    transition: all 0.1s ease-in-out;
+    cursor: pointer;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+
+    &:hover,
+    &:focus-visible {
+      background-color: #202020;
+      color: #fff;
+    }
+  }
+}
