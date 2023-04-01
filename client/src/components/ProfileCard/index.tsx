@@ -14,7 +14,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ userData }) => {
         <div className={styles.avaCon}>
           <div className={styles.ava}></div>
         </div>
-        <h3 className={styles.name}>{userData.name}</h3>
+        <p className={styles.name}>{userData.name}</p>
 
         <div className={styles.detailsCon}>
           <div className={styles.detailsRow}>
@@ -22,10 +22,12 @@ const ProfileCard: FC<ProfileCardProps> = ({ userData }) => {
             <p className={styles.value}>{userData.email}</p>
           </div>
           <div className={styles.detailsRow}>
+            {/* TODO:  */}
             <p className={styles.title}>Phone:</p>
             <p className={styles.value}>+38737853</p>
           </div>
           <div className={styles.detailsRow}>
+            {/* TODO:  */}
             <p className={styles.title}>More info</p>
             <p className={styles.value}>whateva</p>
           </div>
