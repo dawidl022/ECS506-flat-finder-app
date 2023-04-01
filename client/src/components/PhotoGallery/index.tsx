@@ -2,13 +2,7 @@ import { FC } from "react";
 import { Slide } from "react-slideshow-image";
 import "react-slideshow-image/dist/styles.css";
 
-// Default settings for the slider component.
-const divSettings = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  backgroundSize: "cover",
-};
+import styles from "./PhotoGallery.module.scss";
 
 interface PhotoGalleryProps {
   photoUrls: string[];
@@ -23,7 +17,7 @@ const PhotoGallery: FC<PhotoGalleryProps> = ({
     <div style={{ width: width }}>
       <Slide transitionDuration={200}>
         {photoUrls.map((photoUrls, index) => (
-          <div style={divSettings} key={index}>
+          <div className={styles.wrapper} key={index}>
             <img src={photoUrls} width={"100%"} alt={"Photo: " + index} />
           </div>
         ))}
