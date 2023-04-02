@@ -7,6 +7,7 @@ paths:
   /api/v1/login/google:
     post:
       summary: Login into the application with Google Single Sign-On (SSO)
+      security: []
       responses:
         "302":
           description: Redirect to Google auth provider.
@@ -1034,3 +1035,12 @@ components:
       description: ID of the user to fetch or apply the operation on
       schema:
         $ref: "#/components/schemas/userId"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []
