@@ -4,6 +4,25 @@ info:
   version: 0.1.0
 
 paths:
+  /api/v1/sources/accommodation:
+    get:
+      summary: Get the available listing sources, optionally filtered by location
+      description: >-
+        If location is not provided, all sources currently supported by the
+        application will be returned. If location is provided, all sources that
+        offer listings in the same country as the location query parameter will
+        be returned. E.g. if location is set to "London", sources that only
+        offer listings in the USA will be excluded from the results.
+      parameters:
+        - $ref: "#/components/parameters/sourceLocation"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/availableSources"
+
   /api/v1/listings/accommodation:
     get:
       summary: Get a list of accommodation listings, optionally filtered and sorted
@@ -939,12 +958,25 @@ components:
               - $ref: "#/components/schemas/accommodationSummary"
               - $ref: "#/components/schemas/seekingSummary"
 
+    availableSources:
+      type: array
+      items:
+        $ref: "#/components/schemas/listingSource"
+
   parameters:
     searchLocation:
       name: location
       in: query
       required: true
       description: Location to search for nearby accommodation
+      schema:
+        type: string
+
+    sourceLocation:
+      name: location
+      in: query
+      required: false
+      description: Filter sources by location
       schema:
         type: string
 
