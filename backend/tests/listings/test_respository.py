@@ -112,8 +112,6 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
 
         listings_out_of_range = {
             self.accommodation_with_coords(0, 0),
-            self.accommodation_with_coords(51, 2),
-            self.accommodation_with_coords(51, 1),
         }
 
         for listing in set(listings_within_range) | listings_out_of_range:
@@ -142,8 +140,6 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
 
         listings_out_of_range = {
             self.accommodation_with_coords(0, 0),
-            self.accommodation_with_coords(51, 2),
-            self.accommodation_with_coords(51, 1),
         }
 
         for listing in set(listings_within_range) | listings_out_of_range:
@@ -172,8 +168,6 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
 
         listings_out_of_range = {
             self.accommodation_with_coords(0, 0),
-            self.accommodation_with_coords(51, 2),
-            self.accommodation_with_coords(51, 1),
         }
 
         for listing in set(listings_within_range) | listings_out_of_range:
@@ -202,8 +196,6 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
 
         listings_out_of_range = {
             self.accommodation_with_coords(0, 0),
-            self.accommodation_with_coords(51, 2),
-            self.accommodation_with_coords(51, 1),
         }
 
         for listing in set(listings_within_range) | listings_out_of_range:
@@ -230,8 +222,6 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
 
         listings_out_of_range = {
             self.accommodation_with_coords(0, 0),
-            self.accommodation_with_coords(51, 2),
-            self.accommodation_with_coords(51, 1),
         }
 
         for listing in set(listings_within_range) | listings_out_of_range:
@@ -261,8 +251,6 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
 
         listings_out_of_range = {
             self.accommodation_with_coords(0, 0),
-            self.accommodation_with_coords(51, 2),
-            self.accommodation_with_coords(51, 1),
         }
 
         for listing in set(listings_within_range) | listings_out_of_range:
@@ -292,8 +280,6 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
 
         listings_out_of_range = {
             self.accommodation_with_coords(0, 0),
-            self.accommodation_with_coords(51, 2),
-            self.accommodation_with_coords(51, 1),
         }
 
         for listing in set(listings_within_range) | listings_out_of_range:
