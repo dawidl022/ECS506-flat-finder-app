@@ -51,11 +51,5 @@ jobs:
         working-directory: client
         run: npm run openapi:gen
 
-      - name: Show git diff
-        run: git diff
-
-      - name: Show git status
-        run: git status
-
       - name: Compare generated files with HEAD
         run: '[ -z "$(git status --porcelain)" ]'
