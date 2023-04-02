@@ -20,7 +20,7 @@ google = oauth.register(
 )
 
 
-@auth_bp.route('/login/google')
+@auth_bp.post('/login/google')
 def google_login():
     redirect_uri = url_for('auth.google_authenticate', _external=True)
     return google.authorize_redirect(redirect_uri)
@@ -28,6 +28,7 @@ def google_login():
 
 @auth_bp.route('/authenticate/google')
 def google_authenticate():
+    # TODO check for errors, handle gracefully with redirect to frontend
     token = google.authorize_access_token()
     # TODO register user if they're not already in DB
     return token["id_token"]
