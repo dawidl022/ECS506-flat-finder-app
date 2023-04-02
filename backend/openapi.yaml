@@ -4,6 +4,24 @@ info:
   version: 0.1.0
 
 paths:
+  /api/v1/login/google:
+    post:
+      summary: Login into the application with Google Single Sign-On (SSO)
+      responses:
+        "302":
+          description: Redirect to Google auth provider.
+          # TODO describe what happens after a successful and unsuccessful auth flow
+          # e.g. redirect back to frontend, where can JWT token be found
+          headers:
+            Location:
+              description: URL of google auth provider request
+              schema:
+                type: string
+            Set-Cookie:
+              description: Cookie to keep track of authentication request
+              schema:
+                type: string
+
   /api/v1/listings/accommodation:
     get:
       summary: Get a list of accommodation listings, optionally filtered and sorted
