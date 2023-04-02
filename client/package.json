@@ -9,7 +9,7 @@
     "lint": "next lint",
     "format": "prettier src --write src",
     "format:check": "prettier -c src",
-    "openapi:gen": "rm -rf src/generated && openapi-generator-cli generate -i ../backend/openapi.yaml -g typescript-fetch -o src/generated -c openapi-gen.config.yaml"
+    "openapi:gen": "rm -rf src/generated && openapi-generator-cli version-manager set 6.5.0 && openapi-generator-cli generate -i ../backend/openapi.yaml -g typescript-fetch -o src/generated -c openapi-gen.config.yaml"
   },
   "dependencies": {
     "@next/font": "13.1.6",
