@@ -754,9 +754,14 @@ components:
       type: object
       required:
         - name
+      description: >-
+        If the listing author is a consultant, the userProfile property is
+        present containing the consultant's profile
       properties:
         name:
           type: string
+        userProfile:
+          $ref: "#/components/schemas/userProfile"
 
     listingOriginalUrl:
       type: string
