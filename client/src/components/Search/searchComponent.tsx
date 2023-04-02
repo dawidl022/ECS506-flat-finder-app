@@ -1,4 +1,4 @@
-import { FC, useState, FormEvent } from 'react';
+import { FC, useState, FormEvent } from "react";
 
 interface Search {
   handleSubmit: (location: string, radius: number) => void;
@@ -7,7 +7,7 @@ interface Search {
 const SearchComponent: FC<Search> = ({ handleSubmit }) => {
   const [location, setTargetLocation] = useState("");
   const [radius, setTargetRadius] = useState(0);
- 
+
   const submitInputs = (e: FormEvent) => {
     e.preventDefault();
     handleSubmit(location, radius);
@@ -17,9 +17,20 @@ const SearchComponent: FC<Search> = ({ handleSubmit }) => {
     <div>
       <form onSubmit={submitInputs}>
         <label htmlFor="loc">Location:</label>
-        <input id="loc" type="text" placeholder="location" value={location} onChange={e => setTargetLocation(e.target.value)} required/>
+        <input
+          id="loc"
+          type="text"
+          placeholder="location"
+          value={location}
+          onChange={e => setTargetLocation(e.target.value)}
+          required
+        />
         <label htmlFor="radius">Radius:</label>
-        <select id="radius" value={radius} onChange={e => setTargetRadius(parseFloat(e.target.value))}>
+        <select
+          id="radius"
+          value={radius}
+          onChange={e => setTargetRadius(parseFloat(e.target.value))}
+        >
           <option value={0}>This postcode only</option>
           <option value={0.25}>Within 1/4 km</option>
           <option value={0.5}>Within 1/2 km</option>
@@ -36,7 +47,6 @@ const SearchComponent: FC<Search> = ({ handleSubmit }) => {
 
         <button type="submit">Search</button>
       </form>
-
     </div>
   );
 };
