@@ -20,5 +20,14 @@ class Config:
     # needs to be set if we're not using https (e.g. on localhost)
     SESSION_COOKIE_SECURE = False
 
-    GOOGLE_AUTH_CLIENT_ID = must_get_env("GOOGLE_AUTH_CLIENT_ID")
-    GOOGLE_AUTH_CLIENT_SECRET = must_get_env("GOOGLE_AUTH_CLIENT_SECRET")
+    _instance = None
+
+    def __new__(cls) -> 'Config':
+        if cls._instance is None:
+            cls._instance = super(Config, cls).__new__(cls)
+        return cls._instance
+
+    def __init__(self) -> None:
+        self.GOOGLE_AUTH_CLIENT_ID = must_get_env("GOOGLE_AUTH_CLIENT_ID")
+        self.GOOGLE_AUTH_CLIENT_SECRET = must_get_env(
+            "GOOGLE_AUTH_CLIENT_SECRET")

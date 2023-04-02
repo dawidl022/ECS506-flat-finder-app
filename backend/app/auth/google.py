@@ -10,8 +10,8 @@ auth_bp = Blueprint('auth', __name__, url_prefix=Config.ROOT)
 oauth = OAuth(current_app)
 google = oauth.register(
     name='google',
-    client_id=Config.GOOGLE_AUTH_CLIENT_ID,
-    client_secret=Config.GOOGLE_AUTH_CLIENT_SECRET,
+    client_id=Config().GOOGLE_AUTH_CLIENT_ID,
+    client_secret=Config().GOOGLE_AUTH_CLIENT_SECRET,
     access_token_url='https://accounts.google.com/o/oauth2/token',
     authorize_url='https://accounts.google.com/o/oauth2/auth',
     userinfo_url='https://www.googleapis.com/oauth2/v1/userinfo',
