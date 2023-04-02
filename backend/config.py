@@ -1,2 +1,2 @@
 class Config:
-    pass
+    ROOT = "/api/v1"
