@@ -26,12 +26,59 @@ Inside this directory, run
 pip3 install -r requirements.txt
 ```
 
+### Setting up Google Cloud OAuth 2.0 Client
+
+We use Google OAuth and OpenID for authentication and authorisation. To get
+started, you will need to [set up this API on the Google API Console](https://developers.google.com/identity/openid-connect/openid-connect#appsetup). Follow
+the instructions in the preceding link.
+
+A summary of the instructions:
+
+1. Create a new Google project for this application. Wait for it to provision.
+   ![](https://user-images.githubusercontent.com/68463406/229338957-09d0506c-10db-4a6e-a372-4fe99456533b.png)
+2. Select the newly created project from the list opened in the top left of
+   the Google console.
+   ![](https://user-images.githubusercontent.com/68463406/229338962-088f0de7-5282-480a-9c8c-bb2c2fc5768e.png)
+3. Navigate to the "APIs & Services" page, you can find this by typing in the
+   search bar, then go to the credentials tab.
+   ![](https://user-images.githubusercontent.com/68463406/229338963-61cc2149-8b79-46ac-94bc-e4aeb3978471.png)
+4. Click the "Configure Consent Screen" button and follow the wizard. It is
+   sufficient to only fill in the mandatory fields in the "OAuth consent screen"
+   step.
+5. In the "Scopes" step, click "Add or remove scopes" and select check the
+   following scope:
+   |Scope|User-facing description|
+   |-----|-----------------------|
+   |.../auth/userinfo.email|See your primary Google Account email address|
+
+   and scroll down to the update button.
+   ![](https://user-images.githubusercontent.com/68463406/229338972-d9f04e10-2a68-4d77-8941-a34d9ee658a6.png)
+6. Add some test users (e.g. yourself) that will be able to access the
+   application.
+   ![](https://user-images.githubusercontent.com/68463406/229338974-3b90505b-fb8c-4d22-a20a-df4b16ca047e.png)
+7. Click save and continue and on the "Summary" navigate back to the
+   "Credentials" tab.
+8. Now you want to actually create an OAuth credential to use with the
+   application. Navigate to "Create Credentials" and "OAuth client ID" and
+   select "Web application" in the dropdown.
+   ![](https://user-images.githubusercontent.com/68463406/229338977-bae56550-50f9-4537-b39f-e7d26f4377dc.png)
+9.  You need to add "Authorized redirect URIs" for the authentication to work.
+   I have found that using `localhost` did not work for me, so instead use
+   `127.0.0.1` as your host. Enter the full URL to the authentication endpoint,
+   including the protocol and port number.
+   ![](https://user-images.githubusercontent.com/68463406/229338979-8e9e1b99-f7a6-4b74-bcc4-0b876f8046ba.png)
+10. Click "Create" and copy the Client ID and Client secret.
+
+You will need to set the `GOOGLE_AUTH_CLIENT_ID` and `GOOGLE_AUTH_CLIENT_SECRET`
+environment variables with the values you copied from the Google Cloud Console
+when you run the application.
+
 ### Running the server
 
 Inside this directory, run
 
 ```bash
-python3 -m flask run
+GOOGLE_AUTH_CLIENT_ID=<your-auth-client-id> GOOGLE_AUTH_CLIENT_SECRET=<your-auth-client-secret> python3 -m flask run
 ```
 
 You should see output similar to the following:
