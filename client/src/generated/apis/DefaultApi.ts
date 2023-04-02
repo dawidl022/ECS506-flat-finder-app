@@ -990,6 +990,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * Once authentication is successful, a redirect back to the frontend (frontend URL is statically set on the server) occurs along with a Set-Cookie header with a \"token\" entry containing the JWT token for subsequent requests requiring authentication. Unsuccessful authentication is not currently being handled gracefully.
      * Login into the application with Google Single Sign-On (SSO)
      */
     async apiV1LoginGooglePostRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
@@ -1008,6 +1009,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * Once authentication is successful, a redirect back to the frontend (frontend URL is statically set on the server) occurs along with a Set-Cookie header with a \"token\" entry containing the JWT token for subsequent requests requiring authentication. Unsuccessful authentication is not currently being handled gracefully.
      * Login into the application with Google Single Sign-On (SSO)
      */
     async apiV1LoginGooglePost(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
