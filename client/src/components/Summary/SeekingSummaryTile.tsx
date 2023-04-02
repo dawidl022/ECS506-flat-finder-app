@@ -6,7 +6,9 @@ interface seekingSummaryProps {
   seekingAccomodation: SeekingSummary;
 }
 
-const SeekingSummaryTile: FC<seekingSummaryProps> = ({ seekingAccomodation }) => {
+const SeekingSummaryTile: FC<seekingSummaryProps> = ({
+  seekingAccomodation,
+}) => {
   return (
     <div>
       <Link href={`/listings/seeking/${seekingAccomodation.id}`}>
