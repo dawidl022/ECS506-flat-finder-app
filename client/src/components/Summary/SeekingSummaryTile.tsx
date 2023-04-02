@@ -12,7 +12,7 @@ const SeekingSummaryTile: FC<seekingSummaryProps> = ({
   return (
     <div>
       <Link href={`/listings/seeking/${seekingAccomodation.id}`}>
-        <p> {seekingAccomodation.title} </p>
+        <h3> {seekingAccomodation.title} </h3>
         <p> {seekingAccomodation.shortDescription} </p>
       </Link>
     </div>
