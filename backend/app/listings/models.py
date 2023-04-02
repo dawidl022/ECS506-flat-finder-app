@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from enum import StrEnum, auto
+from typing import NamedTuple
+from uuid import UUID
 from marshmallow import Schema, fields
 from marshmallow.validate import Range
 
@@ -56,3 +58,22 @@ class AccommodationSearchResult:
     distance: float
     is_favourite: bool
     accommodation: AccommodationSummary
+
+
+class Coordinates(NamedTuple):
+    lat: float
+    long: float
+
+
+@dataclass(frozen=True)
+class Location:
+    coords: Coordinates
+
+
+@dataclass(frozen=True)
+class AccommodationListing:
+    id: UUID
+    location: Location
+    created_at: float
+    """Time of listing creation"""
+    price: int

@@ -1,0 +1,2 @@
+class ListingNotFoundError(Exception):
+    pass
