@@ -31,3 +31,4 @@ class Config:
         self.GOOGLE_AUTH_CLIENT_ID = must_get_env("GOOGLE_AUTH_CLIENT_ID")
         self.GOOGLE_AUTH_CLIENT_SECRET = must_get_env(
             "GOOGLE_AUTH_CLIENT_SECRET")
+        self.FRONTEND_URL = must_get_env("FRONTEND_URL")

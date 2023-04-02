@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, url_for
+from flask import Blueprint, current_app, make_response, redirect, url_for
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from authlib.integrations.flask_client import OAuth
 
@@ -31,9 +31,12 @@ def google_authenticate():
     # TODO check for errors, handle gracefully with redirect to frontend
     token = google.authorize_access_token()
     # TODO register user if they're not already in DB
-    return token["id_token"]
-    # TODO instead of returning token, redirect to frontend and save the token
-    # either in query params, a cookie or in a header
+
+    response = make_response(redirect(Config().FRONTEND_URL))
+    response.set_cookie(
+        "token", token["id_token"]
+    )  # can set explicit domain if frontend/backend domains differ
+    return response
 
 
 # TODO remove this test endpoint

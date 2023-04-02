@@ -78,8 +78,13 @@ when you run the application.
 Inside this directory, run
 
 ```bash
-GOOGLE_AUTH_CLIENT_ID=<your-auth-client-id> GOOGLE_AUTH_CLIENT_SECRET=<your-auth-client-secret> python3 -m flask run
+FRONTEND_URL=<frontend-url>  GOOGLE_AUTH_CLIENT_ID=<your-auth-client-id> GOOGLE_AUTH_CLIENT_SECRET=<your-auth-client-secret> python3 -m flask run
 ```
+
+Where frontend URL is the URL to the frontend application. If running locally,
+set, use `127.0.0.1` instead of `localhost` to get parity between domains and
+hence share cookies without extra configuration. This URL will be used to
+redirect the user back to the frontend after SSO authentication.
 
 You should see output similar to the following:
 

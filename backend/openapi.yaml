@@ -7,12 +7,16 @@ paths:
   /api/v1/login/google:
     post:
       summary: Login into the application with Google Single Sign-On (SSO)
+      description: >-
+        Once authentication is successful, a redirect back to the frontend
+        (frontend URL is statically set on the server) occurs along with a
+        Set-Cookie header with a "token" entry containing the JWT token for
+        subsequent requests requiring authentication. Unsuccessful
+        authentication is not currently being handled gracefully.
       security: []
       responses:
         "302":
           description: Redirect to Google auth provider.
-          # TODO describe what happens after a successful and unsuccessful auth flow
-          # e.g. redirect back to frontend, where can JWT token be found
           headers:
             Location:
               description: URL of google auth provider request
