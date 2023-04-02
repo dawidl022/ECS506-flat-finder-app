@@ -21,7 +21,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/accommodationSearchResults"
+                $ref: "#/components/schemas/accommodationSearch"
 
     post:
       summary: Create a new accommodation listing
@@ -462,6 +462,17 @@ paths:
 
 components:
   schemas:
+    accommodationSearch:
+      type: object
+      required:
+        - searchResults
+        - sources
+      properties:
+        searchResults:
+          $ref: "#/components/schemas/accommodationSearchResults"
+        sources:
+          $ref: "#/components/schemas/searchSources"
+
     accommodationSearchResults:
       type: array
       items:
@@ -477,6 +488,19 @@ components:
             $ref: "#/components/schemas/isFavourite"
           accommodation:
             $ref: "#/components/schemas/accommodationSummary"
+
+    searchSources:
+      type: array
+      items:
+        type: object
+        required:
+          - name
+          - enabled
+        properties:
+          name:
+            $ref: "#/components/schemas/listingSource"
+          enabled:
+            type: boolean
 
     seekingSearchResults:
       type: array
