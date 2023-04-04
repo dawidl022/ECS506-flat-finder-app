@@ -56,3 +56,30 @@ class AccommodationSearchResult:
     distance: float
     is_favourite: bool
     accommodation: AccommodationSummary
+
+@dataclass
+class AccommodationListing:
+    thumbnailUrl: str
+    accommodationType: str
+    numberOfRooms: int
+    livingConditions: list
+    amenities: list
+
+    def getSourceName(self) -> str:
+        pass
+
+    def getRating(self) -> str:
+        pass
+
+@dataclass
+class ExternalAccommodationListing(AccommodationListing):
+    listingUrl: str
+
+    source: str
+    rating: float
+
+    def getSourceName(self) -> str:
+        return self.source
+
+    def getRating(self) -> str:
+        return self.rating
