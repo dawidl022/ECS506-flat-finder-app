@@ -62,14 +62,14 @@ class AccommodationListing:
     thumbnailUrl: str
     accommodationType: str
     numberOfRooms: int
-    livingConditions: list
-    amenities: list
+    livingConditions: list[str]
+    amenities: list[str]
 
     def getSourceName(self) -> str:
-        pass
+        return ""
 
-    def getRating(self) -> str:
-        pass
+    def getRating(self) -> float:
+        return 0.0
 
 @dataclass
 class ExternalAccommodationListing(AccommodationListing):
@@ -81,5 +81,5 @@ class ExternalAccommodationListing(AccommodationListing):
     def getSourceName(self) -> str:
         return self.source
 
-    def getRating(self) -> str:
+    def getRating(self) -> float:
         return self.rating

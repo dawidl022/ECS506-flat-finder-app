@@ -12,7 +12,7 @@ class APIClient:
     # returns list of AccomodationListing after fetches multiple listings for a given params
 
     @staticmethod
-    def searchListing(area: str, radius: float, order_by: str, page_number: int, page_size: int, maximum_price: int) -> ExternalAccommodationListing:
+    def searchListing(area: str, radius: float, order_by: str, page_number: int, page_size: int, maximum_price: int) -> list[ExternalAccommodationListing]:
         pass
 
     @classmethod

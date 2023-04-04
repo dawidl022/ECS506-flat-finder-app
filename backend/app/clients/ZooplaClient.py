@@ -11,7 +11,7 @@ class ZooplaClient(APIClient):
     API_KEY = os.getenv('ZOOPLA_API_KEY')
 
     @staticmethod
-    def fetchListing(listing_id):
+    def fetchListing(listing_id) -> ExternalAccommodationListing:
         url = "https://zoopla.p.rapidapi.com/properties/list"
         querystring = {"listing_id": listing_id}
 
@@ -49,7 +49,7 @@ class ZooplaClient(APIClient):
         return ExternalAccommodationListing(img, type, numrooms, livingConditions, amen, listurl, src, rating)
 
     @staticmethod
-    def searchListing(area, radius, order_by, page_number, page_size, maximum_price=0):
+    def searchListing(area, radius, order_by, page_number, page_size, maximum_price=0) -> list[ExternalAccommodationListing]:
         url = "https://zoopla.p.rapidapi.com/properties/list"
         querystring = {"area": area, "order_by": order_by, "ordering": "ascending",
                        "radius": radius, "listing_status": "rent", "page_number": page_number, "page_size": page_size}
