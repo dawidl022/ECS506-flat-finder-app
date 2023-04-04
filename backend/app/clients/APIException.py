@@ -4,7 +4,7 @@ class APIException(Exception):
         self.args = [*args];
 
 class APIUnreachableException(APIException):
-    def __str__(self):
+    def __str__(self) -> str:
         return f"API is unreachable."
     
 class APIKeyError(APIException):
@@ -18,6 +18,6 @@ class APIResponseError(Exception):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
     
-    def __str__(self):
+    def __str__(self) -> str:
         return f"The API returned error: :{self.args}"
     
