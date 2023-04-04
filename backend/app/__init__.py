@@ -1,8 +1,10 @@
 from flask import Flask
 from flask_injector import FlaskInjector
 from injector import Binder
-from app.listings.service import ListingsService
+from app.listings.service import GeocodingService, ListingsService
 from app.util.encoding import CamelCaseEncoder
+from app.listings.repository import (
+    InMemoryAccommodationListingsRepository, InMemoryPhotoRepository)
 from config import Config
 
 
@@ -26,5 +28,9 @@ def create_app(config_class: type = Config) -> Flask:
 
 def configure_dependencies(binder: Binder) -> None:
     binder.bind(
-        ListingsService, to=ListingsService()
+        ListingsService, to=ListingsService(
+            accommodation_listing_repo=InMemoryAccommodationListingsRepository(),
+            listing_photo_repo=InMemoryPhotoRepository(),
+            geocoder=GeocodingService(),
+        )
     )

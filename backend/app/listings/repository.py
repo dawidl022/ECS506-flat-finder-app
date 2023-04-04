@@ -5,7 +5,7 @@ from uuid import UUID
 from geopy import distance
 
 from .exceptions import ListingNotFoundError
-from .models import AccommodationListing, Location, SortBy
+from .models import AccommodationListing, Location, Photo, SortBy
 
 
 class ListingRepository(ABC):
@@ -24,10 +24,10 @@ class ListingRepository(ABC):
 
 class AccommodationListingRepository(ListingRepository, ABC):
     @abstractmethod
-    def search_by_location(self, location: Location, radius: int,
-                           order_by: SortBy, page: int, size: int,
-                           max_price: int | None = None
-                           ) -> list[AccommodationListing]:
+    def search_by_location(
+            self, location: Location, radius: int, order_by: SortBy, page: int,
+            size: int, max_price: int | None = None
+    ) -> list[AccommodationListing]:
         pass
 
 
@@ -60,7 +60,7 @@ class InMemoryAccommodationListingsRepository(AccommodationListingRepository):
             key=self.sort_key(location, order_by),
         )[page * size:page * size + size]
 
-    @ staticmethod
+    @staticmethod
     def sort_key(location: Location, sort_by: SortBy) -> Callable[[AccommodationListing], float]:
         current_time = time.time()
 
@@ -73,3 +73,32 @@ class InMemoryAccommodationListingsRepository(AccommodationListingRepository):
                 return lambda l: l.price
 
         raise ValueError()
+
+
+class ListingPhotoRepository(ABC):
+    @abstractmethod
+    def get_photo_by_id(self, photo_id: UUID) -> Photo | None:
+        pass
+
+    @abstractmethod
+    def save_photos(self, photos: list[Photo]) -> None:
+        pass
+
+    @abstractmethod
+    def delete_photos(self, photo_ids: list[UUID]) -> None:
+        pass
+
+
+class InMemoryPhotoRepository(ListingPhotoRepository):
+
+    def get_photo_by_id(self, photo_id: UUID) -> Photo | None:
+        # TODO
+        pass
+
+    def save_photos(self, photos: list[Photo]) -> None:
+        # TODO
+        pass
+
+    def delete_photos(self, photo_ids: list[UUID]) -> None:
+        # TODO
+        pass

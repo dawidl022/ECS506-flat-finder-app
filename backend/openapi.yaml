@@ -860,6 +860,7 @@ components:
         - line1
         - town
         - postCode
+        - country
       properties:
         line1:
           type: string
@@ -868,6 +869,8 @@ components:
         town:
           type: string
         postCode:
+          type: string
+        country:
           type: string
 
     usersList:
