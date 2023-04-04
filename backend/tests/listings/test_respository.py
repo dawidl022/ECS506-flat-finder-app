@@ -3,11 +3,20 @@ import unittest
 import uuid
 
 from app.listings.exceptions import ListingNotFoundError
-from app.listings.models import AccommodationListing
+from app.listings.models import AccommodationListing, UKAddress
 from app.listings.repository import InMemoryAccommodationListingsRepository
 from app.listings.models import Coordinates, Location, SortBy
 
-origin_location = Location(Coordinates(0, 0))
+dummy_address = UKAddress(
+    line1="Queen Mary University of London",
+    line2="Mile End Road",
+    town="London",
+    post_code="London E1 4NS",
+)
+origin_location = Location(
+    coords=Coordinates(0, 0),
+    address=dummy_address
+)
 
 
 class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
@@ -28,7 +37,7 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
 
         actual_listing = repo.get_listing_by_id(listing_id)
 
-        self.assertEquals(listing, actual_listing)
+        self.assertEqual(listing, actual_listing)
 
     def test_delete_listing__given_listing_saved__returns_none(self):
         repo = InMemoryAccommodationListingsRepository()
@@ -66,8 +75,8 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
         for listing in listings_within_range | listings_out_of_range:
             repo.save_listing(listing)
 
-        actual_listings = repo.search_by_location(location=Location(
-            coords=Coordinates(lat=51.5, long=0)),
+        actual_listings = repo.search_by_location(
+            coords=Coordinates(lat=51.5, long=0),
             radius=50,
             order_by=SortBy.newest,
             page=0,
@@ -91,8 +100,8 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
         for listing in listings_out_of_range:
             repo.save_listing(listing)
 
-        actual_listings = repo.search_by_location(location=Location(
-            coords=Coordinates(lat=55, long=0)),
+        actual_listings = repo.search_by_location(
+            coords=Coordinates(lat=55, long=0),
             radius=50,
             order_by=SortBy.newest,
             page=0,
@@ -117,8 +126,8 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
         for listing in set(listings_within_range) | listings_out_of_range:
             repo.save_listing(listing)
 
-        actual_listings = repo.search_by_location(location=Location(
-            coords=Coordinates(lat=51.5, long=0)),
+        actual_listings = repo.search_by_location(
+            coords=Coordinates(lat=51.5, long=0),
             radius=50,
             order_by=SortBy.newest,
             page=0,
@@ -145,8 +154,8 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
         for listing in set(listings_within_range) | listings_out_of_range:
             repo.save_listing(listing)
 
-        actual_listings = repo.search_by_location(location=Location(
-            coords=Coordinates(lat=51.5, long=0)),
+        actual_listings = repo.search_by_location(
+            coords=Coordinates(lat=51.5, long=0),
             radius=50,
             order_by=SortBy.newest,
             page=0,
@@ -173,8 +182,8 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
         for listing in set(listings_within_range) | listings_out_of_range:
             repo.save_listing(listing)
 
-        actual_listings = repo.search_by_location(location=Location(
-            coords=Coordinates(lat=51.5, long=0)),
+        actual_listings = repo.search_by_location(
+            coords=Coordinates(lat=51.5, long=0),
             radius=50,
             order_by=SortBy.newest,
             page=1,
@@ -201,8 +210,8 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
         for listing in set(listings_within_range) | listings_out_of_range:
             repo.save_listing(listing)
 
-        actual_listings = repo.search_by_location(location=Location(
-            coords=Coordinates(lat=51.5, long=0)),
+        actual_listings = repo.search_by_location(
+            coords=Coordinates(lat=51.5, long=0),
             radius=50,
             order_by=SortBy.newest,
             page=1,
@@ -227,8 +236,8 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
         for listing in set(listings_within_range) | listings_out_of_range:
             repo.save_listing(listing)
 
-        actual_listings = repo.search_by_location(location=Location(
-            coords=Coordinates(lat=51.5, long=0)),
+        actual_listings = repo.search_by_location(
+            coords=Coordinates(lat=51.5, long=0),
             radius=50,
             order_by=SortBy.closest,
             page=0,
@@ -256,8 +265,8 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
         for listing in set(listings_within_range) | listings_out_of_range:
             repo.save_listing(listing)
 
-        actual_listings = repo.search_by_location(location=Location(
-            coords=Coordinates(lat=51.5, long=0)),
+        actual_listings = repo.search_by_location(
+            coords=Coordinates(lat=51.5, long=0),
             radius=50,
             order_by=SortBy.cheapest,
             page=0,
@@ -285,8 +294,8 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
         for listing in set(listings_within_range) | listings_out_of_range:
             repo.save_listing(listing)
 
-        actual_listings = repo.search_by_location(location=Location(
-            coords=Coordinates(lat=51.5, long=0)),
+        actual_listings = repo.search_by_location(
+            coords=Coordinates(lat=51.5, long=0),
             radius=50,
             order_by=SortBy.cheapest,
             page=0,
@@ -303,17 +312,30 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
         return AccommodationListing(
             id=uuid.uuid4(),
             location=Location(
-                Coordinates(lat=lat, long=long)
+                coords=Coordinates(lat=lat, long=long),
+                address=dummy_address
             ),
             created_at=time.time(),
             price=price,
+            author_email="user@example.com",
+            title="Example listing",
+            description="Some very interesting description",
+            accommodation_type="Flat",
+            number_of_rooms=3,
+            photo_ids=()
         )
 
-    @staticmethod
+    @ staticmethod
     def default_accommodation(listing_id: uuid.UUID):
         return AccommodationListing(
             id=listing_id,
             location=origin_location,
             created_at=time.time(),
             price=10_000,
+            author_email="user@example.com",
+            title="Example listing",
+            description="Some very interesting description",
+            accommodation_type="Flat",
+            number_of_rooms=3,
+            photo_ids=()
         )

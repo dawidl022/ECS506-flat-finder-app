@@ -129,7 +129,7 @@ class AccommodationListing:
     accommodation_type: str
     number_of_rooms: int
 
-    photo_ids: list[UUID]
+    photo_ids: tuple[UUID, ...]
 
 
 @dataclass

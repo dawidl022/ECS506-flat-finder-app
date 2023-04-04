@@ -5,7 +5,7 @@ from uuid import UUID
 from geopy import distance
 
 from .exceptions import ListingNotFoundError
-from .models import AccommodationListing, Location, Photo, SortBy
+from .models import AccommodationListing, Coordinates, Location, Photo, SortBy
 
 
 class ListingRepository(ABC):
@@ -25,8 +25,8 @@ class ListingRepository(ABC):
 class AccommodationListingRepository(ListingRepository, ABC):
     @abstractmethod
     def search_by_location(
-            self, location: Location, radius: int, order_by: SortBy, page: int,
-            size: int, max_price: int | None = None
+        self, coords: Coordinates, radius: int, order_by: SortBy,
+        page: int, size: int, max_price: int | None = None
     ) -> list[AccommodationListing]:
         pass
 
@@ -48,27 +48,28 @@ class InMemoryAccommodationListingsRepository(AccommodationListingRepository):
         except KeyError:
             raise ListingNotFoundError()
 
-    def search_by_location(self, location: Location, radius: int,
-                           order_by: SortBy, page: int, size: int,
-                           max_price: int | None = None
-                           ) -> list[AccommodationListing]:
+    def search_by_location(
+        self, coords: Coordinates, radius: int, order_by: SortBy, page: int,
+        size: int, max_price: int | None = None
+    ) -> list[AccommodationListing]:
         return sorted(
             [l for l in self.listings.values()
-             if distance.distance(location.coords, l.location.coords) <= radius
+             if distance.distance(coords, l.location.coords) <= radius
              and (max_price is None or l.price <= max_price)
              ],
-            key=self.sort_key(location, order_by),
+            key=self.sort_key(coords, order_by),
         )[page * size:page * size + size]
 
     @staticmethod
-    def sort_key(location: Location, sort_by: SortBy) -> Callable[[AccommodationListing], float]:
+    def sort_key(coords: Coordinates, sort_by: SortBy
+                 ) -> Callable[[AccommodationListing], float]:
         current_time = time.time()
 
         match sort_by:
             case SortBy.newest:
                 return lambda l: current_time - l.created_at
             case SortBy.closest:
-                return lambda l: distance.distance(location.coords, l.location.coords)
+                return lambda l: distance.distance(coords, l.location.coords)
             case SortBy.cheapest:
                 return lambda l: l.price
 
