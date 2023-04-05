@@ -77,7 +77,8 @@ def validate_and_get_uploaded_photos():
     get uploaded photos and ensure they don't exceed the max file size and
     that a correct number of them have been uploaded
     """
-    if any([file_size(file) > MAX_PHOTO_SIZE for file in request.files.values()]):
+    if any([file_size(file) > MAX_PHOTO_SIZE
+            for file in request.files.values()]):
         abort(make_response(
             {'photos': 'no uploaded photo may exceed 5MB in size'}, 413
         ))
