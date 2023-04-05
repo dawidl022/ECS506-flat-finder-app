@@ -1,11 +1,10 @@
-from http.client import BAD_REQUEST, INTERNAL_SERVER_ERROR, UNAUTHORIZED
+from http.client import BAD_REQUEST, UNAUTHORIZED
 import uuid
-from click import UUID
 
 from flask import Blueprint, Response, abort, jsonify, make_response, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
-from app.util.marshmallow import get_params, get_form
+from app.util.marshmallow import get_params, get_input
 from app.util.encoding import CamelCaseEncoder
 from app.util.encoding import CamelCaseDecoder
 from config import Config
@@ -32,9 +31,18 @@ def get_accommodation_listings(listings_service: BaseListingsService
 @jwt_required()
 def create_accommodation_listing(listing_service: BaseListingsService
                                  ) -> Response:
-    form = get_form(CreateAccommodationForm)
+    # in multipart forms, nested fields (like address) are awkwardly placed
+    # into files as a JSON string, so we need to extract that
+    address_file = request.files.get("address")
+    if address_file is None:
+        abort(make_response(
+            {'address': "missing address field"}, BAD_REQUEST))
 
-    photos = [file.stream.read() for file in request.files.values()]
+    form = get_input(CreateAccommodationForm, request.form |
+                     {"address": address_file.stream.read().decode()})
+
+    photos = [file.stream.read()
+              for file in request.files.values() if file.name != "address"]
     if not 1 <= len(photos) <= 15:
         abort(make_response(
             {'photos': "expected between 1 and 15 photos"}, BAD_REQUEST))
