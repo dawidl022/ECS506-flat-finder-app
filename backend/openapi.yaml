@@ -4,6 +4,29 @@ info:
   version: 0.1.0
 
 paths:
+  /api/v1/login/google:
+    post:
+      summary: Login into the application with Google Single Sign-On (SSO)
+      description: >-
+        Once authentication is successful, a redirect back to the frontend
+        (frontend URL is statically set on the server) occurs along with a
+        Set-Cookie header with a "token" entry containing the JWT token for
+        subsequent requests requiring authentication. Unsuccessful
+        authentication is not currently being handled gracefully.
+      security: []
+      responses:
+        "302":
+          description: Redirect to Google auth provider.
+          headers:
+            Location:
+              description: URL of google auth provider request
+              schema:
+                type: string
+            Set-Cookie:
+              description: Cookie to keep track of authentication request
+              schema:
+                type: string
+
   /api/v1/sources/accommodation:
     get:
       summary: Get the available listing sources, optionally filtered by location
@@ -1083,3 +1106,12 @@ components:
       description: ID of the user to fetch or apply the operation on
       schema:
         $ref: "#/components/schemas/userId"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []
