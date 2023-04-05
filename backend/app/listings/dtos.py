@@ -70,7 +70,8 @@ class CreateAccommodationForm(Schemable):
 
         match Country(country):
             case Country.UK:
-                return dacite.from_dict(data_class=UKAddress, data=address, config=dacite.Config(cast=[StrEnum]))
+                return dacite.from_dict(data_class=UKAddress, data=address,
+                                        config=dacite.Config(cast=[StrEnum]))
 
         raise ValueError("Unexpected country")
 
