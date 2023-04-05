@@ -101,7 +101,7 @@ def test_create_accommodation_listing__given_valid_request__returns_listing(clie
             "name": "Example User",
             "userProfile": {
                 "id": "7a5a9895-94d1-44f4-a4b8-2bf41da8a81a",
-                "email": "user@example.com",
+                "email": "unittest@user.com",
                 "name": "Example User",
                 "contactDetails": {
                     "phoneNumber": "+44 78912 345678",
@@ -109,7 +109,7 @@ def test_create_accommodation_listing__given_valid_request__returns_listing(clie
             },
         },
         "contactInfo": {
-            "email": "user@example.com",
+            "email": "unittest@user.com",
             "phoneNumber": "+44 78912 345678",
         }
     }

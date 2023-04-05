@@ -1,8 +1,9 @@
-from http.client import BAD_REQUEST, INTERNAL_SERVER_ERROR
+from http.client import BAD_REQUEST, INTERNAL_SERVER_ERROR, UNAUTHORIZED
 import uuid
 from click import UUID
 
 from flask import Blueprint, Response, abort, jsonify, make_response, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from app.util.marshmallow import get_params, get_form
 from app.util.encoding import CamelCaseEncoder
@@ -28,6 +29,7 @@ def get_accommodation_listings(listings_service: BaseListingsService
 
 
 @bp.post("/accommodation")
+@jwt_required()
 def create_accommodation_listing(listing_service: BaseListingsService
                                  ) -> Response:
     form = get_form(CreateAccommodationForm)
@@ -37,10 +39,17 @@ def create_accommodation_listing(listing_service: BaseListingsService
         abort(make_response(
             {'photos': "expected between 1 and 15 photos"}, BAD_REQUEST))
 
-    # TODO fetch user email from JWT token and fetch profile from UserService
+    current_user_id = get_jwt_identity()
+    current_user_email = current_user_id.get("email")
+
+    if current_user_email is None:
+        abort(make_response(
+            {'token': "invalid bearer token"}, UNAUTHORIZED))
+
+    # TODO fetch profile from UserService
     dummy_user = User(
         id=uuid.UUID("7a5a9895-94d1-44f4-a4b8-2bf41da8a81a"),
-        email="user@example.com",
+        email=current_user_email,
         name="Example User",
         contact_details=ContactDetails(
             phone_number="+44 78912 345678",

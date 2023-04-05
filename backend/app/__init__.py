@@ -10,6 +10,11 @@ from app.listings.repository import (
 from config import Config
 
 
+def register_blueprints(app: Flask) -> None:
+    from app.listings import listings_bp
+    app.register_blueprint(listings_bp)
+
+
 def create_app(config_class: type = Config) -> Flask:
     app = Flask(__name__)
     app.config.from_object(config_class())
@@ -18,9 +23,7 @@ def create_app(config_class: type = Config) -> Flask:
     JWTManager(app)
 
     # Register blueprints
-    from app.listings import listings_bp
-    app.register_blueprint(listings_bp)
-    listings_bp.json_encoder = CamelCaseEncoder
+    register_blueprints(app)
 
     from app.auth.google import auth_bp
     app.register_blueprint(auth_bp)
