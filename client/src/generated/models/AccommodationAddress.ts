@@ -50,6 +50,12 @@ export interface AccommodationAddress {
      * @memberof AccommodationAddress
      */
     postCode: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AccommodationAddress
+     */
+    country: string;
 }
 
 /**
@@ -60,6 +66,7 @@ export function instanceOfAccommodationAddress(value: object): boolean {
     isInstance = isInstance && "line1" in value;
     isInstance = isInstance && "town" in value;
     isInstance = isInstance && "postCode" in value;
+    isInstance = isInstance && "country" in value;
 
     return isInstance;
 }
@@ -78,6 +85,7 @@ export function AccommodationAddressFromJSONTyped(json: any, ignoreDiscriminator
         'line2': !exists(json, 'line2') ? undefined : json['line2'],
         'town': json['town'],
         'postCode': json['postCode'],
+        'country': json['country'],
     };
 }
 
@@ -94,6 +102,7 @@ export function AccommodationAddressToJSON(value?: AccommodationAddress | null):
         'line2': value.line2,
         'town': value.town,
         'postCode': value.postCode,
+        'country': value.country,
     };
 }
 

@@ -15,6 +15,7 @@
 
 import * as runtime from '../runtime';
 import type {
+  Accommodation,
   AccommodationAddress,
   AccommodationDetails,
   AccommodationFormBase,
@@ -29,6 +30,8 @@ import type {
   UserProfileForm,
 } from '../models';
 import {
+    AccommodationFromJSON,
+    AccommodationToJSON,
     AccommodationAddressFromJSON,
     AccommodationAddressToJSON,
     AccommodationDetailsFromJSON,
@@ -446,7 +449,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * Create an accommodation listing as the currently logged in user. Listing will be made visible to other users.
      * Create a new accommodation listing
      */
-    async apiV1ListingsAccommodationPostRaw(requestParameters: ApiV1ListingsAccommodationPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccommodationDetails>> {
+    async apiV1ListingsAccommodationPostRaw(requestParameters: ApiV1ListingsAccommodationPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Accommodation>> {
         if (requestParameters.title === null || requestParameters.title === undefined) {
             throw new runtime.RequiredError('title','Required parameter requestParameters.title was null or undefined when calling apiV1ListingsAccommodationPost.');
         }
@@ -533,14 +536,14 @@ export class DefaultApi extends runtime.BaseAPI {
             body: formParams,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AccommodationDetailsFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => AccommodationFromJSON(jsonValue));
     }
 
     /**
      * Create an accommodation listing as the currently logged in user. Listing will be made visible to other users.
      * Create a new accommodation listing
      */
-    async apiV1ListingsAccommodationPost(requestParameters: ApiV1ListingsAccommodationPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccommodationDetails> {
+    async apiV1ListingsAccommodationPost(requestParameters: ApiV1ListingsAccommodationPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Accommodation> {
         const response = await this.apiV1ListingsAccommodationPostRaw(requestParameters, initOverrides);
         return await response.value();
     }

@@ -43,6 +43,12 @@ export interface UKAddress {
      * @memberof UKAddress
      */
     postCode: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UKAddress
+     */
+    country: string;
 }
 
 /**
@@ -53,6 +59,7 @@ export function instanceOfUKAddress(value: object): boolean {
     isInstance = isInstance && "line1" in value;
     isInstance = isInstance && "town" in value;
     isInstance = isInstance && "postCode" in value;
+    isInstance = isInstance && "country" in value;
 
     return isInstance;
 }
@@ -71,6 +78,7 @@ export function UKAddressFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         'line2': !exists(json, 'line2') ? undefined : json['line2'],
         'town': json['town'],
         'postCode': json['postCode'],
+        'country': json['country'],
     };
 }
 
@@ -87,6 +95,7 @@ export function UKAddressToJSON(value?: UKAddress | null): any {
         'line2': value.line2,
         'town': value.town,
         'postCode': value.postCode,
+        'country': value.country,
     };
 }
 
