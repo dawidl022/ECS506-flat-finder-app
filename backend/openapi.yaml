@@ -877,7 +877,8 @@ components:
           type: string
         country:
           type: string
-          # TODO describe what this is and that it must be lowercase
+          description: Lowercase country code
+          example: uk
 
     usersList:
       type: array
