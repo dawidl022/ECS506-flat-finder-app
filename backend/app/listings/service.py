@@ -10,7 +10,13 @@ from app.listings.repository import (
     AccommodationListingRepository, ListingPhotoRepository)
 
 
-class GeocodingService:
+class BaseGeocodingService(abc.ABC):
+    @abc.abstractmethod
+    def get_coords(self, addr: Address) -> Coordinates:
+        pass
+
+
+class GeocodingService(BaseGeocodingService):
     def get_coords(self, addr: Address) -> Coordinates:
         """
         TODO turn address into coordinates using geopy module
@@ -34,7 +40,7 @@ class BaseListingsService(abc.ABC):
 
 class ListingsService(BaseListingsService):
 
-    def __init__(self, geocoder: GeocodingService,
+    def __init__(self, geocoder: BaseGeocodingService,
                  accommodation_listing_repo: AccommodationListingRepository,
                  listing_photo_repo: ListingPhotoRepository) -> None:
         self.geocoder = geocoder

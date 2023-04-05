@@ -21,7 +21,7 @@ model_listing = AccommodationListing(
             post_code="E1 4NS"
         )
     ),
-    created_at=int(time.time()),
+    created_at=time.time(),
     price=800,
     author_email="user@example.com",
     title="Some random title",

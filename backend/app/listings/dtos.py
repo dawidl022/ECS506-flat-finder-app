@@ -1,5 +1,6 @@
 import abc
 from dataclasses import dataclass
+from enum import StrEnum
 import json
 from typing import cast
 from flask import url_for
@@ -69,7 +70,7 @@ class CreateAccommodationForm(Schemable):
 
         match Country(country):
             case Country.UK:
-                return dacite.from_dict(data_class=UKAddress, data=address)
+                return dacite.from_dict(data_class=UKAddress, data=address, config=dacite.Config(cast=[StrEnum]))
 
         raise ValueError("Unexpected country")
 
