@@ -2,7 +2,11 @@ import { FC, FormEvent, useState } from "react";
 import Tabs from "../Tabs";
 import { useRouter } from "next/router";
 import AccommodationDetails from "../Listing/AccommodationDetails";
-import { Configuration, DefaultApi } from "@/generated";
+import {
+  AccommodationAddressCountryEnum,
+  Configuration,
+  DefaultApi,
+} from "@/generated";
 const ListingForm: FC = ({}) => {
   const router = useRouter();
   const { listingType } = router.query;
@@ -26,12 +30,14 @@ const ListingForm: FC = ({}) => {
         description,
         photos: Array<Blob>(),
         accommodationType,
-        numberOfRooms: noOfRooms,
+        numberOfRooms: 1,
         price,
         address: {
           line1: address,
+          line2: "as",
           town: "London",
           postCode: "E1 8QW",
+          country: AccommodationAddressCountryEnum.Uk,
         },
       })
       .then(res => console.log(res));
