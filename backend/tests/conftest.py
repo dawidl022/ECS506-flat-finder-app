@@ -6,7 +6,8 @@ from flask import Flask
 from flask.testing import FlaskClient, FlaskCliRunner
 
 from app import create_app
-from app.listings.service import ListingsService
+from app.listings.service import BaseListingsService
+from tests.listings.test_routes import MockListingService
 
 
 @pytest.fixture()
@@ -28,13 +29,9 @@ def app() -> Generator[Flask, None, None]:
 
 def configure_mocks(binder: Binder):
     binder.bind(
-        ListingsService, to=MockListingService()
+        BaseListingsService,  # type: ignore[type-abstract]
+        to=MockListingService()
     )
-
-
-class MockListingService(ListingsService):
-    def search_accommodation_listings(self):
-        return []
 
 
 @pytest.fixture()

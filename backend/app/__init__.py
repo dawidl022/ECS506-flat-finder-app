@@ -1,7 +1,8 @@
 from flask import Flask
 from flask_injector import FlaskInjector
 from injector import Binder
-from app.listings.service import GeocodingService, ListingsService
+from app.listings.service import (
+    GeocodingService, ListingsService, BaseListingsService)
 from app.util.encoding import CamelCaseEncoder
 from app.listings.repository import (
     InMemoryAccommodationListingsRepository, InMemoryPhotoRepository)
@@ -11,7 +12,6 @@ from config import Config
 def create_app(config_class: type = Config) -> Flask:
     app = Flask(__name__)
     app.config.from_object(config_class)
-    app.json_encoder = CamelCaseEncoder
 
     # Initialize Flask extensions here
 
@@ -27,10 +27,12 @@ def create_app(config_class: type = Config) -> Flask:
 
 
 def configure_dependencies(binder: Binder) -> None:
+    listing_service = ListingsService(
+        accommodation_listing_repo=InMemoryAccommodationListingsRepository(),
+        listing_photo_repo=InMemoryPhotoRepository(),
+        geocoder=GeocodingService(),
+    )
+
     binder.bind(
-        ListingsService, to=ListingsService(
-            accommodation_listing_repo=InMemoryAccommodationListingsRepository(),
-            listing_photo_repo=InMemoryPhotoRepository(),
-            geocoder=GeocodingService(),
-        )
+        BaseListingsService, to=listing_service  # type: ignore[type-abstract]
     )

@@ -58,7 +58,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/accommodationDetails"
+                $ref: "#/components/schemas/accommodation"
 
   /api/v1/listings/accommodation/{listingId}:
     get:
@@ -872,6 +872,7 @@ components:
           type: string
         country:
           type: string
+          # TODO describe what this is and that it must be lowercase
 
     usersList:
       type: array

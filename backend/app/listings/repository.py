@@ -10,7 +10,8 @@ from .models import AccommodationListing, Coordinates, Location, Photo, SortBy
 
 class ListingRepository(ABC):
     @abstractmethod
-    def get_listing_by_id(self, listing_id: UUID) -> AccommodationListing | None:
+    def get_listing_by_id(self, listing_id: UUID
+                          ) -> AccommodationListing | None:
         pass
 
     @abstractmethod
@@ -36,7 +37,8 @@ class InMemoryAccommodationListingsRepository(AccommodationListingRepository):
     def __init__(self) -> None:
         self.listings: dict[UUID, AccommodationListing] = {}
 
-    def get_listing_by_id(self, listing_id: UUID) -> AccommodationListing | None:
+    def get_listing_by_id(self, listing_id: UUID
+                          ) -> AccommodationListing | None:
         return self.listings.get(listing_id)
 
     def save_listing(self, listing: AccommodationListing) -> None:
@@ -53,9 +55,9 @@ class InMemoryAccommodationListingsRepository(AccommodationListingRepository):
         size: int, max_price: int | None = None
     ) -> list[AccommodationListing]:
         return sorted(
-            [l for l in self.listings.values()
-             if distance.distance(coords, l.location.coords) <= radius
-             and (max_price is None or l.price <= max_price)
+            [listing for listing in self.listings.values()
+             if distance.distance(coords, listing.location.coords) <= radius
+             and (max_price is None or listing.price <= max_price)
              ],
             key=self.sort_key(coords, order_by),
         )[page * size:page * size + size]
@@ -67,11 +69,12 @@ class InMemoryAccommodationListingsRepository(AccommodationListingRepository):
 
         match sort_by:
             case SortBy.newest:
-                return lambda l: current_time - l.created_at
+                return lambda listing: current_time - listing.created_at
             case SortBy.closest:
-                return lambda l: distance.distance(coords, l.location.coords)
+                return lambda listing: distance.distance(
+                    coords, listing.location.coords)
             case SortBy.cheapest:
-                return lambda l: l.price
+                return lambda listing: listing.price
 
         raise ValueError()
 

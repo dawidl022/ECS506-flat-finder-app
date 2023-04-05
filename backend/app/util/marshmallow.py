@@ -1,10 +1,11 @@
 from enum import StrEnum
 from http.client import BAD_REQUEST
-from typing import Any, Type, TypeVar
+from typing import Any, Type, TypeVar, cast
 from flask import abort, make_response, request
 import dacite
 
 from app.util.schema import Schemable
+from app.util.encoding import CamelCaseDecoder
 
 
 T = TypeVar('T', bound=Schemable)
@@ -28,4 +29,5 @@ def get_params(type: Type[T]) -> T:
 
 
 def get_form(type: Type[T]) -> T:
-    return _get_input(type, request.form)
+    form = cast(dict[str, str], CamelCaseDecoder.snake_casify(request.form))
+    return _get_input(type, form)

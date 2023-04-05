@@ -41,7 +41,7 @@ class AccommodationSearchParams(Schemable):
         return self.sources.split(",") if self.sources else []
 
 
-@dataclass
+@dataclass(frozen=True)
 class AccommodationSummary:
     id: str
     title: str
@@ -54,7 +54,7 @@ class AccommodationSummary:
     post_code: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class AccommodationSearchResult:
     distance: float
     is_favourite: bool
@@ -98,7 +98,7 @@ class UKAddress(Address):
     line2: str | None
     town: str
     post_code: str
-    country = Country.UK
+    country: Country = Country.UK
 
     @property
     def address(self) -> str:
@@ -130,9 +130,23 @@ class AccommodationListing:
     number_of_rooms: int
 
     photo_ids: tuple[UUID, ...]
+    source: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class Photo:
     id: UUID
     blob: bytes
+
+
+@dataclass(frozen=True)
+class ContactDetails:
+    phone_number: str
+
+
+@dataclass(frozen=True)
+class User:
+    id: UUID
+    email: str
+    name: str
+    contact_details: ContactDetails

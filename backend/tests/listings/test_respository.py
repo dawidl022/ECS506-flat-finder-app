@@ -322,7 +322,8 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
             description="Some very interesting description",
             accommodation_type="Flat",
             number_of_rooms=3,
-            photo_ids=()
+            photo_ids=(),
+            source="internal"
         )
 
     @ staticmethod
@@ -337,5 +338,6 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
             description="Some very interesting description",
             accommodation_type="Flat",
             number_of_rooms=3,
-            photo_ids=()
+            photo_ids=(),
+            source="internal"
         )
