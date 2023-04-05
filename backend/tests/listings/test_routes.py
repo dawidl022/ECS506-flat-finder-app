@@ -45,13 +45,13 @@ def test_create_accommodation_listing__given_no_files__returns_bad_request(clien
         "accommodationType": model_listing.accommodation_type,
         "numberOfRooms": str(model_listing.number_of_rooms),
         "price": model_listing.price,
-        "address": json.dumps({
+        "address": (BytesIO(json.dumps({
             "country": "uk",
             "line1": address.line1,
             "line2": address.line2,
             "town": address.town,
             "post_code": address.post_code,
-        }),
+        }).encode()), "blob"),
     })
     assert b'{"photos":"expected between 1 and 15 photos"}' in response.data
     assert response.status_code == BAD_REQUEST
@@ -65,13 +65,13 @@ def test_create_accommodation_listing__given_valid_request__returns_listing(clie
         "accommodationType": model_listing.accommodation_type,
         "numberOfRooms": str(model_listing.number_of_rooms),
         "price": model_listing.price,
-        "address": json.dumps({
+        "address": (BytesIO(json.dumps({
             "country": "uk",
             "line1": address.line1,
             "line2": address.line2,
             "town": address.town,
             "post_code": address.post_code,
-        }),
+        }).encode()), "blob"),
         "photos": [
             (BytesIO(bytes((1, 2, 3))), "photo1"),
             (BytesIO(bytes((2, 3, 4))), "photo2"),
