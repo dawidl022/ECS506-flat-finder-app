@@ -5,7 +5,7 @@ from uuid import UUID
 from geopy import distance
 
 from .exceptions import ListingNotFoundError
-from .models import AccommodationListing, Coordinates, Location, Photo, SortBy
+from .models import AccommodationListing, Coordinates, Photo, SortBy
 
 
 class ListingRepository(ABC):
