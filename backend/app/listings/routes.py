@@ -35,33 +35,10 @@ def get_accommodation_listings(listings_service: BaseListingsService
 @jwt_required()
 def create_accommodation_listing(listing_service: BaseListingsService
                                  ) -> Response:
-    # in multipart forms, nested fields (like address) are awkwardly placed
-    # into files as a JSON string, so we need to extract that
-    address_file = request.files.get("address")
-    if address_file is None:
-        abort(make_response(
-            {'address': "missing address field"}, BAD_REQUEST))
+    form = validate_and_get_create_accommodation_form()
+    photos = validate_and_get_uploaded_photos()
 
-    form = get_input(CreateAccommodationForm, request.form |
-                     {"address": address_file.stream.read().decode()})
-
-    if any([file_size(file) > MAX_PHOTO_SIZE for file in request.files.values()]):
-        abort(make_response(
-            {'photos': 'no uploaded photo may exceed 5MB in size'}, 413
-        ))
-
-    photos = [file.stream.read()
-              for file in request.files.values() if file.name != "address"]
-    if not 1 <= len(photos) <= 15:
-        abort(make_response(
-            {'photos': "expected between 1 and 15 photos"}, BAD_REQUEST))
-
-    current_user_id = get_jwt_identity()
-    current_user_email = current_user_id.get("email")
-
-    if current_user_email is None:
-        abort(make_response(
-            {'token': "invalid bearer token"}, UNAUTHORIZED))
+    current_user_email = get_current_user_email()
 
     # TODO fetch profile from UserService
     dummy_user = User(
@@ -81,7 +58,59 @@ def create_accommodation_listing(listing_service: BaseListingsService
     return jsonify(dto)
 
 
+def get_current_user_email():
+    """
+    get user email from JWT token in header of request
+    """
+    current_user_id = get_jwt_identity()
+    current_user_email = current_user_id.get("email")
+
+    if current_user_email is None:
+        abort(make_response(
+            {'token': "invalid bearer token"}, UNAUTHORIZED))
+
+    return current_user_email
+
+
+def validate_and_get_uploaded_photos():
+    """
+    get uploaded photos and ensure they don't exceed the max file size and
+    that a correct number of them have been uploaded
+    """
+    if any([file_size(file) > MAX_PHOTO_SIZE for file in request.files.values()]):
+        abort(make_response(
+            {'photos': 'no uploaded photo may exceed 5MB in size'}, 413
+        ))
+
+    photos = [file.stream.read()
+              for file in request.files.values() if file.name != "address"]
+    if not 1 <= len(photos) <= 15:
+        abort(make_response(
+            {'photos': "expected between 1 and 15 photos"}, BAD_REQUEST))
+
+    return photos
+
+
+def validate_and_get_create_accommodation_form():
+    """
+    in multipart forms, nested fields (like address) are awkwardly placed
+    into files as a JSON string, so we need to extract that
+    """
+    address_file = request.files.get("address")
+    if address_file is None:
+        abort(make_response(
+            {'address': "missing address field"}, BAD_REQUEST))
+
+    form = get_input(CreateAccommodationForm, request.form |
+                     {"address": address_file.stream.read().decode()})
+
+    return form
+
+
 def file_size(file: FileStorage) -> int:
+    """
+    get the file size of an uploaded file, by seeking though the entire file
+    """
     size = file.stream.seek(0, os.SEEK_END)
     file.stream.seek(0, os.SEEK_SET)
     return size
