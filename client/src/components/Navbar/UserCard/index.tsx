@@ -36,7 +36,7 @@ const UserCard = () => {
       </div>
       {isOpen && (
         <div className={styles.dropDown}>
-          <div
+          <button
             onClick={() => {
               setIsOpen(false);
               router.push("/profile/seagull");
@@ -47,8 +47,8 @@ const UserCard = () => {
               <img src="/icons/user.svg" />
             </div>
             <p>Profile</p>
-          </div>
-          <div
+          </button>
+          <button
             className={styles.menuItem}
             onClick={() => {
               setIsOpen(false);
@@ -60,8 +60,8 @@ const UserCard = () => {
               <img src="/icons/book.svg" />
             </div>
             <p>Listing</p>
-          </div>
-          <div
+          </button>
+          <button
             onClick={() => {
               setIsOpen(false);
               // TODO: exit logic (delete cookie)
@@ -72,7 +72,7 @@ const UserCard = () => {
               <img src="/icons/exit.svg" />
             </div>
             <p>Exit</p>
-          </div>
+          </button>
         </div>
       )}
     </div>
