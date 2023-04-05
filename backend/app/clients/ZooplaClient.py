@@ -49,20 +49,13 @@ class ZooplaClient(APIClient):
         img: str = response['listing'][0]['images'][0]["original"]
         type: str = response['listing'][0]['property_type']
         numrooms: int = response['listing'][0]['num_bedrooms']
-        livingConditions: list[str] = [
-            response['listing'][0]['furnished_state']]
-        amen: list[str] = response['listing'][0]['bullet']
-        listurl: str = response['listing'][0]['details_url']
         src: str = ZooplaClient.name
-        rating: float = 0.0  # zoopla does not have ratings
+        listurl: str = response['listing'][0]['details_url']
         return ExternalAccommodationListing(img,
                                             type,
                                             numrooms,
-                                            livingConditions,
-                                            amen,
-                                            listurl,
                                             src,
-                                            rating)
+                                            listurl)
 
     @staticmethod
     def searchListing(area: str,
@@ -117,17 +110,12 @@ class ZooplaClient(APIClient):
             img: str = x['images'][0]["original"]
             type: str = x['property_type']
             numrooms: int = x['num_bedrooms']
-            livingConditions: list[str] = [x['furnished_state']]
-            amen: list[str] = x['bullet']
             listurl: str = x['details_url']
             src: str = ZooplaClient.name
-            rating: float = 0.0  # zoopla does not have ratings
             out.append(ExternalAccommodationListing(img,
                                                     type,
                                                     numrooms,
-                                                    livingConditions,
-                                                    amen, listurl,
                                                     src,
-                                                    rating))
+                                                    listurl))
 
         return out
