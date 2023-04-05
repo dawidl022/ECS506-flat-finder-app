@@ -24,7 +24,8 @@ def is_valid_address(addr: str) -> dict[str, str]:
         dict[str, str], CamelCaseDecoder.snake_casify(json.loads(addr)))
     country = address.get("country")
     if country is None:
-        raise marshmallow.ValidationError("err1")  # TODO missing country
+        raise marshmallow.ValidationError(
+            "country missing from address")
 
     match Country(country):
         case Country.UK:
@@ -33,10 +34,10 @@ def is_valid_address(addr: str) -> dict[str, str]:
                                  config=dacite.Config(cast=[Country]))
                 return address
             except dacite.DaciteError:
-                # TODO invalid address fro country
-                raise marshmallow.ValidationError("err2")
+                raise marshmallow.ValidationError(
+                    f"invalid address format for country: {country}")
 
-    raise marshmallow.ValidationError("err3")  # TODO invalid country
+    raise marshmallow.ValidationError(f"invalid country: {country}")
 
 
 class CreateAccommodationFormSchema(Schema):
