@@ -1,7 +1,8 @@
-import { FC, useState } from "react";
+import { FC, FormEvent, useState } from "react";
 import Tabs from "../Tabs";
 import { useRouter } from "next/router";
 import AccommodationDetails from "../Listing/AccommodationDetails";
+import { Configuration, DefaultApi } from "@/generated";
 const ListingForm: FC = ({}) => {
   const router = useRouter();
   const { listingType } = router.query;
@@ -9,13 +10,31 @@ const ListingForm: FC = ({}) => {
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
-  const [accomodationType, setAccomodationType] = useState("");
+  const [accommodationType, setAccommodationType] = useState("");
   const [noOfRooms, setNoOfRooms] = useState(0);
   const [price, setPrice] = useState(0);
 
   const previewFunc = () => {
     //redirect to preview page and render the AccomodationDetails componen
-    
+  };
+
+  const handleSubmit = (e: FormEvent<HTMLElement>) => {
+    e.preventDefault();
+    new DefaultApi(new Configuration({ basePath: "http://127.0.0.1:5000" }))
+      .apiV1ListingsAccommodationPost({
+        title,
+        description,
+        photos: Array<Blob>(),
+        accommodationType,
+        numberOfRooms: noOfRooms,
+        price,
+        address: {
+          line1: address,
+          town: "London",
+          postCode: "E1 8QW",
+        },
+      })
+      .then(res => console.log(res));
   };
 
   return (
@@ -65,7 +84,7 @@ const ListingForm: FC = ({}) => {
       {listingType === "accommodation" && (
         <div>
           Accommodation Form
-          <form>
+          <form onSubmit={handleSubmit}>
             <input
               type="text"
               placeholder="Accommodation Title"
@@ -110,8 +129,8 @@ const ListingForm: FC = ({}) => {
             <br />
             <select
               id="type"
-              value={accomodationType}
-              onChange={e => setAccomodationType(e.target.value)}
+              value={accommodationType}
+              onChange={e => setAccommodationType(e.target.value)}
             >
               <option value={"Detached"}>Detached House</option>
               <option value={"Semi-detached"}>Semi-detached House</option>
@@ -126,7 +145,7 @@ const ListingForm: FC = ({}) => {
               Preview
             </button>
             <br />
-            <button type="button" >Add</button>
+            <button>Add</button>
           </form>
         </div>
       )}

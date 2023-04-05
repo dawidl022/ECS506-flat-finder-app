@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Inter } from "@next/font/google";
 import styles from "@/styles/Home.module.scss";
 import Tabs from "@/components/Tabs";
+import ListingForm from "@/components/ListingForm/ListingForm";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,6 +20,7 @@ export default function Home() {
       <main>
         <div className="container">
           <h2>Hello</h2>
+          <ListingForm />
         </div>
       </main>
     </>
