@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from flask_injector import FlaskInjector
 from flask_jwt_extended import JWTManager
 from injector import Binder
@@ -20,6 +21,7 @@ def create_app(config_class: type = Config) -> Flask:
     app.config.from_object(config_class())
 
     # Initialize Flask extensions
+    CORS(app, resources={r"/api/*": {"origins": [Config().FRONTEND_URL]}})
     JWTManager(app)
 
     # Register blueprints
