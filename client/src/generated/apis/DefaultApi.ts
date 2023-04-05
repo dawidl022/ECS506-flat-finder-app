@@ -18,7 +18,7 @@ import type {
   AccommodationAddress,
   AccommodationDetails,
   AccommodationFormBase,
-  AccommodationSearchResultsInner,
+  AccommodationSearch,
   Location,
   SeekingDetails,
   SeekingFormBase,
@@ -35,8 +35,8 @@ import {
     AccommodationDetailsToJSON,
     AccommodationFormBaseFromJSON,
     AccommodationFormBaseToJSON,
-    AccommodationSearchResultsInnerFromJSON,
-    AccommodationSearchResultsInnerToJSON,
+    AccommodationSearchFromJSON,
+    AccommodationSearchToJSON,
     LocationFromJSON,
     LocationToJSON,
     SeekingDetailsFromJSON,
@@ -140,6 +140,10 @@ export interface ApiV1ListingsSeekingPostRequest {
     description: string;
     preferredLocation: Location;
     photos?: Array<Blob>;
+}
+
+export interface ApiV1SourcesAccommodationGetRequest {
+    location?: string;
 }
 
 export interface ApiV1UsersUserIdDeleteRequest {
@@ -307,7 +311,7 @@ export class DefaultApi extends runtime.BaseAPI {
     /**
      * Get a list of accommodation listings, optionally filtered and sorted
      */
-    async apiV1ListingsAccommodationGetRaw(requestParameters: ApiV1ListingsAccommodationGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<AccommodationSearchResultsInner>>> {
+    async apiV1ListingsAccommodationGetRaw(requestParameters: ApiV1ListingsAccommodationGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccommodationSearch>> {
         if (requestParameters.location === null || requestParameters.location === undefined) {
             throw new runtime.RequiredError('location','Required parameter requestParameters.location was null or undefined when calling apiV1ListingsAccommodationGet.');
         }
@@ -363,13 +367,13 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(AccommodationSearchResultsInnerFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => AccommodationSearchFromJSON(jsonValue));
     }
 
     /**
      * Get a list of accommodation listings, optionally filtered and sorted
      */
-    async apiV1ListingsAccommodationGet(requestParameters: ApiV1ListingsAccommodationGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<AccommodationSearchResultsInner>> {
+    async apiV1ListingsAccommodationGet(requestParameters: ApiV1ListingsAccommodationGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccommodationSearch> {
         const response = await this.apiV1ListingsAccommodationGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -1014,6 +1018,46 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async apiV1LoginGooglePost(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.apiV1LoginGooglePostRaw(initOverrides);
+    }
+
+    /**
+     * If location is not provided, all sources currently supported by the application will be returned. If location is provided, all sources that offer listings in the same country as the location query parameter will be returned. E.g. if location is set to \"London\", sources that only offer listings in the USA will be excluded from the results.
+     * Get the available listing sources, optionally filtered by location
+     */
+    async apiV1SourcesAccommodationGetRaw(requestParameters: ApiV1SourcesAccommodationGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
+        const queryParameters: any = {};
+
+        if (requestParameters.location !== undefined) {
+            queryParameters['location'] = requestParameters.location;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/v1/sources/accommodation`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * If location is not provided, all sources currently supported by the application will be returned. If location is provided, all sources that offer listings in the same country as the location query parameter will be returned. E.g. if location is set to \"London\", sources that only offer listings in the USA will be excluded from the results.
+     * Get the available listing sources, optionally filtered by location
+     */
+    async apiV1SourcesAccommodationGet(requestParameters: ApiV1SourcesAccommodationGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
+        const response = await this.apiV1SourcesAccommodationGetRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
