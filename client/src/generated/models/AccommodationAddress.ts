@@ -51,7 +51,7 @@ export interface AccommodationAddress {
      */
     postCode: string;
     /**
-     * 
+     * Lowercase country code
      * @type {string}
      * @memberof AccommodationAddress
      */

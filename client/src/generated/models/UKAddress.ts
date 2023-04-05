@@ -44,7 +44,7 @@ export interface UKAddress {
      */
     postCode: string;
     /**
-     * 
+     * Lowercase country code
      * @type {string}
      * @memberof UKAddress
      */
