@@ -1,10 +1,11 @@
 import React from "react";
+import Navbar from "../Navbar";
 
 const Layout = ({ children }: any) => {
   return (
     <div>
-      <h1>123</h1>
-      {children}
+      <Navbar />
+      <div style={{ paddingTop: 100 }}>{children}</div>
     </div>
   );
 };

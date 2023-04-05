@@ -1,0 +1,17 @@
+.wrapper {
+  position: fixed;
+  left: 0;
+  right: 0;
+
+  .navbarInner {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .loginBtn {
+      cursor: pointer;
+      font-size: 16px;
+    }
+  }
+}
