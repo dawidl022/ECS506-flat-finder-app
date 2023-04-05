@@ -27,7 +27,7 @@ def neuter_jwt_identity():
 
 
 @pytest.fixture()
-def app() -> Generator[Flask, None, None]:
+def app(listings_service: MockListingService) -> Generator[Flask, None, None]:
     app = Flask(__name__)
     register_blueprints(app)
 
@@ -39,18 +39,26 @@ def app() -> Generator[Flask, None, None]:
     # other setup can go here
 
     # Inject mock dependencies
-    FlaskInjector(app=app, modules=[configure_mocks])
+    FlaskInjector(app=app, modules=[configure_mocks(listings_service)])
 
     yield app
 
     # clean up / reset resources here
 
 
-def configure_mocks(binder: Binder):
-    binder.bind(
-        BaseListingsService,  # type: ignore[type-abstract]
-        to=MockListingService()
-    )
+@pytest.fixture
+def listings_service() -> MockListingService:
+    return MockListingService()
+
+
+def configure_mocks(listings_service: MockListingService):
+    def wrapper(binder: Binder):
+
+        binder.bind(
+            BaseListingsService,  # type: ignore[type-abstract]
+            to=listings_service)
+
+    return wrapper
 
 
 @ pytest.fixture()

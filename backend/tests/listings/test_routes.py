@@ -10,6 +10,24 @@ from app.listings.models import AccommodationListing, Coordinates, Location, UKA
 
 from app.listings.service import BaseListingsService
 
+
+class MockListingService(BaseListingsService):
+
+    def __init__(self) -> None:
+        # TODO test whether the right files are being passed to create_accommodation_listing
+        self.saved_photos: list[list[bytes]] = []
+
+    def search_accommodation_listings(self):
+        return []
+
+    def create_accommodation_listing(
+            self, form: CreateAccommodationForm, photos: list[bytes],
+            author_email: str
+    ) -> AccommodationListing:
+        self.saved_photos.append(photos)
+        return model_listing
+
+
 model_listing = AccommodationListing(
     id=uuid.uuid4(),
     location=Location(
@@ -78,12 +96,11 @@ def test_create_accommodation_listing__given_file_exceeds_5MB__returns_listing(c
         ]},
     )
 
-    # assert b'{"photos":"expected between 1 and 15 photos"}' in response.data
-    print(response.data)
+    assert b'{"photos":"no uploaded photo may exceed 5MB in size"}' in response.data
     assert response.status_code == 413
 
 
-def test_create_accommodation_listing__given_valid_request__returns_listing(client: FlaskClient):
+def test_create_accommodation_listing__given_valid_request__returns_listing(client: FlaskClient, listings_service: MockListingService):
     address = cast(UKAddress, model_listing.location.address)
     response = client.post("/api/v1/listings/accommodation", data={
         "title": model_listing.title,
@@ -99,10 +116,11 @@ def test_create_accommodation_listing__given_valid_request__returns_listing(clie
             "post_code": address.post_code,
         }).encode()), "blob"),
         "photos": [
-            (BytesIO(bytes((1, 2, 3))), "photo1"),
-            (BytesIO(bytes((2, 3, 4))), "photo2"),
+            (BytesIO(bytes(0 for _ in range(4 * 1024 * 1024 + 1))), "photo1"),
+            (BytesIO(bytes(1 for _ in range(4 * 1024 * 1024 + 1))), "photo2"),
         ]},
     )
+
     assert response.status_code == OK
     assert json.loads(response.data) == {
         "id": str(model_listing.id),
@@ -140,14 +158,4 @@ def test_create_accommodation_listing__given_valid_request__returns_listing(clie
         }
     }
 
-
-class MockListingService(BaseListingsService):
-
-    def search_accommodation_listings(self):
-        return []
-
-    def create_accommodation_listing(
-            self, form: CreateAccommodationForm, photos: list[bytes],
-            author_email: str
-    ) -> AccommodationListing:
-        return model_listing
+    assert len(listings_service.saved_photos[0]) == 2, "not all files saved"
