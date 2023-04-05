@@ -1,8 +1,10 @@
 from http.client import BAD_REQUEST, UNAUTHORIZED
+import os
 import uuid
 
 from flask import Blueprint, Response, abort, jsonify, make_response, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
+from werkzeug.datastructures import FileStorage
 
 from app.util.marshmallow import get_params, get_input
 from app.util.encoding import CamelCaseEncoder
@@ -15,6 +17,8 @@ from .service import BaseListingsService
 bp = Blueprint("listings", __name__, url_prefix=f"{Config.ROOT}/listings")
 bp.json_encoder = CamelCaseEncoder
 bp.json_decoder = CamelCaseDecoder
+
+MAX_PHOTO_SIZE = 5 * 1024 * 1024  # 5MB
 
 
 @bp.get("/accommodation")
@@ -40,6 +44,11 @@ def create_accommodation_listing(listing_service: BaseListingsService
 
     form = get_input(CreateAccommodationForm, request.form |
                      {"address": address_file.stream.read().decode()})
+
+    if any([file_size(file) > MAX_PHOTO_SIZE for file in request.files.values()]):
+        abort(make_response(
+            {'photos': 'no uploaded photo may exceed 5MB in size'}, 413
+        ))
 
     photos = [file.stream.read()
               for file in request.files.values() if file.name != "address"]
@@ -70,6 +79,12 @@ def create_accommodation_listing(listing_service: BaseListingsService
     dto = AccommodationListingDTO(listing, dummy_user)
 
     return jsonify(dto)
+
+
+def file_size(file: FileStorage) -> int:
+    size = file.stream.seek(0, os.SEEK_END)
+    file.stream.seek(0, os.SEEK_SET)
+    return size
 
 
 @bp.get("/<listing_id>/photos/<photo_id>")

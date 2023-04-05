@@ -20,6 +20,9 @@ class Config:
     # needs to be set if we're not using https (e.g. on localhost)
     SESSION_COOKIE_SECURE = False
 
+    # max 80MB payload (15 * 5MB files + 5MB rest of payload)
+    MAX_CONTENT_LENGTH = 80 * 1024 * 1024
+
     _instance = None
 
     def __new__(cls) -> 'Config':
