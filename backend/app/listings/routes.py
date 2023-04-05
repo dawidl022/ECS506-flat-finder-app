@@ -5,10 +5,10 @@ from app.util.marshmallow import get_params
 
 from config import Config
 
-bp = Blueprint("listings", __name__)
+bp = Blueprint("listings", __name__, url_prefix=f"{Config.ROOT}/listings")
 
 
-@bp.get(f"{Config.ROOT}/listings/accommodation")
+@bp.get("/accommodation")
 def get_accommodation_listings(listingsService: ListingsService) -> Response:
     params = get_params(AccommodationSearchParams)
 
