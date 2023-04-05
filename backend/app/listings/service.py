@@ -1,7 +1,51 @@
-from app.listings.models import AccommodationSearchResult, AccommodationSummary
+import abc
+import uuid
+import time
+from app.listings.models import (
+    AccommodationSearchResult, AccommodationSummary, Address, Coordinates,
+    Photo)
+from app.listings.dtos import CreateAccommodationForm
+from app.listings.models import AccommodationListing, Location
+from app.listings.repository import (
+    AccommodationListingRepository, ListingPhotoRepository)
 
 
-class ListingsService():
+class BaseGeocodingService(abc.ABC):
+    @abc.abstractmethod
+    def get_coords(self, addr: Address) -> Coordinates:
+        pass
+
+
+class GeocodingService(BaseGeocodingService):
+    def get_coords(self, addr: Address) -> Coordinates:
+        """
+        TODO turn address into coordinates using geopy module
+        """
+        addr.address
+        return Coordinates(0, 0)
+
+
+class BaseListingsService(abc.ABC):
+    @abc.abstractmethod
+    def search_accommodation_listings(self) -> list[AccommodationSearchResult]:
+        pass
+
+    @abc.abstractmethod
+    def create_accommodation_listing(
+        self, form: CreateAccommodationForm, photos: list[bytes],
+        author_email: str
+    ) -> AccommodationListing:
+        pass
+
+
+class ListingsService(BaseListingsService):
+
+    def __init__(self, geocoder: BaseGeocodingService,
+                 accommodation_listing_repo: AccommodationListingRepository,
+                 listing_photo_repo: ListingPhotoRepository) -> None:
+        self.geocoder = geocoder
+        self.accommodation_listing_repo = accommodation_listing_repo
+        self.listing_photo_repo = listing_photo_repo
 
     def search_accommodation_listings(self) -> list[AccommodationSearchResult]:
         """
@@ -47,3 +91,33 @@ class ListingsService():
                 )
             )
         ]
+
+    def create_accommodation_listing(
+            self, form: CreateAccommodationForm, photos: list[bytes],
+            author_email: str
+    ) -> AccommodationListing:
+
+        listing_photos = [Photo(id=uuid.uuid4(), blob=photo)
+                          for photo in photos]
+
+        listing = AccommodationListing(
+            id=uuid.uuid4(),
+            location=Location(
+                coords=self.geocoder.get_coords(form.decoded_address),
+                address=form.decoded_address
+            ),
+            price=form.price,
+            created_at=time.time(),
+            author_email=author_email,
+            title=form.title,
+            description=form.description,
+            accommodation_type=form.accommodation_type,
+            number_of_rooms=form.number_of_rooms,
+            photo_ids=tuple(photo.id for photo in listing_photos),
+            source="internal"
+        )
+
+        self.listing_photo_repo.save_photos(listing_photos)
+        self.accommodation_listing_repo.save_listing(listing)
+
+        return listing
