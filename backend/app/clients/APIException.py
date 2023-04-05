@@ -1,23 +1,22 @@
 class APIException(Exception):
-    def __init__(self, *args: object) -> None:
-        super().__init__(*args)
-        self.args = [*args];
+    def __init__(self, err: str="") -> None:
+        self.err: str = err;
 
 class APIUnreachableException(APIException):
     def __str__(self) -> str:
         return f"API is unreachable."
     
 class APIKeyError(APIException):
-    def __init__(self, *args: object) -> None:
-        super().__init__(*args)
+    def __init__(self, err: str) -> None:
+        super().__init__(err)
 
     def __str__(self) -> str:
-        return f"API key is invalid, expired or you are not subscribed. message:{self.args}"
+        return f"API key is invalid, expired or you are not subscribed. message:{self.err}"
     
-class APIResponseError(Exception):
-    def __init__(self, *args: object) -> None:
-        super().__init__(*args)
+class APIResponseError(APIException):
+    def __init__(self, err: str) -> None:
+        super().__init__(err)
     
     def __str__(self) -> str:
-        return f"The API returned error: :{self.args}"
+        return f"The API returned error: :{self.err}"
     
