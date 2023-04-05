@@ -724,7 +724,7 @@ components:
       properties:
         isFavourite:
           $ref: "#/components/schemas/isFavourite"
-        accommodation:
+        seeking:
           $ref: "#/components/schemas/seeking"
 
     seeking:
