@@ -57,29 +57,15 @@ class AccommodationSearchResult:
     is_favourite: bool
     accommodation: AccommodationSummary
 
+
 @dataclass
 class AccommodationListing:
     thumbnailUrl: str
     accommodationType: str
     numberOfRooms: int
-    livingConditions: list[str]
-    amenities: list[str]
+    sourceName: str
 
-    def getSourceName(self) -> str:
-        return ""
-
-    def getRating(self) -> float:
-        return 0.0
 
 @dataclass
 class ExternalAccommodationListing(AccommodationListing):
     listingUrl: str
-
-    source: str
-    rating: float
-
-    def getSourceName(self) -> str:
-        return self.source
-
-    def getRating(self) -> float:
-        return self.rating
