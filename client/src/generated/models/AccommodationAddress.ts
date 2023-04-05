@@ -55,8 +55,18 @@ export interface AccommodationAddress {
      * @type {string}
      * @memberof AccommodationAddress
      */
-    country: string;
+    country: AccommodationAddressCountryEnum;
 }
+
+
+/**
+ * @export
+ */
+export const AccommodationAddressCountryEnum = {
+    Uk: 'uk'
+} as const;
+export type AccommodationAddressCountryEnum = typeof AccommodationAddressCountryEnum[keyof typeof AccommodationAddressCountryEnum];
+
 
 /**
  * Check if a given object implements the AccommodationAddress interface.

@@ -878,7 +878,8 @@ components:
         country:
           type: string
           description: Lowercase country code
-          example: uk
+          enum:
+            - uk
 
     usersList:
       type: array

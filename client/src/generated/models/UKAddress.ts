@@ -48,8 +48,18 @@ export interface UKAddress {
      * @type {string}
      * @memberof UKAddress
      */
-    country: string;
+    country: UKAddressCountryEnum;
 }
+
+
+/**
+ * @export
+ */
+export const UKAddressCountryEnum = {
+    Uk: 'uk'
+} as const;
+export type UKAddressCountryEnum = typeof UKAddressCountryEnum[keyof typeof UKAddressCountryEnum];
+
 
 /**
  * Check if a given object implements the UKAddress interface.
