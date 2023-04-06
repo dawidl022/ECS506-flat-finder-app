@@ -1,10 +1,19 @@
 from flask import Flask
+from flask_cors import CORS
 from flask_injector import FlaskInjector
 from flask_jwt_extended import JWTManager
 from injector import Binder
-from app.listings.service import ListingsService
+from app.listings.service import (
+    GeocodingService, ListingsService, BaseListingsService)
 from app.util.encoding import CamelCaseEncoder
+from app.listings.repository import (
+    InMemoryAccommodationListingsRepository, InMemoryPhotoRepository)
 from config import Config
+
+
+def register_blueprints(app: Flask) -> None:
+    from app.listings import listings_bp
+    app.register_blueprint(listings_bp)
 
 
 def create_app(config_class: type = Config) -> Flask:
@@ -12,12 +21,11 @@ def create_app(config_class: type = Config) -> Flask:
     app.config.from_object(config_class())
 
     # Initialize Flask extensions
+    CORS(app, resources={r"/api/*": {"origins": [Config().FRONTEND_URL]}})
     JWTManager(app)
 
     # Register blueprints
-    from app.listings import listings_bp
-    app.register_blueprint(listings_bp)
-    listings_bp.json_encoder = CamelCaseEncoder
+    register_blueprints(app)
 
     from app.auth.google import auth_bp
     app.register_blueprint(auth_bp)
@@ -30,6 +38,12 @@ def create_app(config_class: type = Config) -> Flask:
 
 
 def configure_dependencies(binder: Binder) -> None:
+    listing_service = ListingsService(
+        accommodation_listing_repo=InMemoryAccommodationListingsRepository(),
+        listing_photo_repo=InMemoryPhotoRepository(),
+        geocoder=GeocodingService(),
+    )
+
     binder.bind(
-        ListingsService, to=ListingsService()
+        BaseListingsService, to=listing_service  # type: ignore[type-abstract]
     )
