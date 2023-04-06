@@ -104,12 +104,10 @@ const AccommodationForm: FC = ({}) => {
         <br />
         <input type="file" id="photos" />
         <br />
-        <button>
-          Preview
-        </button>
+        <button>Preview</button>
         <br />
         <button>Add</button>
-    </form>
+      </form>
     </div>
   );
 };
