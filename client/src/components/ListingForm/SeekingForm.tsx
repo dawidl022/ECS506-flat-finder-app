@@ -4,14 +4,13 @@ const SeekingForm: FC = ({}) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
-  const [lat, setLatitude] = useState(0);
-  const [_long, setLongitude] = useState(0);
 
   return (
     <div>
       <div>
         Seeking Form
         <form>
+          <label htmlFor="title">Title: </label>
           <input
             type="text"
             placeholder="Seeking Title"
@@ -20,6 +19,7 @@ const SeekingForm: FC = ({}) => {
             required
           />
           <br />
+          <label htmlFor="description">Description: </label>
           <input
             type="text"
             placeholder="Seeking Description"
@@ -28,33 +28,12 @@ const SeekingForm: FC = ({}) => {
             required
           />
           <br />
+          <label htmlFor="location">Location: </label>
           <input
             type="text"
             placeholder="Seeking Location"
             value={location}
             onChange={e => setLocation(e.target.value)}
-            required
-          />
-          <br />
-          <input
-            type="number"
-            placeholder="Seeking Latitude"
-            value={lat}
-            min={-90}
-            max={90}
-            step="any"
-            onChange={e => setLatitude(parseFloat(e.target.value))}
-            required
-          />
-          <br />
-          <input
-            type="number"
-            placeholder="Seeking Longitude"
-            value={_long}
-            min={-180}
-            max={180}
-            step="any"
-            onChange={e => setLongitude(parseFloat(e.target.value))}
             required
           />
           <br />

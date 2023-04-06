@@ -17,6 +17,7 @@ const AccommodationForm: FC = ({}) => {
     <div>
       Accommodation Form
       <form>
+        <label htmlFor="title">Title</label>
         <input
           type="text"
           placeholder="Accommodation Title"
@@ -25,6 +26,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
+        <label htmlFor="description">Description</label>
         <input
           type="text"
           placeholder="Accommodation Description"
@@ -33,44 +35,52 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
-        <input
-          type="text"
-          placeholder="Accommodation Line 1"
-          value={line1}
-          onChange={e => setLine1(e.target.value)}
-          required
-        />
+        <label htmlFor="line1">Address Line 1: </label>
+        <fieldset>
+          <input
+            type="text"
+            placeholder="Accommodation Line 1"
+            value={line1}
+            onChange={e => setLine1(e.target.value)}
+            required
+          />
+          <br />
+          <label htmlFor="line2">Address Line 2: </label>
+          <input
+            type="text"
+            placeholder="Accommodation Line 2"
+            value={line2}
+            onChange={e => setLine2(e.target.value)}
+          />
+          <br />
+          <label htmlFor="town">Town: </label>
+          <input
+            type="text"
+            placeholder="Accommodation Town"
+            value={town}
+            onChange={e => setTown(e.target.value)}
+            required
+          />
+          <br />
+          <label htmlFor="postCode">Post Code: </label>
+          <input
+            type="text"
+            placeholder="Accommodation Post Code"
+            value={postCode}
+            onChange={e => setPostCode(e.target.value)}
+            required
+          />
+          <br />
+          <label htmlFor="country">Country: </label>
+          <input
+            type="text"
+            placeholder="Accommodation Country"
+            value={country}
+            readOnly
+          />
+        </fieldset>
         <br />
-        <input
-          type="text"
-          placeholder="Accommodation Line 2"
-          value={line2}
-          onChange={e => setLine2(e.target.value)}
-        />
-        <br />
-        <input
-          type="text"
-          placeholder="Accommodation Town"
-          value={town}
-          onChange={e => setTown(e.target.value)}
-          required
-        />
-        <br />
-        <input
-          type="text"
-          placeholder="Accommodation Post Code"
-          value={postCode}
-          onChange={e => setPostCode(e.target.value)}
-          required
-        />
-        <br />
-        <input
-          type="text"
-          placeholder="Accommodation Country"
-          value={country}
-          readOnly
-        />
-        <br />
+        <label htmlFor="price">Price: </label>
         <input
           type="number"
           placeholder="Accommodation Price"
@@ -80,6 +90,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
+        <label htmlFor="numberOfRooms">Number of Rooms: </label>
         <input
           type="number"
           placeholder="Accommodation Number of Rooms"
@@ -90,6 +101,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
+        <label htmlFor="type">Accommodation Type: </label>
         <select
           id="type"
           value={accommodationType}
