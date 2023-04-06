@@ -7,17 +7,16 @@ const AccommodationPreviewPage: FC = ({}) => {
   const router = useRouter();
 
   const title = router.query.title as string;
-  const description = router.query.description  as string;
-  const line1 = router.query.line1  as string;
+  const description = router.query.description as string;
+  const line1 = router.query.line1 as string;
   const line2 = router.query.line2 as string;
   const town = router.query.town as string;
   const postCode = router.query.postCode as string;
-  const country = router.query.country as string;
   const accommodationType = router.query.accommodationType as string;
   const numberOfRooms = Number(router.query.numberOfRooms);
   const price = Number(router.query.price);
 
-  const accomodation : Accommodation= {
+  const accomodation: Accommodation = {
     id: "0",
     title,
     description,
@@ -29,12 +28,12 @@ const AccommodationPreviewPage: FC = ({}) => {
       name: "Preview User",
       userProfile: {
         id: "0",
-        email : "Dummy Email",
+        email: "Dummy Email",
         name: "Preview User",
         contactDetails: {
           phoneNumber: "Dummy Phone Number",
-        }
-      }
+        },
+      },
     },
     contactInfo: {
       phoneNumber: "Dummy Phone Number",
@@ -48,11 +47,10 @@ const AccommodationPreviewPage: FC = ({}) => {
       postCode,
       country: AccommodationAddressCountryEnum.Uk,
     },
-    
-  }
+  };
   return (
     <div>
-      <AccommodationDetails accommodation={accomodation}/>
+      <AccommodationDetails accommodation={accomodation} />
     </div>
   );
 };

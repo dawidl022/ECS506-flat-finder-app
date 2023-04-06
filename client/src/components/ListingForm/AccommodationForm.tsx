@@ -73,6 +73,12 @@ const AccommodationForm: FC = ({}) => {
           country: AccommodationAddressCountryEnum.Uk,
         },
       })
+      .catch(err =>
+        alert(
+          "Accommodation listing failed to be published. \nError: " +
+            err.message
+        )
+      )
       .then(res => (window.location.href = "/myListings"));
   };
 
@@ -80,7 +86,7 @@ const AccommodationForm: FC = ({}) => {
     <div>
       Accommodation Form
       <form onSubmit={handleSubmit}>
-        <label htmlFor="title">Accommodation Title: </label>
+        <label htmlFor="title">Title: </label>
         <input
           type="text"
           placeholder="Accommodation Title"
@@ -89,7 +95,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
-        <label htmlFor="description">Accommodation Description: </label>
+        <label htmlFor="description">Description: </label>
         <input
           type="text"
           placeholder="Accommodation Description"
@@ -98,7 +104,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
-        <label htmlFor="address">Accommodation Address: </label>
+        <label htmlFor="address">Address: </label>
         <input
           type="text"
           placeholder="Accommodation Line 1"
@@ -107,7 +113,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
-        <label htmlFor="address">Accommodation Line 2: </label>
+        <label htmlFor="address">Line 2: </label>
         <input
           type="text"
           placeholder="Accommodation Line 2"
@@ -115,7 +121,7 @@ const AccommodationForm: FC = ({}) => {
           onChange={e => setLine2(e.target.value)}
         />
         <br />
-        <label htmlFor="address">Accommodation Town: </label>
+        <label htmlFor="address">Town: </label>
         <input
           type="text"
           placeholder="Accommodation Town"
@@ -124,7 +130,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
-        <label htmlFor="address">Accommodation Post Code: </label>
+        <label htmlFor="address">Post Code: </label>
         <input
           type="text"
           placeholder="Accommodation Post Code"
@@ -133,7 +139,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
-        <label htmlFor="address">Accommodation Country: </label>
+        <label htmlFor="address">Country: </label>
         <input
           type="text"
           placeholder="Accommodation Country"
@@ -141,7 +147,7 @@ const AccommodationForm: FC = ({}) => {
           readOnly
         />
         <br />
-        <label htmlFor="price">Accommodation Price: </label>
+        <label htmlFor="price">Price: </label>
         <input
           type="number"
           placeholder="Accommodation Price"
@@ -151,7 +157,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
-        <label htmlFor="numberOfRooms">Accommodation Number of Rooms: </label>
+        <label htmlFor="numberOfRooms">Number of Rooms: </label>
         <input
           type="number"
           placeholder="Accommodation Number of Rooms"
@@ -162,7 +168,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
-        <label htmlFor="type">Accommodation Type: </label>
+        <label htmlFor="type">Type: </label>
         <select
           id="type"
           value={accommodationType}

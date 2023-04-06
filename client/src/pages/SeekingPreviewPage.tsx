@@ -10,25 +10,25 @@ const SeekingPreviewPage: FC = ({}) => {
   const lat = Number(router.query.lat);
   const _long = Number(router.query._long);
 
-  const Seeking: Seeking =  { 
+  const Seeking: Seeking = {
     id: "0",
     author: {
       name: "Preview User",
       userProfile: {
         id: "0",
-        email : "Dummy Email",
+        email: "Dummy Email",
         name: "Preview User",
         contactDetails: {
           phoneNumber: "Dummy Phone Number",
-        }
-      }
+        },
+      },
     },
     contactInfo: {
       phoneNumber: "Dummy Phone Number",
       email: "Dummy Email",
-    }, 
-    title, 
-    description, 
+    },
+    title,
+    description,
     preferredLocation: {
       name,
       coordinates: {
@@ -36,10 +36,9 @@ const SeekingPreviewPage: FC = ({}) => {
         _long,
       },
     },
-  
   };
   return (
-    <div> 
+    <div>
       <SeekingDetails seeking={Seeking} />
     </div>
   );

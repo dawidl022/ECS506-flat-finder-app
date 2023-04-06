@@ -47,14 +47,17 @@ const SeekingForm: FC = ({}) => {
           },
         },
       })
+      .catch(err =>
+        alert("Seeking listing failed to be published. \nError: " + err.message)
+      )
       .then(res => (window.location.href = "/myListings"));
   };
   return (
     <div>
       <div>
         Seeking Form
-        <form>
-          <label htmlFor="title">Seeking Title: </label>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="title">Title: </label>
           <input
             type="text"
             placeholder="Seeking Title"
@@ -63,7 +66,7 @@ const SeekingForm: FC = ({}) => {
             required
           />
           <br />
-          <label htmlFor="description">Seeking Description: </label>
+          <label htmlFor="description">Description: </label>
           <input
             type="text"
             placeholder="Seeking Description"
@@ -72,7 +75,7 @@ const SeekingForm: FC = ({}) => {
             required
           />
           <br />
-          <label htmlFor="location">Seeking Location: </label>
+          <label htmlFor="location">Location: </label>
           <input
             type="text"
             placeholder="Seeking Location"
@@ -81,7 +84,7 @@ const SeekingForm: FC = ({}) => {
             required
           />
           <br />
-          <label htmlFor="lat">Seeking Latitude: </label>
+          <label htmlFor="lat">Latitude: </label>
           <input
             type="number"
             placeholder="Seeking Latitude"
@@ -93,7 +96,7 @@ const SeekingForm: FC = ({}) => {
             required
           />
           <br />
-          <label htmlFor="_long">Seeking Longitude: </label>
+          <label htmlFor="_long">Longitude: </label>
           <input
             type="number"
             placeholder="Seeking Longitude"
@@ -111,7 +114,7 @@ const SeekingForm: FC = ({}) => {
             Preview
           </button>
           <br />
-          <button onSubmit={handleSubmit}>Add</button>
+          <button>Add</button>
         </form>
       </div>
     </div>
