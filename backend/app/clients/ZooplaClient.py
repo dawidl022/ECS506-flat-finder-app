@@ -8,7 +8,8 @@ from typing import Dict, Union
 from app.clients.APIClient import APIClient
 from app.clients.APIException import *
 
-from app.listings.models import ExternalAccommodationListing, Location, Coordinates, UKAddress
+from app.listings.models import ExternalAccommodationListing,Location,\
+      Coordinates, UKAddress
 
 
 class ZooplaClient(APIClient):

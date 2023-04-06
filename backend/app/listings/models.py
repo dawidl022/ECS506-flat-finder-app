@@ -133,6 +133,7 @@ class AccommodationListing:
 
     source: str
 
+
 @dataclass(frozen=True)
 class ExternalAccommodationListing(AccommodationListing):
     original_listing_url: str
