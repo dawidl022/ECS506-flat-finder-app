@@ -4,7 +4,7 @@
 
 ### Prerequisites
 
-You must have [Python 3](https://www.python.org/downloads/) version 3.7 or newer installed on your system
+You must have [Python 3](https://www.python.org/downloads/) version 3.11 or newer installed on your system
 
 ### Create a virtual environment
 
