@@ -127,7 +127,8 @@ def file_size(file: FileStorage) -> int:
 
 @bp.get("/accommodation/<listing_id>")
 @jwt_required()
-def get_accommodation_listing(listing_id: str, listing_service: BaseListingsService):
+def get_accommodation_listing(
+        listing_id: str, listing_service: BaseListingsService) -> Response:
     source, id = extract_listing_id_and_source(listing_id)
 
     listing = listing_service.get_accommodation_listing(id, source)

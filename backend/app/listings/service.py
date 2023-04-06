@@ -119,7 +119,7 @@ class ListingsService(BaseListingsService):
             accommodation_type=form.accommodation_type,
             number_of_rooms=form.number_of_rooms,
             photo_ids=tuple(photo.id for photo in listing_photos),
-            source="internal"
+            source=Source.internal
         )
 
         self.listing_photo_repo.save_photos(listing_photos)
