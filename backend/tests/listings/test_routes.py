@@ -150,7 +150,7 @@ def test_create_accommodation_listing__given_valid_request__returns_listing(clie
     # check response
     assert response.status_code == OK
     assert json.loads(response.data) == {
-        "id": str(model_listing.id),
+        "id": "internal/" + str(model_listing.id),
         "title": model_listing.title,
         "description": model_listing.description,
         "photoUrls": [
