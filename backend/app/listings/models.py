@@ -115,6 +115,11 @@ class Location:
     address: Address
 
 
+class Source(StrEnum):
+    internal = auto()
+    zoopla = auto()
+
+
 @dataclass(frozen=True)
 class AccommodationListing:
     id: UUID
@@ -130,7 +135,7 @@ class AccommodationListing:
     number_of_rooms: int
 
     photo_ids: tuple[UUID, ...]
-    source: str
+    source: Source
 
 
 @dataclass(frozen=True)
