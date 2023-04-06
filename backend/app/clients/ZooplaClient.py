@@ -1,11 +1,14 @@
 import os
 import requests
+
+from uuid import UUID
+from datetime import datetime
 from typing import Dict, Union
 
 from app.clients.APIClient import APIClient
 from app.clients.APIException import *
 
-from app.listings.models import ExternalAccommodationListing, listingContactInfo
+from app.listings.models import ExternalAccommodationListing, Location, Coordinates, UKAddress
 
 
 class ZooplaClient(APIClient):
@@ -46,27 +49,7 @@ class ZooplaClient(APIClient):
         if (response['result_count']) == 0:
             return None
 
-        title: str = response['listing'][0]['title']
-        desc: str = response['listing'][0]['description']
-        photos: list[str] = response['listing'][0]['original_image']
-        type: str = response['listing'][0]['property_type']
-        numRooms: int = response['listing'][0]['num_bedrooms']
-        price: int = response['listing'][0]['rental_prices']['per_week']
-        address: str = response['listing'][0]['displayable_address']
-        contact: listingContactInfo = listingContactInfo(
-            response['listing'][0]['agent_phone'], "")
-        listurl: str = response['listing'][0]['details_url']
-        return ExternalAccommodationListing(listing_id,
-                                            title,
-                                            desc,
-                                            photos,
-                                            type,
-                                            numRooms,
-                                            ZooplaClient.name,
-                                            price,
-                                            address,
-                                            contact,
-                                            listurl)
+        return ZooplaClient.parseListing(response['listing'][0])
 
     @staticmethod
     def searchListing(area: str,
@@ -118,27 +101,39 @@ class ZooplaClient(APIClient):
 
         out = []
         for x in response['listing']:
-            listing_id = x['listing_idlisting_id']
-            title: str = x['title']
-            desc: str = x['description']
-            photos: list[str] = x['original_image']
-            type: str = x['property_type']
-            numRooms: int = x['num_bedrooms']
-            price: int = x['rental_prices']['per_week']
-            address: str = x['displayable_address']
-            contact: listingContactInfo = listingContactInfo(
-                x['agent_phone'], "")
-            listurl: str = x['details_url']
-            out.append(ExternalAccommodationListing(listing_id,
-                                                    title,
-                                                    desc,
-                                                    photos,
-                                                    type,
-                                                    numRooms,
-                                                    ZooplaClient.name,
-                                                    price,
-                                                    address,
-                                                    contact,
-                                                    listurl))
+            out.append(ZooplaClient.parseListing(x))
 
         return out
+
+    @staticmethod
+    def parseListing(x) -> ExternalAccommodationListing:
+        listing_id: int = x['listing_id']
+        title: str = x['title']
+        desc: str = x['description']
+        photos: list[str] = x['original_image']
+        type: str = x['property_type']
+        numRooms: int = x['num_bedrooms']
+        price: int = x['rental_prices']['per_week']
+        address: UKAddress = UKAddress(
+            x['street_name'], None, x['post_town'], x['outcode']+x['incode'])
+        contact: str = x['agent_phone']
+        listurl: str = x['details_url']
+        created: float = datetime.fromisoformat(x['listing_date']).timestamp()
+        lat: float = x['latitude']
+        long: float = x['longitude']
+        return ExternalAccommodationListing(UUID(),
+                                            Location(Coordinates(
+                                                lat, long), address),
+                                            created,
+                                            price,
+                                            "",
+                                            contact,
+                                            title,
+                                            desc,
+                                            type,
+                                            numRooms,
+                                            tuple(),
+                                            photos,
+                                            ZooplaClient.name,
+                                            listurl,
+                                            listing_id)
