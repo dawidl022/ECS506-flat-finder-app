@@ -1,33 +1,58 @@
 import { FC } from "react";
 import { useRouter } from "next/router";
+import AccommodationDetails from "@/components/Listing/AccommodationDetails";
+import { Accommodation, AccommodationAddressCountryEnum } from "@/generated";
 
 const AccommodationPreviewPage: FC = ({}) => {
   const router = useRouter();
 
-  const title = router.query.title;
-  const description = router.query.description;
-  const line1 = router.query.line1;
-  const line2 = router.query.line2;
-  const town = router.query.town;
-  const postCode = router.query.postCode;
-  const country = router.query.country;
-  const accommodationType = router.query.accommodationType;
-  const numberOfRooms = router.query.numberOfRooms;
-  const price = router.query.price;
+  const title = router.query.title as string;
+  const description = router.query.description  as string;
+  const line1 = router.query.line1  as string;
+  const line2 = router.query.line2 as string;
+  const town = router.query.town as string;
+  const postCode = router.query.postCode as string;
+  const country = router.query.country as string;
+  const accommodationType = router.query.accommodationType as string;
+  const numberOfRooms = Number(router.query.numberOfRooms);
+  const price = Number(router.query.price);
 
+  const accomodation : Accommodation= {
+    id: "0",
+    title,
+    description,
+    accommodationType,
+    numberOfRooms,
+    photoUrls: [],
+    source: "preview",
+    author: {
+      name: "Preview User",
+      userProfile: {
+        id: "0",
+        email : "Dummy Email",
+        name: "Preview User",
+        contactDetails: {
+          phoneNumber: "Dummy Phone Number",
+        }
+      }
+    },
+    contactInfo: {
+      phoneNumber: "Dummy Phone Number",
+      email: "Dummy Email",
+    },
+    price,
+    address: {
+      line1,
+      line2,
+      town,
+      postCode,
+      country: AccommodationAddressCountryEnum.Uk,
+    },
+    
+  }
   return (
     <div>
-      <h1>Preview of Accommodation Listing</h1>
-      <p>Title: {title}</p>
-      <p>Description: {description}</p>
-      <p>Line 1: {line1}</p>
-      {line2 && <p>Line 2: {line2}</p>}
-      <p>Town: {town}</p>
-      <p>Post Code: {postCode}</p>
-      <p>Country: {country}</p>
-      <p>Accommodation Type: {accommodationType}</p>
-      <p>Number of Rooms: {numberOfRooms}</p>
-      <p>Price: {price}</p>
+      <AccommodationDetails accommodation={accomodation}/>
     </div>
   );
 };
