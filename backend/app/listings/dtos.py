@@ -91,7 +91,7 @@ class ContactInfoDTO:
 
 class AccommodationListingDTO:
     def __init__(self, listing: AccommodationListing, author: User) -> None:
-        self.id = listing.id
+        self.id = f"{listing.source}/{listing.id}"
         self.title = listing.title
         self.description = listing.description
         self.photo_urls = [

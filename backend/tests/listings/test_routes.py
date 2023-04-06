@@ -10,6 +10,23 @@ from app.listings.models import AccommodationListing, Coordinates, Location, UKA
 
 from app.listings.service import BaseListingsService
 
+
+class MockListingService(BaseListingsService):
+
+    def __init__(self) -> None:
+        self.saved_photos: list[list[bytes]] = []
+
+    def search_accommodation_listings(self):
+        return []
+
+    def create_accommodation_listing(
+            self, form: CreateAccommodationForm, photos: list[bytes],
+            author_email: str
+    ) -> AccommodationListing:
+        self.saved_photos.append(photos)
+        return model_listing
+
+
 model_listing = AccommodationListing(
     id=uuid.uuid4(),
     location=Location(
@@ -37,7 +54,7 @@ def test_create_accommodation_listing__given_no_request_body__returns_bad_reques
     assert response.status_code == BAD_REQUEST
 
 
-def test_create_accommodation_listing__given_no_files__returns_bad_request(client: FlaskClient):
+def test_create_accommodation_listing__given_no_photos__returns_bad_request(client: FlaskClient):
     address = cast(UKAddress, model_listing.location.address)
     response = client.post("/api/v1/listings/accommodation", data={
         "title": model_listing.title,
@@ -45,19 +62,19 @@ def test_create_accommodation_listing__given_no_files__returns_bad_request(clien
         "accommodationType": model_listing.accommodation_type,
         "numberOfRooms": str(model_listing.number_of_rooms),
         "price": model_listing.price,
-        "address": json.dumps({
+        "address": (BytesIO(json.dumps({
             "country": "uk",
             "line1": address.line1,
             "line2": address.line2,
             "town": address.town,
             "post_code": address.post_code,
-        }),
+        }).encode()), "blob"),
     })
     assert b'{"photos":"expected between 1 and 15 photos"}' in response.data
     assert response.status_code == BAD_REQUEST
 
 
-def test_create_accommodation_listing__given_valid_request__returns_listing(client: FlaskClient):
+def test_create_accommodation_listing__given_no_too_many_photos__returns_bad_request(client: FlaskClient):
     address = cast(UKAddress, model_listing.location.address)
     response = client.post("/api/v1/listings/accommodation", data={
         "title": model_listing.title,
@@ -65,21 +82,75 @@ def test_create_accommodation_listing__given_valid_request__returns_listing(clie
         "accommodationType": model_listing.accommodation_type,
         "numberOfRooms": str(model_listing.number_of_rooms),
         "price": model_listing.price,
-        "address": json.dumps({
+        "address": (BytesIO(json.dumps({
             "country": "uk",
             "line1": address.line1,
             "line2": address.line2,
             "town": address.town,
             "post_code": address.post_code,
-        }),
+        }).encode()), "blob"),
         "photos": [
-            (BytesIO(bytes((1, 2, 3))), "photo1"),
+            (BytesIO(bytes((i))), f"photo{i}") for i in range(16)
+        ]
+    })
+    assert b'{"photos":"expected between 1 and 15 photos"}' in response.data
+    assert response.status_code == BAD_REQUEST
+
+
+def test_create_accommodation_listing__given_file_exceeds_5MB__returns_listing(client: FlaskClient):
+    address = cast(UKAddress, model_listing.location.address)
+    response = client.post("/api/v1/listings/accommodation", data={
+        "title": model_listing.title,
+        "description": model_listing.description,
+        "accommodationType": model_listing.accommodation_type,
+        "numberOfRooms": str(model_listing.number_of_rooms),
+        "price": model_listing.price,
+        "address": (BytesIO(json.dumps({
+            "country": "uk",
+            "line1": address.line1,
+            "line2": address.line2,
+            "town": address.town,
+            "post_code": address.post_code,
+        }).encode()), "blob"),
+        "photos": [
+            (BytesIO(bytes(0 for _ in range(5 * 1024 * 1024 + 1))), "big_photo"),
             (BytesIO(bytes((2, 3, 4))), "photo2"),
         ]},
     )
+
+    assert b'{"photos":"no uploaded photo may exceed 5MB in size"}' in response.data
+    assert response.status_code == 413
+
+
+def test_create_accommodation_listing__given_valid_request__returns_listing(client: FlaskClient, listings_service: MockListingService):
+    address = cast(UKAddress, model_listing.location.address)
+    files = [
+        bytes(0 for _ in range(4 * 1024 * 1024 + 1)),
+        bytes(1 for _ in range(4 * 1024 * 1024 + 1)),
+    ]
+    response = client.post("/api/v1/listings/accommodation", data={
+        "title": model_listing.title,
+        "description": model_listing.description,
+        "accommodationType": model_listing.accommodation_type,
+        "numberOfRooms": str(model_listing.number_of_rooms),
+        "price": model_listing.price,
+        "address": (BytesIO(json.dumps({
+            "country": "uk",
+            "line1": address.line1,
+            "line2": address.line2,
+            "town": address.town,
+            "post_code": address.post_code,
+        }).encode()), "blob"),
+        "photos": [
+            (BytesIO(files[0]), "photo1"),
+            (BytesIO(files[1]), "photo2"),
+        ]},
+    )
+
+    # check response
     assert response.status_code == OK
     assert json.loads(response.data) == {
-        "id": str(model_listing.id),
+        "id": "internal/" + str(model_listing.id),
         "title": model_listing.title,
         "description": model_listing.description,
         "photoUrls": [
@@ -114,14 +185,7 @@ def test_create_accommodation_listing__given_valid_request__returns_listing(clie
         }
     }
 
-
-class MockListingService(BaseListingsService):
-
-    def search_accommodation_listings(self):
-        return []
-
-    def create_accommodation_listing(
-            self, form: CreateAccommodationForm, photos: list[bytes],
-            author_email: str
-    ) -> AccommodationListing:
-        return model_listing
+    # check photo files were read by server correctly
+    assert len(listings_service.saved_photos[0]) == 2, "not all files saved"
+    assert listings_service.saved_photos[0][0] == files[0]
+    assert listings_service.saved_photos[0][1] == files[1]
