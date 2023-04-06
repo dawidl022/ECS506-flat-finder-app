@@ -14,7 +14,6 @@ from app.listings.service import BaseListingsService
 class MockListingService(BaseListingsService):
 
     def __init__(self) -> None:
-        # TODO test whether the right files are being passed to create_accommodation_listing
         self.saved_photos: list[list[bytes]] = []
 
     def search_accommodation_listings(self):
@@ -102,6 +101,10 @@ def test_create_accommodation_listing__given_file_exceeds_5MB__returns_listing(c
 
 def test_create_accommodation_listing__given_valid_request__returns_listing(client: FlaskClient, listings_service: MockListingService):
     address = cast(UKAddress, model_listing.location.address)
+    files = [
+        bytes(0 for _ in range(4 * 1024 * 1024 + 1)),
+        bytes(1 for _ in range(4 * 1024 * 1024 + 1)),
+    ]
     response = client.post("/api/v1/listings/accommodation", data={
         "title": model_listing.title,
         "description": model_listing.description,
@@ -116,11 +119,12 @@ def test_create_accommodation_listing__given_valid_request__returns_listing(clie
             "post_code": address.post_code,
         }).encode()), "blob"),
         "photos": [
-            (BytesIO(bytes(0 for _ in range(4 * 1024 * 1024 + 1))), "photo1"),
-            (BytesIO(bytes(1 for _ in range(4 * 1024 * 1024 + 1))), "photo2"),
+            (BytesIO(files[0]), "photo1"),
+            (BytesIO(files[1]), "photo2"),
         ]},
     )
 
+    # check response
     assert response.status_code == OK
     assert json.loads(response.data) == {
         "id": str(model_listing.id),
@@ -158,4 +162,7 @@ def test_create_accommodation_listing__given_valid_request__returns_listing(clie
         }
     }
 
+    # check photo files were read by server correctly
     assert len(listings_service.saved_photos[0]) == 2, "not all files saved"
+    assert listings_service.saved_photos[0][0] == files[0]
+    assert listings_service.saved_photos[0][1] == files[1]
