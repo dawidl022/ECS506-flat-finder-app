@@ -16,15 +16,26 @@ const UserCard = () => {
       }
     };
 
+    let keyPressHandler = (event: KeyboardEvent) => {
+      if (event.code === "Space") {
+        setIsOpen(prev => !prev);
+      }
+    };
+
     document.addEventListener("mousedown", handler);
+    document.addEventListener("keypress", keyPressHandler);
 
     return () => {
       document.removeEventListener("mousedown", handler);
+      document.removeEventListener("keypress", keyPressHandler);
     };
   }, []);
   return (
     <div ref={menuRef}>
-      <div onClick={() => setIsOpen(prev => !prev)} className={styles.wrapper}>
+      <button
+        onClick={() => setIsOpen(prev => !prev)}
+        className={styles.wrapper}
+      >
         <p>username</p>
         <div className={styles.avaCon} />
         <div className={styles.arrCon}>
@@ -33,7 +44,7 @@ const UserCard = () => {
             src="/icons/arrDown.svg"
           />
         </div>
-      </div>
+      </button>
       {isOpen && (
         <div className={styles.dropDown}>
           <button
