@@ -7,19 +7,32 @@ const UserCard = () => {
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
-  let menuRef = useRef<any>();
+
+  const menuRef = useRef<any>();
+  const popupState = React.useRef(isOpen);
 
   React.useEffect(() => {
-    let handler = (e: MouseEvent) => {
+    popupState.current = isOpen;
+  }, [isOpen]);
+
+  React.useEffect(() => {
+    const handler = (e: MouseEvent) => {
       if (!menuRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    const keyPressHandler = (event: KeyboardEvent) => {
+      if (event.code === "Escape" && popupState.current === true) {
         setIsOpen(false);
       }
     };
 
     document.addEventListener("mousedown", handler);
+    document.addEventListener("keydown", keyPressHandler);
 
     return () => {
       document.removeEventListener("mousedown", handler);
+      document.removeEventListener("keydown", keyPressHandler);
     };
   }, []);
   return (
