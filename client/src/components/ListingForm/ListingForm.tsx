@@ -1,7 +1,6 @@
 import { FC, FormEvent, useState } from "react";
 import Tabs from "../Tabs";
 import { useRouter } from "next/router";
-import AccommodationDetails from "../Listing/AccommodationDetails";
 import SeekingForm from "./SeekingForm";
 import AccommodationForm from "./AccommodationForm";
 
@@ -14,13 +13,9 @@ const ListingForm: FC = ({}) => {
       {/* "Seeking" and "Accommodation". Based on the outcome, the appropriate form should be rendered. */}
       <Tabs tabs={["Seeking", "Accommodation"]} />
 
-      {listingType === "seeking" && (
-        <SeekingForm />
-      )}
+      {listingType === "seeking" && <SeekingForm />}
 
-      {listingType === "accommodation" && (
-        <AccommodationForm />
-      )}
+      {listingType === "accommodation" && <AccommodationForm />}
     </div>
   );
 };

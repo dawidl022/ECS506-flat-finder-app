@@ -1,4 +1,5 @@
 import { FC, useState, FormEvent } from "react";
+import { useRouter } from "next/router";
 import {
   AccommodationAddressCountryEnum,
   Configuration,
@@ -6,6 +7,8 @@ import {
 } from "@/generated";
 
 const AccommodationForm: FC = ({}) => {
+  const router = useRouter();
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [line1, setLine1] = useState("");
@@ -18,8 +21,38 @@ const AccommodationForm: FC = ({}) => {
   const [numberOfRooms, setNumberOfRooms] = useState(0);
   const [price, setPrice] = useState(0);
 
-  const previewFunc = () => {
-    //redirect to preview page and render the AccomodationDetails componen
+  const preview = () => {
+    router.push({
+      pathname: "/AccommodationPreviewPage",
+      query: {
+        title,
+        description,
+        line1,
+        line2,
+        town,
+        postCode,
+        country,
+        accommodationType,
+        numberOfRooms,
+        price,
+      },
+    });
+  };
+
+  const checkInputs = () => {
+    if (
+      title &&
+      description &&
+      line1 &&
+      town &&
+      postCode &&
+      price &&
+      numberOfRooms
+    ) {
+      return true;
+    } else {
+      return false;
+    }
   };
 
   const handleSubmit = (e: FormEvent<HTMLElement>) => {
@@ -40,13 +73,14 @@ const AccommodationForm: FC = ({}) => {
           country: AccommodationAddressCountryEnum.Uk,
         },
       })
-      .then(res => console.log(res));
+      .then(res => (window.location.href = "/myListings"));
   };
 
   return (
     <div>
       Accommodation Form
       <form onSubmit={handleSubmit}>
+        <label htmlFor="title">Accommodation Title: </label>
         <input
           type="text"
           placeholder="Accommodation Title"
@@ -55,6 +89,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
+        <label htmlFor="description">Accommodation Description: </label>
         <input
           type="text"
           placeholder="Accommodation Description"
@@ -63,6 +98,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
+        <label htmlFor="address">Accommodation Address: </label>
         <input
           type="text"
           placeholder="Accommodation Line 1"
@@ -71,6 +107,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
+        <label htmlFor="address">Accommodation Line 2: </label>
         <input
           type="text"
           placeholder="Accommodation Line 2"
@@ -78,6 +115,7 @@ const AccommodationForm: FC = ({}) => {
           onChange={e => setLine2(e.target.value)}
         />
         <br />
+        <label htmlFor="address">Accommodation Town: </label>
         <input
           type="text"
           placeholder="Accommodation Town"
@@ -86,6 +124,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
+        <label htmlFor="address">Accommodation Post Code: </label>
         <input
           type="text"
           placeholder="Accommodation Post Code"
@@ -94,6 +133,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
+        <label htmlFor="address">Accommodation Country: </label>
         <input
           type="text"
           placeholder="Accommodation Country"
@@ -101,6 +141,7 @@ const AccommodationForm: FC = ({}) => {
           readOnly
         />
         <br />
+        <label htmlFor="price">Accommodation Price: </label>
         <input
           type="number"
           placeholder="Accommodation Price"
@@ -110,6 +151,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
+        <label htmlFor="numberOfRooms">Accommodation Number of Rooms: </label>
         <input
           type="number"
           placeholder="Accommodation Number of Rooms"
@@ -120,6 +162,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
+        <label htmlFor="type">Accommodation Type: </label>
         <select
           id="type"
           value={accommodationType}
@@ -132,14 +175,15 @@ const AccommodationForm: FC = ({}) => {
           <option value={"Bungalows"}>Bungalows</option>
         </select>
         <br />
-        <input type="file" id="photos" />
+        <input multiple type="file" id="photos" />
         <br />
-        <button type="button" onClick={previewFunc}>
+        {/* disable the button if all required fields are not filled in */}
+        <button type="button" onClick={preview} disabled={!checkInputs()}>
           Preview
         </button>
         <br />
         <button>Add</button>
-    </form>
+      </form>
     </div>
   );
 };
