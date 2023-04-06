@@ -16,18 +16,10 @@ const UserCard = () => {
       }
     };
 
-    let keyPressHandler = (event: KeyboardEvent) => {
-      if (event.code === "Space") {
-        setIsOpen(prev => !prev);
-      }
-    };
-
     document.addEventListener("mousedown", handler);
-    document.addEventListener("keypress", keyPressHandler);
 
     return () => {
       document.removeEventListener("mousedown", handler);
-      document.removeEventListener("keypress", keyPressHandler);
     };
   }, []);
   return (
