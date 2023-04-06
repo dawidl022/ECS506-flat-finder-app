@@ -28,11 +28,6 @@ def get_params(type: Type[T]) -> T:
     return _get_input(type, request.args)
 
 
-def get_form(type: Type[T]) -> T:
-    form = cast(dict[str, str], CamelCaseDecoder.snake_casify(request.form))
-    return _get_input(type, form)
-
-
 def get_input(type: Type[T], input: dict[str, str]) -> T:
     form = cast(dict[str, str], CamelCaseDecoder.snake_casify(input))
     return _get_input(type, form)
