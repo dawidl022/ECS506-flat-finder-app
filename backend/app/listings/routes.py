@@ -20,10 +20,11 @@ bp.json_decoder = CamelCaseDecoder
 
 MAX_PHOTO_SIZE = 5 * 1024 * 1024  # 5MB
 
-# TODO remove once user service implemented
-
 
 def make_dummy_user(user_email: str):
+    """
+    TODO remove once user service implemented
+    """
     dummy_user = User(
         id=uuid.UUID("7a5a9895-94d1-44f4-a4b8-2bf41da8a81a"),
         email=user_email,
