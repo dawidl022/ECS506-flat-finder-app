@@ -59,13 +59,25 @@ class AccommodationSearchResult:
 
 
 @dataclass
+class listingContactInfo:
+    phoneNumber: str
+    email: str
+
+
+@dataclass
 class AccommodationListing:
-    thumbnailUrl: str
+    id: int
+    title: str
+    description: str
+    photoUrls: list[str]
     accommodationType: str
     numberOfRooms: int
-    sourceName: str
+    source: str
+    price: int
+    address: str
+    contactInfo: listingContactInfo
 
 
 @dataclass
 class ExternalAccommodationListing(AccommodationListing):
-    listingUrl: str
+    originalListingUrl: str

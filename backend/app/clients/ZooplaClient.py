@@ -5,7 +5,7 @@ from typing import Dict, Union
 from app.clients.APIClient import APIClient
 from app.clients.APIException import *
 
-from app.listings.models import ExternalAccommodationListing
+from app.listings.models import ExternalAccommodationListing, listingContactInfo
 
 
 class ZooplaClient(APIClient):
@@ -46,15 +46,26 @@ class ZooplaClient(APIClient):
         if (response['result_count']) == 0:
             return None
 
-        img: str = response['listing'][0]['images'][0]["original"]
+        title: str = response['listing'][0]['title']
+        desc: str = response['listing'][0]['description']
+        photos: list[str] = response['listing'][0]['original_image']
         type: str = response['listing'][0]['property_type']
-        numrooms: int = response['listing'][0]['num_bedrooms']
-        src: str = ZooplaClient.name
+        numRooms: int = response['listing'][0]['num_bedrooms']
+        price: int = response['listing'][0]['rental_prices']['per_week']
+        address: str = response['listing'][0]['displayable_address']
+        contact: listingContactInfo = listingContactInfo(
+            response['listing'][0]['agent_phone'], "")
         listurl: str = response['listing'][0]['details_url']
-        return ExternalAccommodationListing(img,
+        return ExternalAccommodationListing(listing_id,
+                                            title,
+                                            desc,
+                                            photos,
                                             type,
-                                            numrooms,
-                                            src,
+                                            numRooms,
+                                            ZooplaClient.name,
+                                            price,
+                                            address,
+                                            contact,
                                             listurl)
 
     @staticmethod
@@ -107,15 +118,27 @@ class ZooplaClient(APIClient):
 
         out = []
         for x in response['listing']:
-            img: str = x['images'][0]["original"]
+            listing_id = x['listing_idlisting_id']
+            title: str = x['title']
+            desc: str = x['description']
+            photos: list[str] = x['original_image']
             type: str = x['property_type']
-            numrooms: int = x['num_bedrooms']
+            numRooms: int = x['num_bedrooms']
+            price: int = x['rental_prices']['per_week']
+            address: str = x['displayable_address']
+            contact: listingContactInfo = listingContactInfo(
+                x['agent_phone'], "")
             listurl: str = x['details_url']
-            src: str = ZooplaClient.name
-            out.append(ExternalAccommodationListing(img,
+            out.append(ExternalAccommodationListing(listing_id,
+                                                    title,
+                                                    desc,
+                                                    photos,
                                                     type,
-                                                    numrooms,
-                                                    src,
+                                                    numRooms,
+                                                    ZooplaClient.name,
+                                                    price,
+                                                    address,
+                                                    contact,
                                                     listurl))
 
         return out

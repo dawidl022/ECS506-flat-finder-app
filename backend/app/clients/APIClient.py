@@ -5,7 +5,7 @@ from app.listings.models import ExternalAccommodationListing
 # abstract APIClient class
 class APIClient(ABC):
     # API identifier, e.g. Zoopla
-    name: str | None = None
+    name: str = "None"
 
     # returns an AccomodationListing for the given listing_id
     @staticmethod
@@ -22,5 +22,5 @@ class APIClient(ABC):
                       page_number: int,
                       page_size: int,
                       maximum_price: int
-                      ) -> list[ExternalAccommodationListing] | None:
-        return None
+                      ) -> list[ExternalAccommodationListing]:
+        return []
