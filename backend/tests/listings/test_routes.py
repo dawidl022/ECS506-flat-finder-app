@@ -54,7 +54,7 @@ def test_create_accommodation_listing__given_no_request_body__returns_bad_reques
     assert response.status_code == BAD_REQUEST
 
 
-def test_create_accommodation_listing__given_no_files__returns_bad_request(client: FlaskClient):
+def test_create_accommodation_listing__given_no_photos__returns_bad_request(client: FlaskClient):
     address = cast(UKAddress, model_listing.location.address)
     response = client.post("/api/v1/listings/accommodation", data={
         "title": model_listing.title,
@@ -69,6 +69,29 @@ def test_create_accommodation_listing__given_no_files__returns_bad_request(clien
             "town": address.town,
             "post_code": address.post_code,
         }).encode()), "blob"),
+    })
+    assert b'{"photos":"expected between 1 and 15 photos"}' in response.data
+    assert response.status_code == BAD_REQUEST
+
+
+def test_create_accommodation_listing__given_no_too_many_photos__returns_bad_request(client: FlaskClient):
+    address = cast(UKAddress, model_listing.location.address)
+    response = client.post("/api/v1/listings/accommodation", data={
+        "title": model_listing.title,
+        "description": model_listing.description,
+        "accommodationType": model_listing.accommodation_type,
+        "numberOfRooms": str(model_listing.number_of_rooms),
+        "price": model_listing.price,
+        "address": (BytesIO(json.dumps({
+            "country": "uk",
+            "line1": address.line1,
+            "line2": address.line2,
+            "town": address.town,
+            "post_code": address.post_code,
+        }).encode()), "blob"),
+        "photos": [
+            (BytesIO(bytes((i))), f"photo{i}") for i in range(16)
+        ]
     })
     assert b'{"photos":"expected between 1 and 15 photos"}' in response.data
     assert response.status_code == BAD_REQUEST
