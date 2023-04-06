@@ -1,9 +1,4 @@
-import { FC, useState, FormEvent } from "react";
-import {
-  AccommodationAddressCountryEnum,
-  Configuration,
-  DefaultApi,
-} from "@/generated";
+import { FC, useState } from "react";
 
 const AccommodationForm: FC = ({}) => {
   const [title, setTitle] = useState("");
@@ -18,32 +13,10 @@ const AccommodationForm: FC = ({}) => {
   const [numberOfRooms, setNumberOfRooms] = useState(0);
   const [price, setPrice] = useState(0);
 
-
-  const handleSubmit = (e: FormEvent<HTMLElement>) => {
-    e.preventDefault();
-    new DefaultApi(new Configuration({ basePath: "http://127.0.0.1:5000" }))
-      .apiV1ListingsAccommodationPost({
-        title,
-        description,
-        photos: Array<Blob>(),
-        accommodationType,
-        numberOfRooms,
-        price,
-        address: {
-          line1,
-          line2,
-          town,
-          postCode,
-          country: AccommodationAddressCountryEnum.Uk,
-        },
-      })
-      .then(res => console.log(res));
-  };
-
   return (
     <div>
       Accommodation Form
-      <form onSubmit={handleSubmit}>
+      <form>
         <input
           type="text"
           placeholder="Accommodation Title"

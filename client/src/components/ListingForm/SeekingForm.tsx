@@ -1,8 +1,4 @@
-import { FC, useState, FormEvent } from "react";
-import {
-  Configuration,
-  DefaultApi,
-} from "@/generated";
+import { FC, useState } from "react";
 
 const SeekingForm: FC = ({}) => {
   const [title, setTitle] = useState("");
@@ -10,23 +6,6 @@ const SeekingForm: FC = ({}) => {
   const [location, setLocation] = useState("");
   const [lat, setLatitude] = useState(0);
   const [_long, setLongitude] = useState(0);
-
-  const handleSubmit = (e: FormEvent<HTMLElement>) => {
-    e.preventDefault();
-    new DefaultApi(new Configuration({ basePath: "http://127.0.0.1:5000" }))
-      .apiV1ListingsSeekingPost({
-        title,
-        description,
-        preferredLocation: {
-          name: location,
-          coordinates: {
-            lat,
-            _long,
-          }
-        },
-      })
-      .then(res => console.log(res));
-  };
 
   return (
     <div>
@@ -58,18 +37,24 @@ const SeekingForm: FC = ({}) => {
               required
             />
             <br />
-           <input
-              type="text"
+            <input
+              type="number"
               placeholder="Seeking Latitude"
               value={lat}
+              min={-90}
+              max={90}
+              step="any"
               onChange={e => setLatitude(parseFloat(e.target.value))}
               required
             />
             <br />
             <input
-              type="text"
+              type="number"
               placeholder="Seeking Longitude"
               value={_long}
+              min={-180}
+              max={180}
+              step="any"
               onChange={e => setLongitude(parseFloat(e.target.value))}
               required
             />
@@ -87,3 +72,6 @@ const SeekingForm: FC = ({}) => {
 };
 
 export default SeekingForm;
+
+
+
