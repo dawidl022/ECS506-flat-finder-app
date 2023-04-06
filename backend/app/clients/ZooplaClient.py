@@ -126,14 +126,13 @@ class ZooplaClient(APIClient):
                                                 lat, long), address),
                                             created,
                                             price,
-                                            "",
                                             contact,
                                             title,
                                             desc,
                                             type,
                                             numRooms,
                                             tuple(),
-                                            photos,
                                             ZooplaClient.name,
                                             listurl,
-                                            listing_id)
+                                            listing_id,
+                                            photos)

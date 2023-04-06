@@ -123,7 +123,6 @@ class AccommodationListing:
     """Time of listing creation"""
     price: int
     author_email: str
-    author_phone: str
 
     title: str
     description: str
@@ -131,13 +130,14 @@ class AccommodationListing:
     number_of_rooms: int
 
     photo_ids: tuple[UUID, ...]
-    photo_urls: list[str]
+
     source: str
 
 @dataclass(frozen=True)
 class ExternalAccommodationListing(AccommodationListing):
     original_listing_url: str
     listing_id: int
+    photo_urls: list[str]
 
 
 @dataclass(frozen=True)
