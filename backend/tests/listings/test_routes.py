@@ -34,10 +34,10 @@ class MockListingService(BaseListingsService):
 
     def get_accommodation_listing(self, listing_id: str, source: Source
                                   ) -> AccommodationListing | None:
-        if source == model_listing.source and listing_id in (
-                str(model_listing.id), str(self.failed_update_listing_id)
-        ):
+        if source == model_listing.source and listing_id == str(model_listing.id):
             return model_listing
+        elif source == model_listing.source and listing_id == str(self.failed_update_listing_id):
+            return dataclasses.replace(model_listing, id=uuid.UUID(listing_id))
         return None
 
     def update_accommodation_listing(self, listing_id: uuid.UUID, form: AccommodationForm) -> AccommodationListing:
@@ -391,9 +391,19 @@ def test_get_accommodation_listing__listing_found__returns_listing(client: Flask
     assert json.loads(response.data) == model_listing_json
 
 
+def test_put_accommodation_listing__given_no_form__returns_bad_request(
+        client: FlaskClient, listings_service: MockListingService):
+    response = client.put(
+        f"/api/v1/listings/accommodation/internal_{model_listing.id}")
+
+    assert response.status_code == BAD_REQUEST
+    assert len(listings_service.updated_listings) == 0
+
+
 def test_update_accommodation_listing__given_invalid_id_format__returns_bad_request(
         client: FlaskClient, listings_service: MockListingService):
-    response = client.put("/api/v1/listings/accommodation/whatever")
+    response = client.put("/api/v1/listings/accommodation/whatever",
+                          data=update_accommodation_listing_form())
 
     assert b'{"listingId":"invalid listing id format"}' in response.data
     assert response.status_code == BAD_REQUEST
@@ -402,19 +412,11 @@ def test_update_accommodation_listing__given_invalid_id_format__returns_bad_requ
 
 def test_put_accommodation_listing__given_invalid_source_returns__returns_not_found(
         client: FlaskClient, listings_service: MockListingService):
-    response = client.put("/api/v1/listings/accommodation/fake-source_123")
+    response = client.put("/api/v1/listings/accommodation/fake-source_123",
+                          data=update_accommodation_listing_form())
 
     assert b'{"listingId":"source not found"}' in response.data
     assert response.status_code == NOT_FOUND
-    assert len(listings_service.updated_listings) == 0
-
-
-def test_put_accommodation_listing__given_no_form__returns_bad_request(
-        client: FlaskClient, listings_service: MockListingService):
-    response = client.put(
-        f"/api/v1/listings/accommodation/internal_{model_listing.id}")
-
-    assert response.status_code == BAD_REQUEST
     assert len(listings_service.updated_listings) == 0
 
 

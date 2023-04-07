@@ -188,43 +188,31 @@ def fetch_accommodation_listing(listing_service, source, id
 @jwt_required()
 def put_accommodation_listing(
         listing_id: str, listing_service: BaseListingsService) -> Response:
-    source, id = extract_listing_id_and_source(listing_id)
     form = validate_and_get_create_accommodation_form()
 
-    if source != Source.internal:
-        abort(make_response(
-            {'listingId': "cannot update external listing"}, FORBIDDEN))
-
-    listing = fetch_accommodation_listing(listing_service, source, id)
-    current_user_email = get_current_user_email()
-
-    if listing.author_email != current_user_email:
-        abort(make_response(
-            {'listingId':
-              "currently logged in user is not the author of this listing"},
-            FORBIDDEN))
+    listing = get_accommodation_listing_authored_by_current_user(
+        listing_id, listing_service, action="update")
 
     try:
         updated_listing = listing_service.update_accommodation_listing(
-            uuid.UUID(id), form)
+            listing.id, form)
     except ListingNotFoundError:
         abort(make_response(
             {'listingId': "listing not found"}, NOT_FOUND))
 
-    dummy_user = make_dummy_user(current_user_email)
+    dummy_user = make_dummy_user(get_current_user_email())
 
     return jsonify(AccommodationListingDTO(updated_listing, dummy_user))
 
 
-@bp.delete("/accommodation/<listing_id>")
-@jwt_required()
-def delete_accommodation_listing(
-        listing_id: str, listing_service: BaseListingsService) -> Response:
+def get_accommodation_listing_authored_by_current_user(
+        listing_id: str, listing_service: BaseListingsService, action: str
+) -> AccommodationListing:
     source, id = extract_listing_id_and_source(listing_id)
 
     if source != Source.internal:
         abort(make_response(
-            {'listingId': "cannot delete external listing"}, FORBIDDEN))
+            {'listingId': f"cannot {action} external listing"}, FORBIDDEN))
 
     listing = fetch_accommodation_listing(listing_service, source, id)
 
@@ -234,8 +222,18 @@ def delete_accommodation_listing(
               "currently logged in user is not the author of this listing"},
             FORBIDDEN))
 
+    return listing
+
+
+@bp.delete("/accommodation/<listing_id>")
+@jwt_required()
+def delete_accommodation_listing(
+        listing_id: str, listing_service: BaseListingsService) -> Response:
+    listing = get_accommodation_listing_authored_by_current_user(
+        listing_id, listing_service, action="delete")
+
     try:
-        listing_service.delete_accommodation_listing(uuid.UUID(id))
+        listing_service.delete_accommodation_listing(listing.id)
     except ListingNotFoundError:
         abort(make_response(
             {'listingId': "listing not found"}, NOT_FOUND))
