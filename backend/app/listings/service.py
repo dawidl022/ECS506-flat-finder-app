@@ -66,6 +66,12 @@ class BaseListingsService(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def update_accommodation_listing(
+        self, listing_id: uuid.UUID, form: AccommodationForm
+    ) -> AccommodationListing:
+        pass
+
+    @abc.abstractmethod
     def delete_accommodation_listing(self, listing_id: uuid.UUID) -> None:
         pass
 
