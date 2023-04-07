@@ -1,25 +1,27 @@
 import abc
+import dataclasses
 import uuid
 import time
+from app.listings.exceptions import ListingNotFoundError
 from app.listings.models import (
     AccommodationSearchResult, Address, Coordinates, Photo, Source)
 from app.listings.dtos import (
-    CreateAccommodationForm, AccommodationSearchParams)
+    AccommodationForm, AccommodationSearchParams)
 from app.listings.models import AccommodationListing, Location
 from app.listings.repository import (
     AccommodationListingRepository, ListingPhotoRepository)
 
 
 class BaseGeocodingService(abc.ABC):
-    @ abc.abstractmethod
+    @abc.abstractmethod
     def get_coords(self, addr: Address) -> Coordinates:
         pass
 
-    @ abc.abstractmethod
+    @abc.abstractmethod
     def search_coords(self, location_query: str) -> Coordinates:
         pass
 
-    @ abc.abstractmethod
+    @abc.abstractmethod
     def calc_distance(self, c1: Coordinates, c2: Coordinates) -> float:
         pass
 
@@ -46,21 +48,27 @@ class GeocodingService(BaseGeocodingService):
 
 
 class BaseListingsService(abc.ABC):
-    @ abc.abstractmethod
+    @abc.abstractmethod
     def search_accommodation_listings(self, params: AccommodationSearchParams
                                       ) -> list[AccommodationSearchResult]:
         pass
 
-    @ abc.abstractmethod
+    @abc.abstractmethod
     def create_accommodation_listing(
-        self, form: CreateAccommodationForm, photos: list[bytes],
+        self, form: AccommodationForm, photos: list[bytes],
         author_email: str
     ) -> AccommodationListing:
         pass
 
-    @ abc.abstractmethod
+    @abc.abstractmethod
     def get_accommodation_listing(self, listing_id: str, source: Source
                                   ) -> AccommodationListing | None:
+        pass
+
+    @abc.abstractmethod
+    def update_accommodation_listing(
+        self, listing_id: uuid.UUID, form: AccommodationForm
+    ) -> AccommodationListing:
         pass
 
     @abc.abstractmethod
@@ -104,7 +112,7 @@ class ListingsService(BaseListingsService):
         ) for acc in listings]
 
     def create_accommodation_listing(
-            self, form: CreateAccommodationForm, photos: list[bytes],
+            self, form: AccommodationForm, photos: list[bytes],
             author_email: str
     ) -> AccommodationListing:
 
@@ -140,6 +148,25 @@ class ListingsService(BaseListingsService):
             return self.accommodation_listing_repo.get_listing_by_id(id)
 
         raise ValueError("Unknown source for accommodation listing")
+
+    def update_accommodation_listing(
+        self, listing_id: uuid.UUID, form: AccommodationForm
+    ) -> AccommodationListing:
+        listing = self.accommodation_listing_repo.get_listing_by_id(listing_id)
+
+        if listing is None:
+            raise ListingNotFoundError()
+
+        updated_listing = dataclasses.replace(
+            listing,
+            **form.to_dict(),
+            location=dataclasses.replace(
+                listing.location, address=form.decoded_address)
+        )
+
+        self.accommodation_listing_repo.save_listing(updated_listing)
+
+        return updated_listing
 
     def delete_accommodation_listing(self, listing_id: uuid.UUID) -> None:
         self.accommodation_listing_repo.delete_listing(listing_id)

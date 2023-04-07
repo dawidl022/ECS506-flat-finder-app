@@ -132,16 +132,3 @@ class AccommodationListing:
 class Photo:
     id: UUID
     blob: bytes
-
-
-@dataclass(frozen=True)
-class ContactDetails:
-    phone_number: str
-
-
-@dataclass(frozen=True)
-class User:
-    id: UUID
-    email: str
-    name: str
-    contact_details: ContactDetails

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import StrEnum
 import json
-from typing import cast
+from typing import Any, cast
 from flask import url_for
 
 from marshmallow import Schema, fields
@@ -14,9 +14,8 @@ from app.listings.models import (
     AccommodationSearchResult, AccommodationSummary, Country, SortBy, Source,
     UKAddress)
 from app.util.encoding import CamelCaseDecoder
-from app.listings.models import Address
-from app.listings.models import AccommodationListing
-from app.listings.models import User
+from app.listings.models import Address, AccommodationListing
+from app.user.user_model import User
 
 
 def validate_sources(sources: str) -> str:
@@ -90,7 +89,7 @@ class CreateAccommodationFormSchema(Schema):
 
 
 @dataclass(frozen=True)
-class CreateAccommodationForm(Schemable):
+class AccommodationForm(Schemable):
     schema = CreateAccommodationFormSchema()
 
     title: str
@@ -114,6 +113,11 @@ class CreateAccommodationForm(Schemable):
                                         config=dacite.Config(cast=[StrEnum]))
 
         raise ValueError("Unexpected country")
+
+    def to_dict(self) -> dict[str, Any]:
+        d = vars(self).copy()
+        del d["address"]
+        return d
 
 
 class AuthorDTO:
