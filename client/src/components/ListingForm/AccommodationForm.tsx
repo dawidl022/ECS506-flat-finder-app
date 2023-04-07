@@ -79,7 +79,7 @@ const AccommodationForm: FC = ({}) => {
             err.message
         )
       )
-      .then(res => (window.location.href = "/myListings"));
+      .then(res =>  router.push({pathname: "/myListings"}));
   };
 
   return (
