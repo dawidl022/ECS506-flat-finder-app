@@ -4,22 +4,34 @@ import unittest
 from uuid import UUID
 import uuid
 
-from app.listings.dtos import CreateAccommodationForm
+from .test_routes import model_listing, model_listing_summary
 from app.listings.exceptions import ListingNotFoundError
 from app.listings.models import AccommodationListing, Address, Coordinates, Location, Photo, SortBy, Source, UKAddress
-from app.listings.repository import AccommodationListingRepository, ListingPhotoRepository
+from app.listings.dtos import CreateAccommodationForm
 from app.listings.service import BaseGeocodingService, ListingsService
-from .test_routes import model_listing
+from app.listings.repository import AccommodationListingRepository, ListingPhotoRepository
+from app.listings.models import AccommodationListing, AccommodationSearchResult, Address, Coordinates, Location, Photo, SortBy, UKAddress
+from app.listings.dtos import CreateAccommodationForm, AccommodationSearchParams
+
 
 expected_coords = Coordinates(51.524067, -0.040374)
+expected_search_coords = Coordinates(51.5, 0)
+expected_distance = 10
 
 
 class StubGeocodingService(BaseGeocodingService):
     def get_coords(self, addr: Address) -> Coordinates:
         return expected_coords
 
+    def search_coords(self, location_query: str) -> Coordinates:
+        return expected_search_coords
+
+    def calc_distance(self, coords1: Coordinates, coords2: Coordinates) -> float:
+        return expected_distance
+
 
 class SpyAccommodationListingRepo(AccommodationListingRepository):
+
     def __init__(self) -> None:
         self.saved_listings: list[AccommodationListing] = []
         self.deleted_listing_ids: list[UUID] = []
@@ -36,10 +48,12 @@ class SpyAccommodationListingRepo(AccommodationListingRepository):
             raise ListingNotFoundError()
 
     def search_by_location(
-        self, coords: Coordinates, radius: int, order_by: SortBy, page: int,
-        size: int, max_price: int | None = None
+        self, coords: Coordinates, radius: float, order_by: SortBy, page: int,
+        size: int, max_price: float | None = None
     ) -> list[AccommodationListing]:
-        raise NotImplementedError()
+        if coords == expected_search_coords and radius >= 10:
+            return [model_listing]
+        return []
 
     def save_listing(self, listing: AccommodationListing) -> None:
         self.saved_listings.append(listing)
@@ -60,6 +74,8 @@ class SpyPhotoRepo(ListingPhotoRepository):
 
 
 class ListingsServiceTest(unittest.TestCase):
+    maxDiff = 100000
+
     address = UKAddress(
         line1="Queen Mary University of London",
         line2="Mile End Road",
@@ -139,6 +155,51 @@ class ListingsServiceTest(unittest.TestCase):
         self.assertIsNotNone(saved_photos[0][0].id)
         self.assertIsNotNone(saved_photos[0][1].id)
 
+    def test_search_accommodation_listing__given_no_sources__searches_all_repos(self):
+        """
+        TODO update to search external sources too
+        """
+        params = AccommodationSearchParams(
+            location="London",
+            radius=10,
+        )
+        results = self.service.search_accommodation_listings(params)
+
+        self.assertEqual([
+            AccommodationSearchResult(
+                distance=expected_distance,
+                is_favourite=False,
+                accommodation=model_listing_summary,
+            )
+        ], results)
+
+    def test_search_accommodation_listing__given_internal_source__searches_internal_repo(self):
+        params = AccommodationSearchParams(
+            location="London",
+            radius=10,
+            sources="internal"
+        )
+        results = self.service.search_accommodation_listings(params)
+
+        self.assertEqual([
+            AccommodationSearchResult(
+                distance=expected_distance,
+                is_favourite=False,
+                accommodation=model_listing_summary,
+            )
+        ], results)
+
+    def test_search_accommodation_listing__given_external_source__uses_client_to_search(self):
+        # TODO in #80
+        params = AccommodationSearchParams(
+            location="London",
+            radius=10,
+            sources="zoopla"
+        )
+        results = self.service.search_accommodation_listings(params)
+
+        self.assertEqual([], results)
+
     def test_get_accommodation_listing__given_listing_exists_in_repo__returns_listing(self):
         actual = self.service.get_accommodation_listing(
             str(model_listing.id), Source.internal)
@@ -165,3 +226,10 @@ class ListingsServiceTest(unittest.TestCase):
         listing_id = UUID("634d95f1-8b03-4605-a9e5-38722b907c89")
         self.assertRaises(ListingNotFoundError,
                           lambda: self.service.delete_accommodation_listing(listing_id))
+
+    def test_get_available_sources__returns_all_sources(self):
+        expected = {Source.internal, Source.zoopla}
+        actual = self.service.get_available_sources("London")
+
+        self.assertEqual(len(expected), len(actual))
+        self.assertEqual(expected, set(actual))

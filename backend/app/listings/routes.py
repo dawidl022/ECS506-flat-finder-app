@@ -12,10 +12,13 @@ from app.util.marshmallow import get_params, get_input
 from app.util.encoding import CamelCaseEncoder
 from app.util.encoding import CamelCaseDecoder
 from config import Config
-from .dtos import CreateAccommodationForm, AccommodationListingDTO
 from .models import (
-    AccommodationListing, AccommodationSearchParams, Source, User,
-    ContactDetails)
+    AccommodationListing, Source, User, ContactDetails)
+from .dtos import (
+    AccommodationSearchResultDTO, CreateAccommodationForm,
+    AccommodationListingDTO, AccommodationSearchParams, SearchResult, SourceDTO
+)
+from .models import Source, User, ContactDetails
 from .service import BaseListingsService
 
 bp = Blueprint("listings", __name__, url_prefix=f"{Config.ROOT}/listings")
@@ -42,13 +45,26 @@ def make_dummy_user(user_email: str):
 
 
 @bp.get("/accommodation")
+@jwt_required()
 def get_accommodation_listings(listings_service: BaseListingsService
                                ) -> Response:
     params = get_params(AccommodationSearchParams)
 
-    listings = listings_service.search_accommodation_listings()
+    listings = listings_service.search_accommodation_listings(params)
+    sources = listings_service.get_available_sources(params.location)
 
-    return jsonify(listings)
+    result = SearchResult(
+        sources=[
+            SourceDTO(s, enabled=params.sources is None or s in params.sources)
+            for s in sources
+        ],
+        search_results=[
+            AccommodationSearchResultDTO(listing)
+            for listing in listings
+        ]
+    )
+
+    return jsonify(result)
 
 
 @bp.post("/accommodation")
