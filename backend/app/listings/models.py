@@ -112,7 +112,7 @@ class AccommodationListing:
     number_of_rooms: int
 
     photo_ids: tuple[UUID, ...]
-    source: str
+    source: Source
 
     def summarise(self) -> AccommodationSummary:
         return AccommodationSummary(
