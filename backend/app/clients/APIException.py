@@ -11,13 +11,12 @@ class APIUnreachableException(APIException):
         return f"API is unreachable. :{self.err}"
 
 
-class APIKeyError(APIException):
+class APIForbiddenError(APIException):
     def __init__(self, err: object) -> None:
         super().__init__(err)
 
     def __str__(self) -> str:
-        return f"API key is invalid, expired\
-                or you are not subscribed. message:{self.err}"
+        return f"API rejected your request. message:{self.err}"
 
 
 class APIResponseError(APIException):

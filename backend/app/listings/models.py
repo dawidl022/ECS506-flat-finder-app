@@ -139,6 +139,8 @@ class ExternalAccommodationListing(AccommodationListing):
     original_listing_url: str
     listing_id: int
     photo_urls: list[str]
+    short_description: str
+    author_phone: str
 
 
 @dataclass(frozen=True)

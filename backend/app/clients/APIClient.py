@@ -1,6 +1,8 @@
 from abc import ABC,  abstractmethod
 from app.listings.models import ExternalAccommodationListing
 
+from app.clients.ZooplaClient import ZooplaOrderBy
+
 
 # abstract APIClient class
 class APIClient(ABC):
@@ -18,7 +20,7 @@ class APIClient(ABC):
     @abstractmethod
     def searchListing(area: str,
                       radius: float,
-                      order_by: str,
+                      order_by: ZooplaOrderBy,
                       page_number: int,
                       page_size: int,
                       maximum_price: int
