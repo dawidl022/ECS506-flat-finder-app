@@ -10,9 +10,7 @@ const SeekingForm: FC = ({}) => {
       <div>
         Seeking Form
         <form>
-          <label htmlFor="title" id="titleText">
-            Title:{" "}
-          </label>
+          <label htmlFor="title">Title: </label>
           <input
             id="title"
             type="text"
@@ -22,9 +20,7 @@ const SeekingForm: FC = ({}) => {
             required
           />
           <br />
-          <label htmlFor="description" id="descriptionText">
-            Description:{" "}
-          </label>
+          <label htmlFor="description">Description: </label>
           <textarea
             rows={15}
             cols={30}
@@ -35,9 +31,7 @@ const SeekingForm: FC = ({}) => {
             required
           />
           <br />
-          <label htmlFor="location" id="locationText">
-            Location:{" "}
-          </label>
+          <label htmlFor="location">Location: </label>
           <input
             type="text"
             id="location"
@@ -47,9 +41,7 @@ const SeekingForm: FC = ({}) => {
             required
           />
           <br />
-          <label htmlFor="photos" id="photosText">
-            Photos:{""}
-          </label>
+          <label htmlFor="photos">Photos:{""}</label>
           <input
             type="file"
             id="photos"
