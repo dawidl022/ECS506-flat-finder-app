@@ -66,8 +66,7 @@ const AccommodationForm: FC = ({}) => {
 
       //check if the file size is greater than 5MB
       for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        if (file.size > 5242880) {
+        if (files[i].size > 5242880) {
           alert(`The maximum file size is 5MB`);
           e.target.value = ''; 
           return;
