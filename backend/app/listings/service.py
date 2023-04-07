@@ -3,7 +3,7 @@ import uuid
 import time
 from app.listings.models import (
     AccommodationSearchResult, AccommodationSummary, Address, Coordinates,
-    Photo)
+    Photo, Source)
 from app.listings.dtos import CreateAccommodationForm
 from app.listings.models import AccommodationListing, Location
 from app.listings.repository import (
@@ -35,6 +35,11 @@ class BaseListingsService(abc.ABC):
         self, form: CreateAccommodationForm, photos: list[bytes],
         author_email: str
     ) -> AccommodationListing:
+        pass
+
+    @abc.abstractmethod
+    def get_accommodation_listing(self, listing_id: str, source: Source
+                                  ) -> AccommodationListing | None:
         pass
 
 
@@ -114,10 +119,18 @@ class ListingsService(BaseListingsService):
             accommodation_type=form.accommodation_type,
             number_of_rooms=form.number_of_rooms,
             photo_ids=tuple(photo.id for photo in listing_photos),
-            source="internal"
+            source=Source.internal
         )
 
         self.listing_photo_repo.save_photos(listing_photos)
         self.accommodation_listing_repo.save_listing(listing)
 
         return listing
+
+    def get_accommodation_listing(self, listing_id: str, source: Source
+                                  ) -> AccommodationListing | None:
+        if source == source.internal:
+            id = uuid.UUID(listing_id)
+            return self.accommodation_listing_repo.get_listing_by_id(id)
+
+        raise ValueError("Unknown source for accommodation listing")

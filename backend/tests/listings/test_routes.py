@@ -1,4 +1,4 @@
-from http.client import BAD_REQUEST, OK
+from http.client import BAD_REQUEST, NOT_FOUND, OK
 from io import BytesIO
 import json
 import time
@@ -6,7 +6,7 @@ from typing import cast
 import uuid
 from flask.testing import FlaskClient
 from app.listings.dtos import CreateAccommodationForm
-from app.listings.models import AccommodationListing, Coordinates, Location, UKAddress
+from app.listings.models import AccommodationListing, Coordinates, Location, Source, UKAddress
 
 from app.listings.service import BaseListingsService
 
@@ -25,6 +25,12 @@ class MockListingService(BaseListingsService):
     ) -> AccommodationListing:
         self.saved_photos.append(photos)
         return model_listing
+
+    def get_accommodation_listing(self, listing_id: str, source: Source
+                                  ) -> AccommodationListing | None:
+        if source == model_listing.source and listing_id == str(model_listing.id):
+            return model_listing
+        return None
 
 
 model_listing = AccommodationListing(
@@ -46,7 +52,46 @@ model_listing = AccommodationListing(
     accommodation_type="Flat",
     number_of_rooms=3,
     photo_ids=(uuid.uuid4(), uuid.uuid4()),
-    source="internal")
+    source=Source.internal)
+
+address = cast(UKAddress, model_listing.location.address)
+
+
+model_listing_json = {
+    "id": "internal/" + str(model_listing.id),
+    "title": model_listing.title,
+    "description": model_listing.description,
+    "photoUrls": [
+        f"/api/v1/listings/{model_listing.id}/photos/{id}"
+        for id in model_listing.photo_ids
+    ],
+    "accommodationType": model_listing.accommodation_type,
+    "numberOfRooms": model_listing.number_of_rooms,
+    "source": "internal",
+    "price": model_listing.price,
+    "address": {
+        "country": "uk",
+        "line1": address.line1,
+        "line2": address.line2,
+        "town": address.town,
+        "postCode": address.post_code,
+    },
+    "author": {
+        "name": "Example User",
+        "userProfile": {
+                "id": "7a5a9895-94d1-44f4-a4b8-2bf41da8a81a",
+                "email": "unittest@user.com",
+                "name": "Example User",
+                "contactDetails": {
+                    "phoneNumber": "+44 78912 345678",
+                },
+        },
+    },
+    "contactInfo": {
+        "email": "unittest@user.com",
+        "phoneNumber": "+44 78912 345678",
+    }
+}
 
 
 def test_create_accommodation_listing__given_no_request_body__returns_bad_request(client: FlaskClient):
@@ -55,7 +100,6 @@ def test_create_accommodation_listing__given_no_request_body__returns_bad_reques
 
 
 def test_create_accommodation_listing__given_no_photos__returns_bad_request(client: FlaskClient):
-    address = cast(UKAddress, model_listing.location.address)
     response = client.post("/api/v1/listings/accommodation", data={
         "title": model_listing.title,
         "description": model_listing.description,
@@ -75,7 +119,6 @@ def test_create_accommodation_listing__given_no_photos__returns_bad_request(clie
 
 
 def test_create_accommodation_listing__given_no_too_many_photos__returns_bad_request(client: FlaskClient):
-    address = cast(UKAddress, model_listing.location.address)
     response = client.post("/api/v1/listings/accommodation", data={
         "title": model_listing.title,
         "description": model_listing.description,
@@ -98,7 +141,6 @@ def test_create_accommodation_listing__given_no_too_many_photos__returns_bad_req
 
 
 def test_create_accommodation_listing__given_file_exceeds_5MB__returns_listing(client: FlaskClient):
-    address = cast(UKAddress, model_listing.location.address)
     response = client.post("/api/v1/listings/accommodation", data={
         "title": model_listing.title,
         "description": model_listing.description,
@@ -149,43 +191,39 @@ def test_create_accommodation_listing__given_valid_request__returns_listing(clie
 
     # check response
     assert response.status_code == OK
-    assert json.loads(response.data) == {
-        "id": "internal/" + str(model_listing.id),
-        "title": model_listing.title,
-        "description": model_listing.description,
-        "photoUrls": [
-            f"/api/v1/listings/{model_listing.id}/photos/{id}"
-            for id in model_listing.photo_ids
-        ],
-        "accommodationType": model_listing.accommodation_type,
-        "numberOfRooms": model_listing.number_of_rooms,
-        "source": "internal",
-        "price": model_listing.price,
-        "address": {
-            "country": "uk",
-            "line1": address.line1,
-            "line2": address.line2,
-            "town": address.town,
-            "postCode": address.post_code,
-        },
-        "author": {
-            "name": "Example User",
-            "userProfile": {
-                "id": "7a5a9895-94d1-44f4-a4b8-2bf41da8a81a",
-                "email": "unittest@user.com",
-                "name": "Example User",
-                "contactDetails": {
-                    "phoneNumber": "+44 78912 345678",
-                },
-            },
-        },
-        "contactInfo": {
-            "email": "unittest@user.com",
-            "phoneNumber": "+44 78912 345678",
-        }
-    }
+
+    assert json.loads(response.data) == model_listing_json
 
     # check photo files were read by server correctly
     assert len(listings_service.saved_photos[0]) == 2, "not all files saved"
     assert listings_service.saved_photos[0][0] == files[0]
     assert listings_service.saved_photos[0][1] == files[1]
+
+
+def test_get_accommodation_listing__given_invalid_id_format__returns_bad_request(client: FlaskClient):
+    response = client.get("/api/v1/listings/accommodation/whatever")
+
+    assert b'{"listingId":"invalid listing id format"}' in response.data
+    assert response.status_code == BAD_REQUEST
+
+
+def test_get_accommodation_listing__given_invalid_source_returns__returns_not_found(client: FlaskClient):
+    response = client.get("/api/v1/listings/accommodation/fake-source_123")
+
+    assert b'{"listingId":"source not found"}' in response.data
+    assert response.status_code == NOT_FOUND
+
+
+def test_get_accommodation_listing__given_no_listing_found__returns_not_found(client: FlaskClient):
+    response = client.get(
+        "/api/v1/listings/accommodation/internal_20f1bdbc-1042-4957-aab9-93462ff97fea")
+
+    assert b'{"listingId":"listing not found"}' in response.data
+    assert response.status_code == NOT_FOUND
+
+
+def test_get_accommodation_listing__listing_found__returns_listing(client: FlaskClient):
+    response = client.get(
+        f"/api/v1/listings/accommodation/internal_{model_listing.id}")
+    assert response.status_code == OK
+    assert json.loads(response.data) == model_listing_json

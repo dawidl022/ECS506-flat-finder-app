@@ -2,11 +2,13 @@ import json
 import time
 import unittest
 from uuid import UUID
+import uuid
 
 from app.listings.dtos import CreateAccommodationForm
-from app.listings.models import AccommodationListing, Address, Coordinates, Location, Photo, SortBy, UKAddress
+from app.listings.models import AccommodationListing, Address, Coordinates, Location, Photo, SortBy, Source, UKAddress
 from app.listings.repository import AccommodationListingRepository, ListingPhotoRepository
 from app.listings.service import BaseGeocodingService, ListingsService
+from .test_routes import model_listing
 
 expected_coords = Coordinates(51.524067, -0.040374)
 
@@ -22,7 +24,9 @@ class SpyAccommodationListingRepo(AccommodationListingRepository):
 
     def get_listing_by_id(self, listing_id: UUID
                           ) -> AccommodationListing | None:
-        raise NotImplementedError()
+        if listing_id == model_listing.id:
+            return model_listing
+        return None
 
     def delete_listing(self, listing_id: UUID) -> None:
         raise NotImplementedError()
@@ -120,7 +124,7 @@ class ListingsServiceTest(unittest.TestCase):
 
     def test_create_accommodation_listing__saves_photos_to_repo(self):
         photos = [bytes((1, 2, 3)), bytes((2, 3, 4))]
-        actual = self.service.create_accommodation_listing(
+        self.service.create_accommodation_listing(
             form=self.form, author_email="test@user.com", photos=photos
         )
         saved_photos = self.spy_photo_repo.saved_photos
@@ -130,3 +134,17 @@ class ListingsServiceTest(unittest.TestCase):
         self.assertEqual(photos[1], saved_photos[0][1].blob)
         self.assertIsNotNone(saved_photos[0][0].id)
         self.assertIsNotNone(saved_photos[0][1].id)
+
+    def test_get_accommodation_listing__given_listing_exists_in_repo__returns_listing(self):
+        actual = self.service.get_accommodation_listing(
+            str(model_listing.id), Source.internal)
+        self.assertEqual(model_listing, actual)
+
+    def test_get_accommodation_listing__given_listing_not_exists_in_repo__returns_none(self):
+        actual = self.service.get_accommodation_listing(
+            str(uuid.uuid4()), Source.internal)
+        self.assertIsNone(actual)
+
+    def test_get_accommodation_listing__given_zoopla_source__raises_error(self):
+        self.assertRaises(ValueError, lambda: self.service.get_accommodation_listing(
+            str(model_listing.id), Source.zoopla))
