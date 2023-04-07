@@ -79,7 +79,7 @@ const AccommodationForm: FC = ({}) => {
             err.message
         )
       )
-      .then(res =>  router.push({pathname: "/myListings"}));
+      .then(res => router.push({ pathname: "/myListings" }));
   };
 
   return (
