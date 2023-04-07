@@ -109,7 +109,7 @@ const AccommodationForm: FC = ({}) => {
         <label htmlFor="title">Title: </label>
         <input
           type="text"
-          placeholder="Accommodation Title"
+          placeholder="Title REQUIRED"
           value={title}
           onChange={e => setTitle(e.target.value)}
           required
@@ -121,7 +121,7 @@ const AccommodationForm: FC = ({}) => {
           rows={15}
           cols={30}
           id="description"
-          placeholder="Accommodation Description REQUIRED"
+          placeholder="Description REQUIRED"
           value={description}
           onChange={e => setDescription(e.target.value)}
           required
@@ -144,7 +144,7 @@ const AccommodationForm: FC = ({}) => {
           <input
             type="text"
             id="line2"
-            placeholder="Accommodation Line 2 OPTIONAL"
+            placeholder="Line 2 OPTIONAL"
             value={line2}
             onChange={e => setLine2(e.target.value)}
           />
@@ -153,7 +153,7 @@ const AccommodationForm: FC = ({}) => {
           <input
             id="town"
             type="text"
-            placeholder="Accommodation Town REQUIRED"
+            placeholder="Town REQUIRED"
             value={town}
             onChange={e => setTown(e.target.value)}
             required
@@ -163,7 +163,7 @@ const AccommodationForm: FC = ({}) => {
           <input
             type="text"
             id="postCode"
-            placeholder="Accommodation Post Code REQUIRED"
+            placeholder="Post Code REQUIRED"
             value={postCode}
             onChange={e => setPostCode(e.target.value)}
             required
@@ -173,7 +173,7 @@ const AccommodationForm: FC = ({}) => {
           <input
             type="text"
             id="country"
-            placeholder="Accommodation Country REQUIRED"
+            placeholder="Country REQUIRED"
             value={country}
             readOnly
             disabled={true}
@@ -184,7 +184,7 @@ const AccommodationForm: FC = ({}) => {
         <input
           type="number"
           id="price"
-          placeholder="Accommodation Price REQUIRED"
+          placeholder="Price REQUIRED"
           value={price}
           onChange={e => setPrice(parseFloat(e.target.value))}
           min={0}
@@ -195,7 +195,7 @@ const AccommodationForm: FC = ({}) => {
         <input
           type="number"
           id="numberOfRooms"
-          placeholder="Accommodation Number of Rooms REQUIRED"
+          placeholder="Number of Rooms REQUIRED"
           value={numberOfRooms}
           onChange={e => setNumberOfRooms(parseFloat(e.target.value))}
           min={0}

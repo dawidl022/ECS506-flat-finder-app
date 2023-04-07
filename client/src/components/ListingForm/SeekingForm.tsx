@@ -73,7 +73,7 @@ const SeekingForm: FC = ({}) => {
           <input
             id="title"
             type="text"
-            placeholder="Seeking Title REQUIRED"
+            placeholder="Title REQUIRED"
             value={title}
             onChange={e => setTitle(e.target.value)}
             required
@@ -85,7 +85,7 @@ const SeekingForm: FC = ({}) => {
             rows={15}
             cols={30}
             id="description"
-            placeholder="Seeking Description REQUIRED"
+            placeholder="Description REQUIRED"
             value={description}
             onChange={e => setDescription(e.target.value)}
             required
@@ -95,7 +95,7 @@ const SeekingForm: FC = ({}) => {
           <input
             type="text"
             id="location"
-            placeholder="Seeking Location REQUIRED"
+            placeholder="Location REQUIRED"
             value={location}
             onChange={e => setLocation(e.target.value)}
             required
