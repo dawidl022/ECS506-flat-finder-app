@@ -766,7 +766,7 @@ components:
         photos:
           $ref: "#/components/schemas/listingPhotos"
         preferredLocation:
-          $ref: "#/components/schemas/location"
+          type: string
 
     seekingFormBase:
       type: object
@@ -780,7 +780,7 @@ components:
         description:
           $ref: "#/components/schemas/listingDescription"
         preferredLocation:
-          $ref: "#/components/schemas/location"
+          type: string
 
     listingId:
       type: string

@@ -52,6 +52,7 @@ const SeekingForm: FC = ({}) => {
       )
       .then(res => (window.location.href = "/myListings"));
   };
+
   return (
     <div>
       <div>
@@ -59,17 +60,21 @@ const SeekingForm: FC = ({}) => {
         <form onSubmit={handleSubmit}>
           <label htmlFor="title">Title: </label>
           <input
+            id="title"
             type="text"
-            placeholder="Seeking Title"
+            placeholder="Seeking Title REQUIRED"
             value={title}
             onChange={e => setTitle(e.target.value)}
             required
           />
           <br />
           <label htmlFor="description">Description: </label>
-          <input
-            type="text"
-            placeholder="Seeking Description"
+
+          <textarea
+            rows={15}
+            cols={30}
+            id="description"
+            placeholder="Seeking Description REQUIRED"
             value={description}
             onChange={e => setDescription(e.target.value)}
             required
@@ -78,37 +83,22 @@ const SeekingForm: FC = ({}) => {
           <label htmlFor="location">Location: </label>
           <input
             type="text"
-            placeholder="Seeking Location"
+            id="location"
+            placeholder="Seeking Location REQUIRED"
             value={location}
             onChange={e => setLocation(e.target.value)}
             required
           />
+          
           <br />
-          <label htmlFor="lat">Latitude: </label>
+          <label htmlFor="photos">Photos:{""}</label>
           <input
-            type="number"
-            placeholder="Seeking Latitude"
-            value={lat}
-            min={-90}
-            max={90}
-            step="any"
-            onChange={e => setLatitude(parseFloat(e.target.value))}
-            required
-          />
-          <br />
-          <label htmlFor="_long">Longitude: </label>
-          <input
-            type="number"
-            placeholder="Seeking Longitude"
-            value={_long}
-            min={-180}
-            max={180}
-            step="any"
-            onChange={e => setLongitude(parseFloat(e.target.value))}
-            required
-          />
-          <br />
-          <input multiple type="file" id="photos" />
+            type="file"
+            id="photos"
+            placeholder="Import Photos OPTIONAL"
+            accept="image/png, image/jpeg"
+            multiple
+          />          
           <br />
           <button type="button" onClick={preview} disabled={!checkInputs()}>
             Preview

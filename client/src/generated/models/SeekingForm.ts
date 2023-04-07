@@ -13,13 +13,6 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { Location } from './Location';
-import {
-    LocationFromJSON,
-    LocationFromJSONTyped,
-    LocationToJSON,
-} from './Location';
-
 /**
  * 
  * @export
@@ -46,10 +39,10 @@ export interface SeekingForm {
     photos?: Array<Blob>;
     /**
      * 
-     * @type {Location}
+     * @type {string}
      * @memberof SeekingForm
      */
-    preferredLocation: Location;
+    preferredLocation: string;
 }
 
 /**
@@ -77,7 +70,7 @@ export function SeekingFormFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'title': json['title'],
         'description': json['description'],
         'photos': !exists(json, 'photos') ? undefined : json['photos'],
-        'preferredLocation': LocationFromJSON(json['preferredLocation']),
+        'preferredLocation': json['preferredLocation'],
     };
 }
 
@@ -93,7 +86,7 @@ export function SeekingFormToJSON(value?: SeekingForm | null): any {
         'title': value.title,
         'description': value.description,
         'photos': value.photos,
-        'preferredLocation': LocationToJSON(value.preferredLocation),
+        'preferredLocation': value.preferredLocation,
     };
 }
 

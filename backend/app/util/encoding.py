@@ -1,6 +1,7 @@
 from enum import StrEnum
 import json
 import re
+from uuid import UUID
 
 
 def camel_case(s: str) -> str:
@@ -19,7 +20,7 @@ class CamelCaseEncoder(json.JSONEncoder):
     """
 
     def encode(self, obj: object) -> str:
-        if obj is None or isinstance(obj, StrEnum):
+        if obj is None or isinstance(obj, (StrEnum, str, int, float, UUID)):
             return super().encode(obj)
 
         if isinstance(obj, list):
@@ -33,8 +34,8 @@ class CamelCaseEncoder(json.JSONEncoder):
             obj = {camel_case(k): v for k, v in obj.__dict__.items()}
 
         for key, value in obj.items():
-            if hasattr(value, "__dict__"):
-                obj[key] = json.loads(self.encode(value))
+            obj[key] = json.loads(self.encode(value))
+
         return super().encode(obj)
 
 

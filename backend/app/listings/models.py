@@ -3,10 +3,6 @@ from dataclasses import dataclass
 from enum import StrEnum, auto
 from typing import NamedTuple
 from uuid import UUID
-from marshmallow import Schema, fields
-from marshmallow.validate import Range
-
-from app.util.schema import Schemable
 
 
 class SortBy(StrEnum):
@@ -15,30 +11,9 @@ class SortBy(StrEnum):
     closest = auto()
 
 
-class AccommodationSearchParamsSchema(Schema):
-    location = fields.Str(required=True)
-    radius = fields.Float(required=True, validate=Range(min=0))
-    max_price = fields.Float(validate=Range(min=0))
-    sort_by = fields.Enum(SortBy)
-    page = fields.Int(validate=Range(min=0))
-    size = fields.Int(validate=Range(min=1, max=100))
-
-
-@dataclass(frozen=True)
-class AccommodationSearchParams(Schemable):
-    schema = AccommodationSearchParamsSchema()
-
-    location: str
-    radius: float
-    max_price: float | None
-    sources: str | None
-    sort_by: SortBy = SortBy.newest
-    page: int = 0
-    size: int = 10
-
-    @property
-    def sources_list(self) -> list[str]:
-        return self.sources.split(",") if self.sources else []
+class Source(StrEnum):
+    internal = auto()
+    zoopla = auto()
 
 
 @dataclass(frozen=True)
@@ -46,10 +21,10 @@ class AccommodationSummary:
     id: str
     title: str
     short_description: str
-    thumbnail_url: str
+    thumbnail_id: UUID
     accommodation_type: str
     number_of_rooms: int
-    source: str
+    source: Source
     price: float
     post_code: str
 
@@ -91,6 +66,10 @@ class Address(abc.ABC):
 
     country: Country
 
+    @abc.abstractmethod
+    def get_post_code(self) -> str:
+        pass
+
 
 @dataclass(frozen=True)
 class UKAddress(Address):
@@ -107,6 +86,9 @@ class UKAddress(Address):
     @property
     def country_name(self) -> str:
         return "United Kingdom"
+
+    def get_post_code(self) -> str:
+        return self.post_code
 
 
 @dataclass(frozen=True)
@@ -130,7 +112,20 @@ class AccommodationListing:
     number_of_rooms: int
 
     photo_ids: tuple[UUID, ...]
-    source: str
+    source: Source
+
+    def summarise(self) -> AccommodationSummary:
+        return AccommodationSummary(
+            id=str(self.id),
+            title=self.title,
+            short_description=self.description,
+            thumbnail_id=self.photo_ids[0],
+            accommodation_type=self.accommodation_type,
+            number_of_rooms=self.number_of_rooms,
+            source=self.source,
+            post_code=self.location.address.get_post_code(),
+            price=self.price
+        )
 
 
 @dataclass(frozen=True)
