@@ -70,6 +70,14 @@ class Address(abc.ABC):
     def get_post_code(self) -> str:
         pass
 
+    @property
+    def full_address(self) -> str:
+        """
+        Get the full, human-readable address including the country. Can be used
+        to search for the location in e.g. Google Maps.
+        """
+        return f"{self.address}, {self.country_name}"
+
 
 @dataclass(frozen=True)
 class UKAddress(Address):
