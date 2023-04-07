@@ -17,7 +17,9 @@ const AccommodationForm: FC = ({}) => {
     <div>
       Accommodation Form
       <form>
-        <label htmlFor="title" id="titleText">Title</label>
+        <label htmlFor="title" id="titleText">
+          Title
+        </label>
         <input
           type="text"
           id="title"
@@ -27,7 +29,9 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
-        <label htmlFor="description" id="descriptionText">Description</label>
+        <label htmlFor="description" id="descriptionText">
+          Description
+        </label>
         <textarea
           rows={15}
           cols={30}
@@ -40,7 +44,9 @@ const AccommodationForm: FC = ({}) => {
         <br />
         <fieldset>
           <legend>Address</legend>
-          <label htmlFor="line1" id="line1Text">Address Line 1: </label>
+          <label htmlFor="line1" id="line1Text">
+            Address Line 1:{" "}
+          </label>
           <input
             id="line1"
             type="text"
@@ -50,7 +56,9 @@ const AccommodationForm: FC = ({}) => {
             required
           />
           <br />
-          <label htmlFor="line2" id="line2Text">Address Line 2: </label>
+          <label htmlFor="line2" id="line2Text">
+            Address Line 2:{" "}
+          </label>
           <input
             type="text"
             id="line2"
@@ -59,7 +67,9 @@ const AccommodationForm: FC = ({}) => {
             onChange={e => setLine2(e.target.value)}
           />
           <br />
-          <label htmlFor="town" id="townText">Town: </label>
+          <label htmlFor="town" id="townText">
+            Town:{" "}
+          </label>
           <input
             id="town"
             type="text"
@@ -69,7 +79,9 @@ const AccommodationForm: FC = ({}) => {
             required
           />
           <br />
-          <label htmlFor="postCode" id="postCodeText">Post Code: </label>
+          <label htmlFor="postCode" id="postCodeText">
+            Post Code:{" "}
+          </label>
           <input
             type="text"
             id="postCode"
@@ -79,7 +91,9 @@ const AccommodationForm: FC = ({}) => {
             required
           />
           <br />
-          <label htmlFor="country" id="countryText">Country: </label>
+          <label htmlFor="country" id="countryText">
+            Country:{" "}
+          </label>
           <input
             type="text"
             id="country"
@@ -90,7 +104,9 @@ const AccommodationForm: FC = ({}) => {
           />
         </fieldset>
         <br />
-        <label htmlFor="price" id="priceText">Price: </label>
+        <label htmlFor="price" id="priceText">
+          Price:{" "}
+        </label>
         <input
           type="number"
           id="price"
@@ -101,7 +117,9 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
-        <label htmlFor="numberOfRooms" id="roomsText">Number of Rooms: </label>
+        <label htmlFor="numberOfRooms" id="roomsText">
+          Number of Rooms:{" "}
+        </label>
         <input
           type="number"
           id="numberOfRooms"
@@ -113,7 +131,9 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
-        <label htmlFor="type" id="typeText">Accommodation Type: </label>
+        <label htmlFor="type" id="typeText">
+          Accommodation Type:{" "}
+        </label>
         <select
           id="type"
           value={accommodationType}
@@ -126,7 +146,9 @@ const AccommodationForm: FC = ({}) => {
           <option value={"Bungalows"}>Bungalows</option>
         </select>
         <br />
-        <label htmlFor="photos" id="photosText">Photos: </label>
+        <label htmlFor="photos" id="photosText">
+          Photos:{" "}
+        </label>
         <input type="file" placeholder="Import Photos REQUIRED" id="photos" />
         <br />
         <button>Preview</button>
