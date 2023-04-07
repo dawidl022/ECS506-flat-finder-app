@@ -930,7 +930,6 @@ components:
       required:
         - id
         - email
-        - name
         - contactDetails
       properties:
         id:
@@ -965,8 +964,6 @@ components:
 
     userContactDetails:
       type: object
-      required:
-        - phoneNumber
       properties:
         phoneNumber:
           type: string

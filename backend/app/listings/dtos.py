@@ -14,9 +14,8 @@ from app.listings.models import (
     AccommodationSearchResult, AccommodationSummary, Country, SortBy, Source,
     UKAddress)
 from app.util.encoding import CamelCaseDecoder
-from app.listings.models import Address
-from app.listings.models import AccommodationListing
-from app.listings.models import User
+from app.listings.models import Address, AccommodationListing
+from app.user.user_model import User
 
 
 def validate_sources(sources: str) -> str:

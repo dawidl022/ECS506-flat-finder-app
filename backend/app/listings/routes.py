@@ -12,13 +12,12 @@ from app.util.marshmallow import get_params, get_input
 from app.util.encoding import CamelCaseEncoder
 from app.util.encoding import CamelCaseDecoder
 from config import Config
-from .models import (
-    AccommodationListing, Source, User, ContactDetails)
+from .models import AccommodationListing, Source
+from app.user.user_model import User, ContactDetails
 from .dtos import (
     AccommodationSearchResultDTO, AccommodationForm,
     AccommodationListingDTO, AccommodationSearchParams, SearchResult, SourceDTO
 )
-from .models import Source, User, ContactDetails
 from .service import BaseListingsService
 
 bp = Blueprint("listings", __name__, url_prefix=f"{Config.ROOT}/listings")

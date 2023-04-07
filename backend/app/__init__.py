@@ -5,6 +5,8 @@ from flask_jwt_extended import JWTManager
 from injector import Binder
 from app.listings.service import (
     GeocodingService, ListingsService, BaseListingsService)
+from app.user.user_repository import InMemoryUserRepository
+from app.user.user_service import BaseUserService, UserService
 from app.util.encoding import CamelCaseEncoder
 from app.listings.repository import (
     InMemoryAccommodationListingsRepository, InMemoryPhotoRepository)
@@ -43,7 +45,13 @@ def configure_dependencies(binder: Binder) -> None:
         listing_photo_repo=InMemoryPhotoRepository(),
         geocoder=GeocodingService(),
     )
+    user_service = UserService(
+        repo=InMemoryUserRepository()
+    )
 
     binder.bind(
         BaseListingsService, to=listing_service  # type: ignore[type-abstract]
+    )
+    binder.bind(
+        BaseUserService, to=user_service  # type: ignore[type-abstract]
     )
