@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import StrEnum
 import json
-from typing import cast
+from typing import Any, cast
 from flask import url_for
 
 from marshmallow import Schema, fields
@@ -89,7 +89,7 @@ class CreateAccommodationFormSchema(Schema):
 
 
 @dataclass(frozen=True)
-class CreateAccommodationForm(Schemable):
+class AccommodationForm(Schemable):
     schema = CreateAccommodationFormSchema()
 
     title: str
@@ -113,6 +113,11 @@ class CreateAccommodationForm(Schemable):
                                         config=dacite.Config(cast=[StrEnum]))
 
         raise ValueError("Unexpected country")
+
+    def to_dict(self) -> dict[str, Any]:
+        d = vars(self).copy()
+        del d["address"]
+        return d
 
 
 class AuthorDTO:
