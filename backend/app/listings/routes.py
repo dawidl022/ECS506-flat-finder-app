@@ -15,7 +15,7 @@ from config import Config
 from .models import (
     AccommodationListing, Source, User, ContactDetails)
 from .dtos import (
-    AccommodationSearchResultDTO, CreateAccommodationForm,
+    AccommodationSearchResultDTO, AccommodationForm,
     AccommodationListingDTO, AccommodationSearchParams, SearchResult, SourceDTO
 )
 from .models import Source, User, ContactDetails
@@ -130,7 +130,7 @@ def validate_and_get_create_accommodation_form():
         abort(make_response(
             {'address': "missing address field"}, BAD_REQUEST))
 
-    form = get_input(CreateAccommodationForm, request.form |
+    form = get_input(AccommodationForm, request.form |
                      {"address": address_file.stream.read().decode()})
 
     return form
@@ -184,15 +184,35 @@ def fetch_accommodation_listing(listing_service, source, id
     return listing
 
 
-@bp.delete("/accommodation/<listing_id>")
+@bp.put("/accommodation/<listing_id>")
 @jwt_required()
-def delete_accommodation_listing(
+def put_accommodation_listing(
         listing_id: str, listing_service: BaseListingsService) -> Response:
+    form = validate_and_get_create_accommodation_form()
+
+    listing = get_accommodation_listing_authored_by_current_user(
+        listing_id, listing_service, action="update")
+
+    try:
+        updated_listing = listing_service.update_accommodation_listing(
+            listing.id, form)
+    except ListingNotFoundError:
+        abort(make_response(
+            {'listingId': "listing not found"}, NOT_FOUND))
+
+    dummy_user = make_dummy_user(get_current_user_email())
+
+    return jsonify(AccommodationListingDTO(updated_listing, dummy_user))
+
+
+def get_accommodation_listing_authored_by_current_user(
+        listing_id: str, listing_service: BaseListingsService, action: str
+) -> AccommodationListing:
     source, id = extract_listing_id_and_source(listing_id)
 
     if source != Source.internal:
         abort(make_response(
-            {'listingId': "cannot delete external listing"}, FORBIDDEN))
+            {'listingId': f"cannot {action} external listing"}, FORBIDDEN))
 
     listing = fetch_accommodation_listing(listing_service, source, id)
 
@@ -202,8 +222,18 @@ def delete_accommodation_listing(
               "currently logged in user is not the author of this listing"},
             FORBIDDEN))
 
+    return listing
+
+
+@bp.delete("/accommodation/<listing_id>")
+@jwt_required()
+def delete_accommodation_listing(
+        listing_id: str, listing_service: BaseListingsService) -> Response:
+    listing = get_accommodation_listing_authored_by_current_user(
+        listing_id, listing_service, action="delete")
+
     try:
-        listing_service.delete_accommodation_listing(uuid.UUID(id))
+        listing_service.delete_accommodation_listing(listing.id)
     except ListingNotFoundError:
         abort(make_response(
             {'listingId': "listing not found"}, NOT_FOUND))

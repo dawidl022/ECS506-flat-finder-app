@@ -1,3 +1,4 @@
+import dataclasses
 import time
 import unittest
 import uuid
@@ -38,6 +39,21 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
         actual_listing = repo.get_listing_by_id(listing_id)
 
         self.assertEqual(listing, actual_listing)
+
+    def test_get_listings_by_id__given_listing_updated__returns_updated_listing(self):
+        repo = InMemoryAccommodationListingsRepository()
+
+        listing_id = uuid.uuid4()
+        listing = self.default_accommodation(listing_id)
+        updated_listing = dataclasses.replace(
+            listing, title="My new amazing title")
+
+        repo.save_listing(listing)
+        repo.save_listing(updated_listing)
+
+        actual_listing = repo.get_listing_by_id(listing_id)
+
+        self.assertEqual(updated_listing, actual_listing)
 
     def test_delete_listing__given_listing_saved__returns_none(self):
         repo = InMemoryAccommodationListingsRepository()
