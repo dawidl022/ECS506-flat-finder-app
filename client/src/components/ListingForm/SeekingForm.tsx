@@ -48,9 +48,15 @@ const SeekingForm: FC = ({}) => {
           />
           <br />
           <label htmlFor="photos" id="photosText">
-            Photos:{" "}
+            Photos:{""}
           </label>
-          <input type="file" id="photos" placeholder="Import Photos OPTIONAL" />
+          <input
+            type="file"
+            id="photos"
+            placeholder="Import Photos OPTIONAL"
+            accept="image/png, image/jpeg"
+            multiple
+          />
           <br />
           <button>Preview</button>
           <br />

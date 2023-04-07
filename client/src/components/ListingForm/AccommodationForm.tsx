@@ -147,9 +147,15 @@ const AccommodationForm: FC = ({}) => {
         </select>
         <br />
         <label htmlFor="photos" id="photosText">
-          Photos:{" "}
+          Photos:{""}
         </label>
-        <input type="file" placeholder="Import Photos REQUIRED" id="photos" />
+        <input
+          type="file"
+          placeholder="Import Photos REQUIRED"
+          id="photos"
+          accept="image/png, image/jpeg"
+          multiple
+        />
         <br />
         <button>Preview</button>
         <br />
