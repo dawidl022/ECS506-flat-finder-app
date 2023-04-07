@@ -24,7 +24,7 @@ export interface UserContactDetails {
      * @type {string}
      * @memberof UserContactDetails
      */
-    phoneNumber: string;
+    phoneNumber?: string;
 }
 
 /**
@@ -32,7 +32,6 @@ export interface UserContactDetails {
  */
 export function instanceOfUserContactDetails(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "phoneNumber" in value;
 
     return isInstance;
 }
@@ -47,7 +46,7 @@ export function UserContactDetailsFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'phoneNumber': json['phoneNumber'],
+        'phoneNumber': !exists(json, 'phoneNumber') ? undefined : json['phoneNumber'],
     };
 }
 

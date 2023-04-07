@@ -43,7 +43,7 @@ export interface UserProfile {
      * @type {string}
      * @memberof UserProfile
      */
-    name: string;
+    name?: string;
     /**
      * 
      * @type {UserContactDetails}
@@ -59,7 +59,6 @@ export function instanceOfUserProfile(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "id" in value;
     isInstance = isInstance && "email" in value;
-    isInstance = isInstance && "name" in value;
     isInstance = isInstance && "contactDetails" in value;
 
     return isInstance;
@@ -77,7 +76,7 @@ export function UserProfileFromJSONTyped(json: any, ignoreDiscriminator: boolean
         
         'id': json['id'],
         'email': json['email'],
-        'name': json['name'],
+        'name': !exists(json, 'name') ? undefined : json['name'],
         'contactDetails': UserContactDetailsFromJSON(json['contactDetails']),
     };
 }
