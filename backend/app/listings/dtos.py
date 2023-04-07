@@ -9,14 +9,42 @@ from marshmallow import Schema, fields
 import marshmallow
 from marshmallow.validate import Range
 import dacite
-from werkzeug.datastructures import FileStorage
 
 from app.util.schema import Schemable
-from app.listings.models import Country, UKAddress
+from app.listings.models import AccommodationSummary, Country, SortBy, Source, UKAddress
 from app.util.encoding import CamelCaseDecoder
 from app.listings.models import Address
 from app.listings.models import AccommodationListing
 from app.listings.models import User
+
+
+class AccommodationSearchParamsSchema(Schema):
+    location = fields.Str(required=True)
+    radius = fields.Float(required=True, validate=Range(min=0))
+    max_price = fields.Float(validate=Range(min=0))
+    sort_by = fields.Enum(SortBy)
+    # TODO validate schema
+    page = fields.Int(validate=Range(min=0))
+    size = fields.Int(validate=Range(min=1, max=100))
+
+
+@dataclass(frozen=True)
+class AccommodationSearchParams(Schemable):
+    schema = AccommodationSearchParamsSchema()
+
+    location: str
+    radius: float
+    max_price: float | None = None
+    sources: str | None = None
+    sort_by: SortBy = SortBy.newest
+    page: int = 0
+    size: int = 10
+
+    @property
+    def sources_list(self) -> list[Source]:
+        return [
+            Source(s) for s in self.sources.split(",")
+        ] if self.sources else []
 
 
 def is_valid_address(addr: str) -> dict[str, str]:
@@ -106,3 +134,26 @@ class AccommodationListingDTO:
         self.address = listing.location.address
         self.author = AuthorDTO(author)
         self.contact_info = ContactInfoDTO(author)
+
+
+class AccommodationSummaryDTO:
+    pass
+
+
+@dataclass(frozen=True)
+class SourceDTO:
+    name: str
+    enabled: bool
+
+
+@dataclass(frozen=True)
+class AccommodationSearchResultDTO:
+    distance: float
+    is_favourite: bool
+    accommodation: AccommodationSummaryDTO
+
+
+@dataclass(frozen=True)
+class SearchResult:
+    sources: list[SourceDTO]
+    searchResults: list[AccommodationSearchResultDTO]

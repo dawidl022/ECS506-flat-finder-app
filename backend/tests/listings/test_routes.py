@@ -6,7 +6,7 @@ from typing import cast
 import uuid
 from flask.testing import FlaskClient
 from app.listings.dtos import CreateAccommodationForm
-from app.listings.models import AccommodationListing, Coordinates, Location, UKAddress
+from app.listings.models import AccommodationListing, AccommodationSummary, Coordinates, Location, UKAddress
 
 from app.listings.service import BaseListingsService
 
@@ -47,6 +47,18 @@ model_listing = AccommodationListing(
     number_of_rooms=3,
     photo_ids=(uuid.uuid4(), uuid.uuid4()),
     source="internal")
+
+model_listing_summary = AccommodationSummary(
+    id=str(model_listing.id),
+    title=model_listing.title,
+    short_description=model_listing.description,
+    accommodation_type=model_listing.accommodation_type,
+    number_of_rooms=model_listing.number_of_rooms,
+    source=model_listing.source,
+    post_code=cast(UKAddress, model_listing.location.address).post_code,
+    thumbnail_id=model_listing.photo_ids[0],
+    price=model_listing.price,
+)
 
 
 def test_create_accommodation_listing__given_no_request_body__returns_bad_request(client: FlaskClient):
