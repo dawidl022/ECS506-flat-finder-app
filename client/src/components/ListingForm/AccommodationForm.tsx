@@ -86,6 +86,7 @@ const AccommodationForm: FC = ({}) => {
             placeholder="Accommodation Country REQUIRED"
             value={country}
             readOnly
+            disabled={true}
           />
         </fieldset>
         <br />
