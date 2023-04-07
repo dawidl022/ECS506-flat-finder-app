@@ -1,4 +1,5 @@
-from http.client import BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, UNAUTHORIZED
+from http.client import (
+    BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, UNAUTHORIZED)
 import os
 import uuid
 
@@ -12,7 +13,9 @@ from app.util.encoding import CamelCaseEncoder
 from app.util.encoding import CamelCaseDecoder
 from config import Config
 from .dtos import CreateAccommodationForm, AccommodationListingDTO
-from .models import AccommodationListing, AccommodationSearchParams, Source, User, ContactDetails
+from .models import (
+    AccommodationListing, AccommodationSearchParams, Source, User,
+    ContactDetails)
 from .service import BaseListingsService
 
 bp = Blueprint("listings", __name__, url_prefix=f"{Config.ROOT}/listings")
@@ -155,7 +158,8 @@ def extract_listing_id_and_source(external_listing_id: str
     return source, id
 
 
-def fetch_accommodation_listing(listing_service, source, id) -> AccommodationListing:
+def fetch_accommodation_listing(listing_service, source, id
+                                ) -> AccommodationListing:
     listing = listing_service.get_accommodation_listing(id, source)
     if listing is None:
         abort(make_response(
@@ -178,7 +182,9 @@ def delete_accommodation_listing(
 
     if listing.author_email != get_current_user_email():
         abort(make_response(
-            {'listingId': "currently logged in user is not the author of this listing"}, FORBIDDEN))
+            {'listingId':
+              "currently logged in user is not the author of this listing"},
+            FORBIDDEN))
 
     try:
         listing_service.delete_accommodation_listing(uuid.UUID(id))
