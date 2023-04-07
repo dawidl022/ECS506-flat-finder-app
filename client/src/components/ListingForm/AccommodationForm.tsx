@@ -39,6 +39,7 @@ const AccommodationForm: FC = ({}) => {
         />
         <br />
         <fieldset>
+          <legend>Address</legend>
           <label htmlFor="line1" id="line1Text">Address Line 1: </label>
           <input
             id="line1"
