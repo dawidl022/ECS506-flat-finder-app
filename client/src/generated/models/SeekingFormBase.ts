@@ -13,13 +13,6 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { Location } from './Location';
-import {
-    LocationFromJSON,
-    LocationFromJSONTyped,
-    LocationToJSON,
-} from './Location';
-
 /**
  * 
  * @export
@@ -40,10 +33,10 @@ export interface SeekingFormBase {
     description: string;
     /**
      * 
-     * @type {Location}
+     * @type {string}
      * @memberof SeekingFormBase
      */
-    preferredLocation: Location;
+    preferredLocation: string;
 }
 
 /**
@@ -70,7 +63,7 @@ export function SeekingFormBaseFromJSONTyped(json: any, ignoreDiscriminator: boo
         
         'title': json['title'],
         'description': json['description'],
-        'preferredLocation': LocationFromJSON(json['preferredLocation']),
+        'preferredLocation': json['preferredLocation'],
     };
 }
 
@@ -85,7 +78,7 @@ export function SeekingFormBaseToJSON(value?: SeekingFormBase | null): any {
         
         'title': value.title,
         'description': value.description,
-        'preferredLocation': LocationToJSON(value.preferredLocation),
+        'preferredLocation': value.preferredLocation,
     };
 }
 
