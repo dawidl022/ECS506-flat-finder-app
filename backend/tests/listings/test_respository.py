@@ -3,7 +3,7 @@ import unittest
 import uuid
 
 from app.listings.exceptions import ListingNotFoundError
-from app.listings.models import AccommodationListing, UKAddress
+from app.listings.models import AccommodationListing, Source, UKAddress
 from app.listings.repository import InMemoryAccommodationListingsRepository
 from app.listings.models import Coordinates, Location, SortBy
 
@@ -323,7 +323,7 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
             accommodation_type="Flat",
             number_of_rooms=3,
             photo_ids=(),
-            source="internal"
+            source=Source.internal
         )
 
     @ staticmethod
@@ -339,5 +339,5 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
             accommodation_type="Flat",
             number_of_rooms=3,
             photo_ids=(),
-            source="internal"
+            source=Source.internal
         )

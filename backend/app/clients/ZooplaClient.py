@@ -10,7 +10,7 @@ from app.clients.APIClient import APIClient
 from app.clients.APIException import *
 
 from app.listings.models import ExternalAccommodationListing, Location, \
-    Coordinates, UKAddress
+    Coordinates, UKAddress, Source
 
 
 class ZooplaOrderBy(StrEnum):
@@ -139,7 +139,7 @@ class ZooplaClient(APIClient):
                                             type,
                                             numRooms,
                                             tuple(),
-                                            ZooplaClient.name,
+                                            Source.zoopla,
                                             listurl,
                                             listing_id,
                                             photos,
