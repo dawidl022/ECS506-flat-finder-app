@@ -19,7 +19,6 @@ import type {
   AccommodationDetails,
   AccommodationFormBase,
   AccommodationSearch,
-  Location,
   SeekingDetails,
   SeekingFormBase,
   SeekingSearchResultsInner,
@@ -37,8 +36,6 @@ import {
     AccommodationFormBaseToJSON,
     AccommodationSearchFromJSON,
     AccommodationSearchToJSON,
-    LocationFromJSON,
-    LocationToJSON,
     SeekingDetailsFromJSON,
     SeekingDetailsToJSON,
     SeekingFormBaseFromJSON,
@@ -138,7 +135,7 @@ export interface ApiV1ListingsSeekingListingIdPutRequest {
 export interface ApiV1ListingsSeekingPostRequest {
     title: string;
     description: string;
-    preferredLocation: Location;
+    preferredLocation: string;
     photos?: Array<Blob>;
 }
 
@@ -842,8 +839,8 @@ export class DefaultApi extends runtime.BaseAPI {
         }
 
         if (requestParameters.preferredLocation !== undefined) {
-            formParams.append('preferredLocation', new Blob([JSON.stringify(LocationToJSON(requestParameters.preferredLocation))], { type: "application/json", }));
-                    }
+            formParams.append('preferredLocation', requestParameters.preferredLocation as any);
+        }
 
         const response = await this.request({
             path: `/api/v1/listings/seeking`,
