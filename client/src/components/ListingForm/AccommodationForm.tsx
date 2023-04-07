@@ -1,6 +1,14 @@
-import { FC, useState } from "react";
+import { FC, useState, FormEvent, ChangeEvent } from "react";
+import { useRouter } from "next/router";
+import { handleFileInput } from "./handleFileInput";
+import {
+  AccommodationAddressCountryEnum,
+  Configuration,
+  DefaultApi,
+} from "@/generated";
 
 const AccommodationForm: FC = ({}) => {
+  const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [line1, setLine1] = useState("");
@@ -13,31 +21,93 @@ const AccommodationForm: FC = ({}) => {
   const [numberOfRooms, setNumberOfRooms] = useState(0);
   const [price, setPrice] = useState(0);
 
+  const preview = () => {
+    router.push({
+      pathname: "/AccommodationPreviewPage",
+      query: {
+        title,
+        description,
+        line1,
+        line2,
+        town,
+        postCode,
+        country,
+        accommodationType,
+        numberOfRooms,
+        price,
+      },
+    });
+  };
+
+  const checkInputs = () => {
+    if (
+      title &&
+      description &&
+      line1 &&
+      town &&
+      postCode &&
+      price &&
+      numberOfRooms
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const handleSubmit = (e: FormEvent<HTMLElement>) => {
+    e.preventDefault();
+    new DefaultApi(new Configuration({ basePath: "http://127.0.0.1:5000" }))
+      .apiV1ListingsAccommodationPost({
+        title,
+        description,
+        photos: Array<Blob>(),
+        accommodationType,
+        numberOfRooms,
+        price,
+        address: {
+          line1,
+          line2,
+          town,
+          postCode,
+          country: AccommodationAddressCountryEnum.Uk,
+        },
+      })
+      .catch(err =>
+        alert(
+          "Accommodation listing failed to be published. \nError: " +
+            err.message
+        )
+      )
+      .then(res => router.push({ pathname: "/myListings" }));
+  };
+
   return (
     <div>
       Accommodation Form
-      <form>
-        <label htmlFor="title">Title</label>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="title">Title: </label>
         <input
           type="text"
-          id="title"
-          placeholder="Accommodation Title REQUIRED"
+          placeholder="Title REQUIRED"
           value={title}
           onChange={e => setTitle(e.target.value)}
           required
         />
         <br />
+
         <label htmlFor="description">Description</label>
         <textarea
           rows={15}
           cols={30}
           id="description"
-          placeholder="Accommodation Description REQUIRED"
+          placeholder="Description REQUIRED"
           value={description}
           onChange={e => setDescription(e.target.value)}
           required
         />
         <br />
+
         <fieldset>
           <legend>Address</legend>
           <label htmlFor="line1">Address Line 1: </label>
@@ -54,7 +124,7 @@ const AccommodationForm: FC = ({}) => {
           <input
             type="text"
             id="line2"
-            placeholder="Accommodation Line 2 OPTIONAL"
+            placeholder="Line 2 OPTIONAL"
             value={line2}
             onChange={e => setLine2(e.target.value)}
           />
@@ -63,7 +133,7 @@ const AccommodationForm: FC = ({}) => {
           <input
             id="town"
             type="text"
-            placeholder="Accommodation Town REQUIRED"
+            placeholder="Town REQUIRED"
             value={town}
             onChange={e => setTown(e.target.value)}
             required
@@ -73,7 +143,7 @@ const AccommodationForm: FC = ({}) => {
           <input
             type="text"
             id="postCode"
-            placeholder="Accommodation Post Code REQUIRED"
+            placeholder="Post Code REQUIRED"
             value={postCode}
             onChange={e => setPostCode(e.target.value)}
             required
@@ -83,7 +153,7 @@ const AccommodationForm: FC = ({}) => {
           <input
             type="text"
             id="country"
-            placeholder="Accommodation Country REQUIRED"
+            placeholder="Country REQUIRED"
             value={country}
             readOnly
             disabled={true}
@@ -94,7 +164,7 @@ const AccommodationForm: FC = ({}) => {
         <input
           type="number"
           id="price"
-          placeholder="Accommodation Price REQUIRED"
+          placeholder="Price REQUIRED"
           value={price}
           onChange={e => setPrice(parseFloat(e.target.value))}
           min={0}
@@ -105,7 +175,7 @@ const AccommodationForm: FC = ({}) => {
         <input
           type="number"
           id="numberOfRooms"
-          placeholder="Accommodation Number of Rooms REQUIRED"
+          placeholder="Number of Rooms REQUIRED"
           value={numberOfRooms}
           onChange={e => setNumberOfRooms(parseFloat(e.target.value))}
           min={0}
@@ -113,7 +183,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
-        <label htmlFor="type">Accommodation Type: </label>
+        <label htmlFor="type">Type: </label>
         <select
           id="type"
           value={accommodationType}
@@ -129,13 +199,17 @@ const AccommodationForm: FC = ({}) => {
         <label htmlFor="photos">Photos:{""}</label>
         <input
           type="file"
-          placeholder="Import Photos REQUIRED"
+          onChange={handleFileInput}
           id="photos"
-          accept="image/png, image/jpeg"
+          accept="image/*"
           multiple
         />
         <br />
-        <button>Preview</button>
+        {/* disable the button if all required fields are not filled in */}
+        <button type="button" onClick={preview} disabled={!checkInputs()}>
+          Preview
+        </button>
+
         <br />
         <button>Add</button>
       </form>

@@ -1,5 +1,6 @@
+import dataclasses
 from http.client import BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, OK
-from io import BytesIO
+from io import SEEK_SET, BytesIO
 import json
 import time
 from typing import cast
@@ -7,7 +8,7 @@ from unittest.mock import patch
 import uuid
 from flask.testing import FlaskClient
 from app.listings.exceptions import ListingNotFoundError
-from app.listings.dtos import AccommodationSearchParams, CreateAccommodationForm
+from app.listings.dtos import AccommodationSearchParams, AccommodationForm
 from app.listings.models import AccommodationListing, AccommodationSearchResult, AccommodationSummary, Coordinates, Location, Source, UKAddress
 
 from app.listings.service import BaseListingsService
@@ -18,12 +19,14 @@ class MockListingService(BaseListingsService):
     def __init__(self) -> None:
         self.saved_photos: list[list[bytes]] = []
         self.deleted_listing_ids: list[uuid.UUID] = []
+        self.updated_listings: list[tuple[uuid.UUID, AccommodationForm]] = []
+        self.failed_update_listing_id = uuid.uuid4()
 
     def search_accommodation_listings(self, params: AccommodationSearchParams) -> list[AccommodationSearchResult]:
         return [model_search_result]
 
     def create_accommodation_listing(
-            self, form: CreateAccommodationForm, photos: list[bytes],
+            self, form: AccommodationForm, photos: list[bytes],
             author_email: str
     ) -> AccommodationListing:
         self.saved_photos.append(photos)
@@ -33,7 +36,17 @@ class MockListingService(BaseListingsService):
                                   ) -> AccommodationListing | None:
         if source == model_listing.source and listing_id == str(model_listing.id):
             return model_listing
+        elif source == model_listing.source and listing_id == str(self.failed_update_listing_id):
+            return dataclasses.replace(model_listing, id=uuid.UUID(listing_id))
         return None
+
+    def update_accommodation_listing(self, listing_id: uuid.UUID, form: AccommodationForm) -> AccommodationListing:
+        self.updated_listings.append((listing_id, form))
+
+        if listing_id == self.failed_update_listing_id:
+            raise ListingNotFoundError()
+
+        return dataclasses.replace(model_listing, title="Updated listing")
 
     def delete_accommodation_listing(self, listing_id: uuid.UUID) -> None:
         duplicate_delete = False
@@ -144,6 +157,23 @@ search_results_json = [
         }
     }
 ]
+
+
+def update_accommodation_listing_form():
+    return {
+        "title": "Updated listing",
+        "description": model_listing.description,
+        "accommodationType": model_listing.accommodation_type,
+        "numberOfRooms": str(model_listing.number_of_rooms),
+        "price": model_listing.price,
+        "address": (BytesIO(json.dumps({
+            "country": "uk",
+            "line1": address.line1,
+            "line2": address.line2,
+            "town": address.town,
+            "post_code": address.post_code,
+        }).encode()), "blob")
+    }
 
 
 def test_create_accommodation_listing__given_no_request_body__returns_bad_request(client: FlaskClient):
@@ -359,6 +389,113 @@ def test_get_accommodation_listing__listing_found__returns_listing(client: Flask
         f"/api/v1/listings/accommodation/internal_{model_listing.id}")
     assert response.status_code == OK
     assert json.loads(response.data) == model_listing_json
+
+
+def test_put_accommodation_listing__given_no_form__returns_bad_request(
+        client: FlaskClient, listings_service: MockListingService):
+    response = client.put(
+        f"/api/v1/listings/accommodation/internal_{model_listing.id}")
+
+    assert response.status_code == BAD_REQUEST
+    assert len(listings_service.updated_listings) == 0
+
+
+def test_update_accommodation_listing__given_invalid_id_format__returns_bad_request(
+        client: FlaskClient, listings_service: MockListingService):
+    response = client.put("/api/v1/listings/accommodation/whatever",
+                          data=update_accommodation_listing_form())
+
+    assert b'{"listingId":"invalid listing id format"}' in response.data
+    assert response.status_code == BAD_REQUEST
+    assert len(listings_service.updated_listings) == 0
+
+
+def test_put_accommodation_listing__given_invalid_source_returns__returns_not_found(
+        client: FlaskClient, listings_service: MockListingService):
+    response = client.put("/api/v1/listings/accommodation/fake-source_123",
+                          data=update_accommodation_listing_form())
+
+    assert b'{"listingId":"source not found"}' in response.data
+    assert response.status_code == NOT_FOUND
+    assert len(listings_service.updated_listings) == 0
+
+
+def test_put_accommodation_listing__given_no_listing_found__returns_not_found(
+        client: FlaskClient, listings_service: MockListingService):
+    response = client.put(
+        "/api/v1/listings/accommodation/internal_20f1bdbc-1042-4957-aab9-93462ff97fea",
+        data=update_accommodation_listing_form()
+    )
+
+    assert b'{"listingId":"listing not found"}' in response.data
+    assert response.status_code == NOT_FOUND
+    assert len(listings_service.updated_listings) == 0
+
+
+def test_put_accommodation_listing__given_author_mismatch__returns_forbidden(
+        client: FlaskClient, listings_service: MockListingService):
+    with patch("flask_jwt_extended.utils.get_jwt") as mock_get_jwt_identity:
+        mock_get_jwt_identity.return_value = {
+            "sub": {"email": "not-the-author@example.com"}
+        }
+
+        response = client.put(
+            f"/api/v1/listings/accommodation/internal_{model_listing.id}",
+            data=update_accommodation_listing_form())
+
+        assert response.status_code == FORBIDDEN
+        assert b'{"listingId":"currently logged in user is not the author of this listing"}' in response.data
+        assert len(listings_service.updated_listings) == 0
+
+
+def test_put_accommodation_listing__given_form__returns_updates_listing(
+        client: FlaskClient, listings_service: MockListingService):
+    response = client.put(
+        f"/api/v1/listings/accommodation/internal_{model_listing.id}",
+        data=update_accommodation_listing_form())
+
+    expected = model_listing_json.copy()
+    expected["title"] = "Updated listing"
+
+    assert response.status_code == OK
+    assert len(listings_service.updated_listings) == 1
+    assert listings_service.updated_listings[0] == (
+        model_listing.id, AccommodationForm(
+            title="Updated listing",
+            description=model_listing.description,
+            accommodation_type=model_listing.accommodation_type,
+            number_of_rooms=model_listing.number_of_rooms,
+            price=model_listing.price,
+            address=json.dumps({
+                "country": "uk",
+                "line1": address.line1,
+                "line2": address.line2,
+                "town": address.town,
+                "post_code": address.post_code,
+            })
+        ))
+
+    assert json.loads(response.data) == expected
+
+
+def test_put_accommodation_listing__service_raises_not_found__returns_not_found(
+        client: FlaskClient, listings_service: MockListingService):
+    response = client.put(
+        f"/api/v1/listings/accommodation/internal_{listings_service.failed_update_listing_id}",
+        data=update_accommodation_listing_form())
+
+    assert response.status_code == NOT_FOUND
+    assert len(listings_service.updated_listings) == 1
+
+
+def test_put_accommodation_listing__given_external_source_format__returns_forbidden(
+        client: FlaskClient, listings_service: MockListingService):
+    response = client.put("/api/v1/listings/accommodation/zoopla_123",
+                          data=update_accommodation_listing_form())
+
+    assert b'{"listingId":"cannot update external listing"}' in response.data
+    assert response.status_code == FORBIDDEN
+    assert len(listings_service.updated_listings) == 0
 
 
 def test_delete_accommodation_listing__given_invalid_id_format__returns_bad_request(

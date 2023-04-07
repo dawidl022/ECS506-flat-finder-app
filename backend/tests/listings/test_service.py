@@ -1,3 +1,4 @@
+import dataclasses
 import json
 import time
 import unittest
@@ -7,11 +8,11 @@ import uuid
 from .test_routes import model_listing, model_listing_summary
 from app.listings.exceptions import ListingNotFoundError
 from app.listings.models import AccommodationListing, Address, Coordinates, Location, Photo, SortBy, Source, UKAddress
-from app.listings.dtos import CreateAccommodationForm
+from app.listings.dtos import AccommodationForm
 from app.listings.service import BaseGeocodingService, ListingsService
 from app.listings.repository import AccommodationListingRepository, ListingPhotoRepository
 from app.listings.models import AccommodationListing, AccommodationSearchResult, Address, Coordinates, Location, Photo, SortBy, UKAddress
-from app.listings.dtos import CreateAccommodationForm, AccommodationSearchParams
+from app.listings.dtos import AccommodationForm, AccommodationSearchParams
 
 
 expected_coords = Coordinates(51.524067, -0.040374)
@@ -80,15 +81,15 @@ class ListingsServiceTest(unittest.TestCase):
         line1="Queen Mary University of London",
         line2="Mile End Road",
         town="London",
-        post_code="London E1 4NS",
+        post_code="E1 4NS",
     )
 
-    form = CreateAccommodationForm(
+    form = AccommodationForm(
         title="Some random title",
         description="Amazing accommodation!! A great place to stay",
         accommodation_type="Flat",
         number_of_rooms=3,
-        price=700,
+        price=800,
         address=json.dumps({
             "line1": address.line1,
             "line2": address.line2,
@@ -213,6 +214,69 @@ class ListingsServiceTest(unittest.TestCase):
     def test_get_accommodation_listing__given_zoopla_source__raises_error(self):
         self.assertRaises(ValueError, lambda: self.service.get_accommodation_listing(
             str(model_listing.id), Source.zoopla))
+
+    def test_update_accommodation_listing__given_listing_id__updates_listing(self):
+        new_title = "My new amazing title!"
+        updated_form = dataclasses.replace(self.form, title=new_title)
+        updated_listing = dataclasses.replace(model_listing, title=new_title)
+
+        self.service.update_accommodation_listing(
+            model_listing.id, updated_form)
+
+        saved = self.spy_accommodation_listing_repo.saved_listings
+        self.assertEqual(1, len(saved))
+        self.assertEqual(saved[0], updated_listing)
+
+    def test_update_accommodation_listing__given_listing_id__returns_updated_listing(self):
+        new_title = "My new amazing title!"
+        new_description = "An updated description"
+        new_address_json = json.dumps({
+            "line1": "New Street",
+            "line2": self.address.line2,
+            "town": self.address.town,
+            "post_code": self.address.post_code,
+            "country": "uk"
+        })
+        updated_form = dataclasses.replace(
+            self.form,
+            title=new_title,
+            description=new_description,
+            address=new_address_json,
+            accommodation_type="House",
+            number_of_rooms=2,
+            price=1200,
+        )
+
+        updated_address = dataclasses.replace(
+            model_listing.location.address, line1="New Street")
+        updated_location = dataclasses.replace(
+            model_listing.location, address=updated_address)
+        updated_listing = dataclasses.replace(
+            model_listing,
+            title=new_title,
+            description=new_description,
+            location=updated_location,
+            accommodation_type="House",
+            number_of_rooms=2,
+            price=1200,
+        )
+
+        actual = self.service.update_accommodation_listing(
+            model_listing.id, updated_form)
+
+        self.assertEqual(updated_listing, actual)
+
+    def test_update_accommodation_listing__given_listing_not_found__raises_error(self):
+        listing_id = uuid.uuid4()
+        updated_form = dataclasses.replace(
+            self.form, title="My new amazing title!")
+
+        self.assertRaises(
+            ListingNotFoundError,
+            lambda: self.service.update_accommodation_listing(
+                listing_id, updated_form
+            )
+        )
 
     def test_delete_accommodation_listing__given_listing_id__deletes_listing(self):
         listing_id = uuid.uuid4()

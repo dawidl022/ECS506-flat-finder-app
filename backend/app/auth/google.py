@@ -1,6 +1,10 @@
+import datetime
+import time
+from uuid import UUID
 from flask import Blueprint, current_app, make_response, redirect, url_for
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from authlib.integrations.flask_client import OAuth
+import jwt
+from app.user.user_service import BaseUserService
 
 from config import Config
 
@@ -27,24 +31,24 @@ def google_login():
 
 
 @auth_bp.route('/authenticate/google')
-def google_authenticate():
+def google_authenticate(user_service: BaseUserService):
     # TODO check for errors, handle gracefully with redirect to frontend
     token = google.authorize_access_token()
-    # TODO register user if they're not already in DB
+
+    user_email = token["userinfo"]["email"]
+    user_id = user_service.get_user_id_for_email(user_email)
 
     response = make_response(redirect(Config().FRONTEND_URL))
     response.set_cookie(
-        "token", token["id_token"]
+        "token", create_jwt_token(user_email=user_email, user_id=user_id)
     )  # can set explicit domain if frontend/backend domains differ
     return response
 
 
-# TODO remove this test endpoint
-@auth_bp.route('/protected')
-@jwt_required()
-def protected_endpoint():
-    current_user_id = get_jwt_identity()
-    # Do something with the current user ID, like retrieve data from database
-    # ...
-    print(current_user_id)
-    return {'message': 'This endpoint is protected with JWT authentication'}
+def create_jwt_token(user_email: str, user_id: UUID) -> str:
+    payload = {
+        "sub": str(user_id),
+        "email": user_email,
+    }
+
+    return jwt.encode(payload, Config().JWT_SECRET_KEY)
