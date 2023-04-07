@@ -202,7 +202,7 @@ const AccommodationForm: FC = ({}) => {
           id="photos"
           accept="image/png, image/jpeg"
           multiple
-        />        
+        />
         <br />
         {/* disable the button if all required fields are not filled in */}
         <button type="button" onClick={preview} disabled={!checkInputs()}>

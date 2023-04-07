@@ -15,7 +15,7 @@ const SeekingForm: FC = ({}) => {
       query: {
         title,
         description,
-        location
+        location,
       },
     });
   };
@@ -36,7 +36,6 @@ const SeekingForm: FC = ({}) => {
         description,
         photos: Array<Blob>(),
         preferredLocation: location,
-        
       })
       .catch(err =>
         alert("Seeking listing failed to be published. \nError: " + err.message)
@@ -80,7 +79,7 @@ const SeekingForm: FC = ({}) => {
             onChange={e => setLocation(e.target.value)}
             required
           />
-          
+
           <br />
           <label htmlFor="photos">Photos:{""}</label>
           <input
@@ -89,7 +88,7 @@ const SeekingForm: FC = ({}) => {
             placeholder="Import Photos OPTIONAL"
             accept="image/png, image/jpeg"
             multiple
-          />          
+          />
           <br />
           <button type="button" onClick={preview} disabled={!checkInputs()}>
             Preview

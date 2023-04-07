@@ -7,9 +7,6 @@ const SeekingPreviewPage: FC = ({}) => {
   const title = router.query.title as string;
   const description = router.query.description as string;
   const name = router.query.location as string;
-  const lat = Number(router.query.lat);
-  const _long = Number(router.query._long);
-
   const Seeking: Seeking = {
     id: "0",
     author: {
@@ -32,8 +29,8 @@ const SeekingPreviewPage: FC = ({}) => {
     preferredLocation: {
       name,
       coordinates: {
-        lat,
-        _long,
+        lat: 0,
+        _long: 0,
       },
     },
   };
