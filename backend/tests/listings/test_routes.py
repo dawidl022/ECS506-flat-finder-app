@@ -5,8 +5,8 @@ import time
 from typing import cast
 import uuid
 from flask.testing import FlaskClient
-from app.listings.dtos import CreateAccommodationForm
-from app.listings.models import AccommodationListing, Coordinates, Location, Source, UKAddress
+from app.listings.dtos import AccommodationSearchParams, CreateAccommodationForm, SearchResult
+from app.listings.models import AccommodationListing, AccommodationSearchResult, AccommodationSummary, Coordinates, Location, Source, UKAddress
 
 from app.listings.service import BaseListingsService
 
@@ -16,8 +16,8 @@ class MockListingService(BaseListingsService):
     def __init__(self) -> None:
         self.saved_photos: list[list[bytes]] = []
 
-    def search_accommodation_listings(self):
-        return []
+    def search_accommodation_listings(self, params: AccommodationSearchParams) -> list[AccommodationSearchResult]:
+        return [model_search_result]
 
     def create_accommodation_listing(
             self, form: CreateAccommodationForm, photos: list[bytes],
@@ -31,6 +31,9 @@ class MockListingService(BaseListingsService):
         if source == model_listing.source and listing_id == str(model_listing.id):
             return model_listing
         return None
+
+    def get_available_sources(self, location_query: str) -> list[Source]:
+        return [Source.internal, Source.zoopla]
 
 
 model_listing = AccommodationListing(
@@ -92,6 +95,42 @@ model_listing_json = {
         "phoneNumber": "+44 78912 345678",
     }
 }
+
+model_listing_summary = AccommodationSummary(
+    id=str(model_listing.id),
+    title=model_listing.title,
+    short_description=model_listing.description,
+    accommodation_type=model_listing.accommodation_type,
+    number_of_rooms=model_listing.number_of_rooms,
+    source=model_listing.source,
+    post_code=cast(UKAddress, model_listing.location.address).post_code,
+    thumbnail_id=model_listing.photo_ids[0],
+    price=model_listing.price,
+)
+
+model_search_result = AccommodationSearchResult(
+    distance=10,
+    is_favourite=True,
+    accommodation=model_listing_summary
+)
+
+search_results_json = [
+    {
+        "distance": model_search_result.distance,
+        "isFavourite": model_search_result.is_favourite,
+        "accommodation": {
+            "id": model_listing_summary.id,
+            "title": model_listing_summary.title,
+            "shortDescription": model_listing_summary.short_description,
+            "thumbnailUrl": f"/api/v1/listings/{model_listing_summary.id}/photos/{model_listing_summary.thumbnail_id}",
+            "accommodationType": model_listing_summary.accommodation_type,
+            "numberOfRooms": model_listing_summary.number_of_rooms,
+            "source": model_listing_summary.source,
+            "price": model_listing_summary.price,
+            "postCode": model_listing_summary.post_code
+        }
+    }
+]
 
 
 def test_create_accommodation_listing__given_no_request_body__returns_bad_request(client: FlaskClient):
@@ -198,6 +237,86 @@ def test_create_accommodation_listing__given_valid_request__returns_listing(clie
     assert len(listings_service.saved_photos[0]) == 2, "not all files saved"
     assert listings_service.saved_photos[0][0] == files[0]
     assert listings_service.saved_photos[0][1] == files[1]
+
+
+def test_search_accommodation_listing_given_no_params_returns_bad_request(client: FlaskClient):
+    response = client.get("/api/v1/listings/accommodation")
+
+    assert response.status_code == BAD_REQUEST
+
+
+def test_search_accommodation_listing_given_invalid_params__returns_bad_request(client: FlaskClient):
+    response = client.get("/api/v1/listings/accommodation?blah=whatever")
+
+    assert response.status_code == BAD_REQUEST
+
+
+def test_search_accommodation_listing_given_invalid_source__returns_bad_request(client: FlaskClient):
+    response = client.get(
+        "/api/v1/listings/accommodation?location=London&radius=10&sources=internal,fake")
+
+    assert b'{"sources":["\'fake\' is not a valid Source"]}' in response.data
+    assert response.status_code == BAD_REQUEST
+
+
+def test_search_accommodation_listing_given_valid_source__returns_search_result(client: FlaskClient):
+    response = client.get(
+        "/api/v1/listings/accommodation?location=London&radius=10&sources=internal")
+
+    assert response.status_code == OK
+    assert json.loads(response.data) == {
+        "sources": [
+            {
+                "name": "internal",
+                "enabled": True
+            },
+            {
+                "name": "zoopla",
+                "enabled": False
+            }
+        ],
+        "searchResults": search_results_json
+    }
+
+
+def test_search_accommodation_listing_given_required_params__returns_search_result(client: FlaskClient):
+    response = client.get(
+        "/api/v1/listings/accommodation?location=London&radius=10")
+
+    assert response.status_code == OK
+    assert json.loads(response.data) == {
+        "sources": [
+            {
+                "name": "internal",
+                "enabled": True
+            },
+            {
+                "name": "zoopla",
+                "enabled": True
+            }
+        ],
+        "searchResults": search_results_json
+    }
+
+
+def test_search_accommodation_listing_given_all_params__returns_search_result(client: FlaskClient):
+    response = client.get(
+        "/api/v1/listings/accommodation?location=London&radius=10&sources=internal,zoopla&max_price=1000&sort_by=cheapest&page=2&size=20")
+
+    assert response.status_code == OK
+    assert json.loads(response.data) == {
+        "sources": [
+            {
+                "name": "internal",
+                "enabled": True
+            },
+            {
+                "name": "zoopla",
+                "enabled": True
+            }
+        ],
+        "searchResults": search_results_json
+    }
 
 
 def test_get_accommodation_listing__given_invalid_id_format__returns_bad_request(client: FlaskClient):

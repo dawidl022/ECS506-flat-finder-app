@@ -26,8 +26,8 @@ class ListingRepository(ABC):
 class AccommodationListingRepository(ListingRepository, ABC):
     @abstractmethod
     def search_by_location(
-        self, coords: Coordinates, radius: int, order_by: SortBy,
-        page: int, size: int, max_price: int | None = None
+        self, coords: Coordinates, radius: float, order_by: SortBy,
+        page: int, size: int, max_price: float | None = None
     ) -> list[AccommodationListing]:
         pass
 
@@ -51,8 +51,8 @@ class InMemoryAccommodationListingsRepository(AccommodationListingRepository):
             raise ListingNotFoundError()
 
     def search_by_location(
-        self, coords: Coordinates, radius: int, order_by: SortBy, page: int,
-        size: int, max_price: int | None = None
+        self, coords: Coordinates, radius: float, order_by: SortBy, page: int,
+        size: int, max_price: float | None = None
     ) -> list[AccommodationListing]:
         return sorted(
             [listing for listing in self.listings.values()
