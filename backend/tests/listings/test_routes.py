@@ -32,6 +32,9 @@ class MockListingService(BaseListingsService):
             return model_listing
         return None
 
+    def delete_accommodation_listing(self, listing_id: uuid.UUID) -> None:
+        pass
+
 
 model_listing = AccommodationListing(
     id=uuid.uuid4(),

@@ -5,6 +5,7 @@ from uuid import UUID
 import uuid
 
 from app.listings.dtos import CreateAccommodationForm
+from app.listings.exceptions import ListingNotFoundError
 from app.listings.models import AccommodationListing, Address, Coordinates, Location, Photo, SortBy, Source, UKAddress
 from app.listings.repository import AccommodationListingRepository, ListingPhotoRepository
 from app.listings.service import BaseGeocodingService, ListingsService
@@ -21,6 +22,7 @@ class StubGeocodingService(BaseGeocodingService):
 class SpyAccommodationListingRepo(AccommodationListingRepository):
     def __init__(self) -> None:
         self.saved_listings: list[AccommodationListing] = []
+        self.deleted_listing_ids: list[UUID] = []
 
     def get_listing_by_id(self, listing_id: UUID
                           ) -> AccommodationListing | None:
@@ -29,7 +31,9 @@ class SpyAccommodationListingRepo(AccommodationListingRepository):
         return None
 
     def delete_listing(self, listing_id: UUID) -> None:
-        raise NotImplementedError()
+        self.deleted_listing_ids.append(listing_id)
+        if listing_id == UUID("634d95f1-8b03-4605-a9e5-38722b907c89"):
+            raise ListingNotFoundError()
 
     def search_by_location(
         self, coords: Coordinates, radius: int, order_by: SortBy, page: int,
@@ -148,3 +152,16 @@ class ListingsServiceTest(unittest.TestCase):
     def test_get_accommodation_listing__given_zoopla_source__raises_error(self):
         self.assertRaises(ValueError, lambda: self.service.get_accommodation_listing(
             str(model_listing.id), Source.zoopla))
+
+    def test_delete_accommodation_listing__given_listing_id__deletes_listing(self):
+        listing_id = uuid.uuid4()
+        self.service.delete_accommodation_listing(listing_id)
+
+        deleted = self.spy_accommodation_listing_repo.deleted_listing_ids
+        self.assertEqual(1, len(deleted))
+        self.assertEqual(deleted[0], listing_id)
+
+    def test_delete_accommodation_listing__given_listing_not_found__raises_error(self):
+        listing_id = UUID("634d95f1-8b03-4605-a9e5-38722b907c89")
+        self.assertRaises(ListingNotFoundError,
+                          lambda: self.service.delete_accommodation_listing(listing_id))

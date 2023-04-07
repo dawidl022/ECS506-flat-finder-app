@@ -42,6 +42,10 @@ class BaseListingsService(abc.ABC):
                                   ) -> AccommodationListing | None:
         pass
 
+    @abc.abstractmethod
+    def delete_accommodation_listing(self, listing_id: uuid.UUID) -> None:
+        pass
+
 
 class ListingsService(BaseListingsService):
 
@@ -134,3 +138,6 @@ class ListingsService(BaseListingsService):
             return self.accommodation_listing_repo.get_listing_by_id(id)
 
         raise ValueError("Unknown source for accommodation listing")
+
+    def delete_accommodation_listing(self, listing_id: uuid.UUID) -> None:
+        self.accommodation_listing_repo.delete_listing(listing_id)
