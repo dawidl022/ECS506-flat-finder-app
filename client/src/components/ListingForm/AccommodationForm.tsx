@@ -27,8 +27,9 @@ const AccommodationForm: FC = ({}) => {
         />
         <br />
         <label htmlFor="description">Description</label>
-        <input
-          type="text"
+        <textarea
+          rows={15}
+          cols={30}
           placeholder="Accommodation Description"
           value={description}
           onChange={e => setDescription(e.target.value)}

@@ -20,8 +20,9 @@ const SeekingForm: FC = ({}) => {
           />
           <br />
           <label htmlFor="description">Description: </label>
-          <input
-            type="text"
+          <textarea
+            rows={15}
+            cols={30}
             placeholder="Seeking Description"
             value={description}
             onChange={e => setDescription(e.target.value)}
