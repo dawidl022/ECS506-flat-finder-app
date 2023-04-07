@@ -125,6 +125,7 @@ const AccommodationForm: FC = ({}) => {
           <option value={"Bungalows"}>Bungalows</option>
         </select>
         <br />
+        <label htmlFor="photos" id="photosText">Photos: </label>
         <input type="file" placeholder="Import Photos REQUIRED" id="photos" />
         <br />
         <button>Preview</button>
