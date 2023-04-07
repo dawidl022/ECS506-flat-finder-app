@@ -20,7 +20,7 @@ const AccommodationForm: FC = ({}) => {
         <label htmlFor="title">Title</label>
         <input
           type="text"
-          placeholder="Accommodation Title"
+          placeholder="Accommodation Title REQUIRED"
           value={title}
           onChange={e => setTitle(e.target.value)}
           required
@@ -30,7 +30,7 @@ const AccommodationForm: FC = ({}) => {
         <textarea
           rows={15}
           cols={30}
-          placeholder="Accommodation Description"
+          placeholder="Accommodation Description REQUIRED"
           value={description}
           onChange={e => setDescription(e.target.value)}
           required
@@ -40,7 +40,7 @@ const AccommodationForm: FC = ({}) => {
         <fieldset>
           <input
             type="text"
-            placeholder="Accommodation Line 1"
+            placeholder="Accommodation Line 1 REQUIRED"
             value={line1}
             onChange={e => setLine1(e.target.value)}
             required
@@ -49,7 +49,7 @@ const AccommodationForm: FC = ({}) => {
           <label htmlFor="line2">Address Line 2: </label>
           <input
             type="text"
-            placeholder="Accommodation Line 2"
+            placeholder="Accommodation Line 2 OPTIONAL"
             value={line2}
             onChange={e => setLine2(e.target.value)}
           />
@@ -57,7 +57,7 @@ const AccommodationForm: FC = ({}) => {
           <label htmlFor="town">Town: </label>
           <input
             type="text"
-            placeholder="Accommodation Town"
+            placeholder="Accommodation Town REQUIRED"
             value={town}
             onChange={e => setTown(e.target.value)}
             required
@@ -66,7 +66,7 @@ const AccommodationForm: FC = ({}) => {
           <label htmlFor="postCode">Post Code: </label>
           <input
             type="text"
-            placeholder="Accommodation Post Code"
+            placeholder="Accommodation Post Code REQUIRED"
             value={postCode}
             onChange={e => setPostCode(e.target.value)}
             required
@@ -75,7 +75,7 @@ const AccommodationForm: FC = ({}) => {
           <label htmlFor="country">Country: </label>
           <input
             type="text"
-            placeholder="Accommodation Country"
+            placeholder="Accommodation Country REQUIRED"
             value={country}
             readOnly
           />
@@ -84,7 +84,7 @@ const AccommodationForm: FC = ({}) => {
         <label htmlFor="price">Price: </label>
         <input
           type="number"
-          placeholder="Accommodation Price"
+          placeholder="Accommodation Price REQUIRED"
           value={price}
           onChange={e => setPrice(parseFloat(e.target.value))}
           min={0}
@@ -94,7 +94,7 @@ const AccommodationForm: FC = ({}) => {
         <label htmlFor="numberOfRooms">Number of Rooms: </label>
         <input
           type="number"
-          placeholder="Accommodation Number of Rooms"
+          placeholder="Accommodation Number of Rooms REQUIRED"
           value={numberOfRooms}
           onChange={e => setNumberOfRooms(parseFloat(e.target.value))}
           min={0}
@@ -115,7 +115,7 @@ const AccommodationForm: FC = ({}) => {
           <option value={"Bungalows"}>Bungalows</option>
         </select>
         <br />
-        <input type="file" id="photos" />
+        <input type="file" placeholder="Import Photos REQUIRED" id="photos" />
         <br />
         <button>Preview</button>
         <br />

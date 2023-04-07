@@ -13,7 +13,7 @@ const SeekingForm: FC = ({}) => {
           <label htmlFor="title">Title: </label>
           <input
             type="text"
-            placeholder="Seeking Title"
+            placeholder="Seeking Title REQUIRED"
             value={title}
             onChange={e => setTitle(e.target.value)}
             required
@@ -23,7 +23,7 @@ const SeekingForm: FC = ({}) => {
           <textarea
             rows={15}
             cols={30}
-            placeholder="Seeking Description"
+            placeholder="Seeking Description REQUIRED"
             value={description}
             onChange={e => setDescription(e.target.value)}
             required
@@ -32,13 +32,14 @@ const SeekingForm: FC = ({}) => {
           <label htmlFor="location">Location: </label>
           <input
             type="text"
-            placeholder="Seeking Location"
+            placeholder="Seeking Location REQUIRED"
             value={location}
             onChange={e => setLocation(e.target.value)}
             required
           />
           <br />
-          <input type="file" id="photos" />
+          <label htmlFor="photos">Photos: </label>
+          <input type="file" placeholder="Import Photos OPTIONAL" id="photos" />
           <br />
           <button>Preview</button>
           <br />
