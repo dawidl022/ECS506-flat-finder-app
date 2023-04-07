@@ -17,28 +17,31 @@ const AccommodationForm: FC = ({}) => {
     <div>
       Accommodation Form
       <form>
-        <label htmlFor="title">Title</label>
+        <label htmlFor="title" id="titleText">Title</label>
         <input
           type="text"
+          id="title"
           placeholder="Accommodation Title REQUIRED"
           value={title}
           onChange={e => setTitle(e.target.value)}
           required
         />
         <br />
-        <label htmlFor="description">Description</label>
+        <label htmlFor="description" id="descriptionText">Description</label>
         <textarea
           rows={15}
           cols={30}
+          id="description"
           placeholder="Accommodation Description REQUIRED"
           value={description}
           onChange={e => setDescription(e.target.value)}
           required
         />
         <br />
-        <label htmlFor="line1">Address Line 1: </label>
+        <label htmlFor="line1" id="line1Text">Address Line 1: </label>
         <fieldset>
           <input
+            id="line1"
             type="text"
             placeholder="Accommodation Line 1 REQUIRED"
             value={line1}
@@ -46,16 +49,18 @@ const AccommodationForm: FC = ({}) => {
             required
           />
           <br />
-          <label htmlFor="line2">Address Line 2: </label>
+          <label htmlFor="line2" id="line2Text">Address Line 2: </label>
           <input
             type="text"
+            id="line2"
             placeholder="Accommodation Line 2 OPTIONAL"
             value={line2}
             onChange={e => setLine2(e.target.value)}
           />
           <br />
-          <label htmlFor="town">Town: </label>
+          <label htmlFor="town" id="townText">Town: </label>
           <input
+            id="town"
             type="text"
             placeholder="Accommodation Town REQUIRED"
             value={town}
@@ -63,27 +68,30 @@ const AccommodationForm: FC = ({}) => {
             required
           />
           <br />
-          <label htmlFor="postCode">Post Code: </label>
+          <label htmlFor="postCode" id="postCodeText">Post Code: </label>
           <input
             type="text"
+            id="postCode"
             placeholder="Accommodation Post Code REQUIRED"
             value={postCode}
             onChange={e => setPostCode(e.target.value)}
             required
           />
           <br />
-          <label htmlFor="country">Country: </label>
+          <label htmlFor="country" id="countryText">Country: </label>
           <input
             type="text"
+            id="country"
             placeholder="Accommodation Country REQUIRED"
             value={country}
             readOnly
           />
         </fieldset>
         <br />
-        <label htmlFor="price">Price: </label>
+        <label htmlFor="price" id="priceText">Price: </label>
         <input
           type="number"
+          id="price"
           placeholder="Accommodation Price REQUIRED"
           value={price}
           onChange={e => setPrice(parseFloat(e.target.value))}
@@ -91,9 +99,10 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
-        <label htmlFor="numberOfRooms">Number of Rooms: </label>
+        <label htmlFor="numberOfRooms" id="roomsText">Number of Rooms: </label>
         <input
           type="number"
+          id="numberOfRooms"
           placeholder="Accommodation Number of Rooms REQUIRED"
           value={numberOfRooms}
           onChange={e => setNumberOfRooms(parseFloat(e.target.value))}
@@ -102,7 +111,7 @@ const AccommodationForm: FC = ({}) => {
           required
         />
         <br />
-        <label htmlFor="type">Accommodation Type: </label>
+        <label htmlFor="type" id="typeText">Accommodation Type: </label>
         <select
           id="type"
           value={accommodationType}
