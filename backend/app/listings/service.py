@@ -2,25 +2,25 @@ import abc
 import uuid
 import time
 from app.listings.models import (
-    AccommodationSearchResult, AccommodationSummary, Address, Coordinates,
-    Photo, Source)
-from app.listings.dtos import CreateAccommodationForm, AccommodationSearchParams
+    AccommodationSearchResult, Address, Coordinates, Photo, Source)
+from app.listings.dtos import (
+    CreateAccommodationForm, AccommodationSearchParams)
 from app.listings.models import AccommodationListing, Location
 from app.listings.repository import (
     AccommodationListingRepository, ListingPhotoRepository)
 
 
 class BaseGeocodingService(abc.ABC):
-    @abc.abstractmethod
+    @ abc.abstractmethod
     def get_coords(self, addr: Address) -> Coordinates:
         pass
 
-    @abc.abstractmethod
+    @ abc.abstractmethod
     def search_coords(self, location_query: str) -> Coordinates:
         pass
 
-    @abc.abstractmethod
-    def calc_distance(self, coords1: Coordinates, coords2: Coordinates) -> float:
+    @ abc.abstractmethod
+    def calc_distance(self, c1: Coordinates, c2: Coordinates) -> float:
         pass
 
 
@@ -38,7 +38,7 @@ class GeocodingService(BaseGeocodingService):
         """
         return Coordinates(0, 0)
 
-    def calc_distance(self, coords1: Coordinates, coords2: Coordinates) -> float:
+    def calc_distance(self, c1: Coordinates, c2: Coordinates) -> float:
         """
         TODO calc distance using geopy module
         """
@@ -46,23 +46,24 @@ class GeocodingService(BaseGeocodingService):
 
 
 class BaseListingsService(abc.ABC):
-    @abc.abstractmethod
-    def search_accommodation_listings(self, params: AccommodationSearchParams) -> list[AccommodationSearchResult]:
+    @ abc.abstractmethod
+    def search_accommodation_listings(self, params: AccommodationSearchParams
+                                      ) -> list[AccommodationSearchResult]:
         pass
 
-    @abc.abstractmethod
+    @ abc.abstractmethod
     def create_accommodation_listing(
         self, form: CreateAccommodationForm, photos: list[bytes],
         author_email: str
     ) -> AccommodationListing:
         pass
 
-    @abc.abstractmethod
+    @ abc.abstractmethod
     def get_accommodation_listing(self, listing_id: str, source: Source
                                   ) -> AccommodationListing | None:
         pass
 
-    @abc.abstractmethod
+    @ abc.abstractmethod
     def get_available_sources(self, location_query: str) -> list[Source]:
         pass
 
@@ -76,7 +77,8 @@ class ListingsService(BaseListingsService):
         self.accommodation_listing_repo = accommodation_listing_repo
         self.listing_photo_repo = listing_photo_repo
 
-    def search_accommodation_listings(self, params: AccommodationSearchParams) -> list[AccommodationSearchResult]:
+    def search_accommodation_listings(self, params: AccommodationSearchParams
+                                      ) -> list[AccommodationSearchResult]:
         coords = self.geocoder.search_coords(params.location)
         listings: list[AccommodationListing] = []
         search_all_sources = params.sources is None

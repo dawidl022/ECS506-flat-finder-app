@@ -10,7 +10,10 @@ from app.util.marshmallow import get_params, get_input
 from app.util.encoding import CamelCaseEncoder
 from app.util.encoding import CamelCaseDecoder
 from config import Config
-from .dtos import AccommodationSearchResultDTO, CreateAccommodationForm, AccommodationListingDTO, AccommodationSearchParams, SearchResult, SourceDTO
+from .dtos import (
+    AccommodationSearchResultDTO, CreateAccommodationForm,
+    AccommodationListingDTO, AccommodationSearchParams, SearchResult, SourceDTO
+)
 from .models import Source, User, ContactDetails
 from .service import BaseListingsService
 
@@ -51,7 +54,10 @@ def get_accommodation_listings(listings_service: BaseListingsService
             SourceDTO(s, enabled=params.sources is None or s in params.sources)
             for s in sources
         ],
-        search_results=[AccommodationSearchResultDTO(l) for l in listings]
+        search_results=[
+            AccommodationSearchResultDTO(listing)
+            for listing in listings
+        ]
     )
 
     return jsonify(result)

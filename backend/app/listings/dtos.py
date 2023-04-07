@@ -10,7 +10,9 @@ from marshmallow.validate import Range
 import dacite
 
 from app.util.schema import Schemable
-from app.listings.models import AccommodationSearchResult, AccommodationSummary, Country, SortBy, Source, UKAddress
+from app.listings.models import (
+    AccommodationSearchResult, AccommodationSummary, Country, SortBy, Source,
+    UKAddress)
 from app.util.encoding import CamelCaseDecoder
 from app.listings.models import Address
 from app.listings.models import AccommodationListing
