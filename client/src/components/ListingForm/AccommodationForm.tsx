@@ -1,4 +1,4 @@
-import { FC, useState, FormEvent, ChangeEvent} from "react";
+import { FC, useState, FormEvent, ChangeEvent } from "react";
 import { useRouter } from "next/router";
 import {
   AccommodationAddressCountryEnum,
@@ -60,7 +60,7 @@ const AccommodationForm: FC = ({}) => {
     if (files && files.length > 0) {
       if (files.length > 15) {
         alert("You can upload up to 15 files");
-        e.target.value = '';
+        e.target.value = "";
         return;
       }
 
@@ -68,11 +68,11 @@ const AccommodationForm: FC = ({}) => {
       for (let i = 0; i < files.length; i++) {
         if (files[i].size > 5242880) {
           alert(`The maximum file size is 5MB`);
-          e.target.value = ''; 
+          e.target.value = "";
           return;
         }
       }
-    } 
+    }
   }
 
   const handleSubmit = (e: FormEvent<HTMLElement>) => {
