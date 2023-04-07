@@ -8,8 +8,6 @@ const SeekingForm: FC = ({}) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
-  const [lat, setLatitude] = useState(0);
-  const [_long, setLongitude] = useState(0);
 
   const preview = () => {
     router.push({
@@ -17,15 +15,13 @@ const SeekingForm: FC = ({}) => {
       query: {
         title,
         description,
-        location,
-        lat,
-        _long,
+        location
       },
     });
   };
 
   const checkInputs = () => {
-    if (title && description && location && lat && _long) {
+    if (title && description && location) {
       return true;
     } else {
       return false;
@@ -39,13 +35,8 @@ const SeekingForm: FC = ({}) => {
         title,
         description,
         photos: Array<Blob>(),
-        preferredLocation: {
-          name: location,
-          coordinates: {
-            lat,
-            _long,
-          },
-        },
+        preferredLocation: location,
+        
       })
       .catch(err =>
         alert("Seeking listing failed to be published. \nError: " + err.message)
