@@ -62,6 +62,10 @@ class BaseListingsService(abc.ABC):
                                   ) -> AccommodationListing | None:
         pass
 
+    @abc.abstractmethod
+    def get_available_sources(self, location_query: str) -> list[Source]:
+        pass
+
 
 class ListingsService(BaseListingsService):
 
@@ -130,3 +134,6 @@ class ListingsService(BaseListingsService):
             return self.accommodation_listing_repo.get_listing_by_id(id)
 
         raise ValueError("Unknown source for accommodation listing")
+
+    def get_available_sources(self, location_query: str) -> list[Source]:
+        return [s for s in Source]

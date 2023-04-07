@@ -24,7 +24,7 @@ class AccommodationSummary:
     thumbnail_id: UUID
     accommodation_type: str
     number_of_rooms: int
-    source: str
+    source: Source
     price: float
     post_code: str
 

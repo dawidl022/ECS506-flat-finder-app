@@ -208,3 +208,10 @@ class ListingsServiceTest(unittest.TestCase):
     def test_get_accommodation_listing__given_zoopla_source__raises_error(self):
         self.assertRaises(ValueError, lambda: self.service.get_accommodation_listing(
             str(model_listing.id), Source.zoopla))
+
+    def test_get_available_sources__returns_all_sources(self):
+        expected = {Source.internal, Source.zoopla}
+        actual = self.service.get_available_sources("London")
+
+        self.assertEqual(len(expected), len(actual))
+        self.assertEqual(expected, set(actual))
