@@ -1,15 +1,19 @@
-from http.client import BAD_REQUEST, NOT_FOUND, UNAUTHORIZED
+from http.client import (
+    BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, UNAUTHORIZED)
 import os
 import uuid
 
 from flask import Blueprint, Response, abort, jsonify, make_response, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from werkzeug.datastructures import FileStorage
+from app.listings.exceptions import ListingNotFoundError
 
 from app.util.marshmallow import get_params, get_input
 from app.util.encoding import CamelCaseEncoder
 from app.util.encoding import CamelCaseDecoder
 from config import Config
+from .models import (
+    AccommodationListing, Source, User, ContactDetails)
 from .dtos import (
     AccommodationSearchResultDTO, CreateAccommodationForm,
     AccommodationListingDTO, AccommodationSearchParams, SearchResult, SourceDTO
@@ -147,11 +151,7 @@ def get_accommodation_listing(
         listing_id: str, listing_service: BaseListingsService) -> Response:
     source, id = extract_listing_id_and_source(listing_id)
 
-    listing = listing_service.get_accommodation_listing(id, source)
-    if listing is None:
-        abort(make_response(
-            {'listingId': "listing not found"}, NOT_FOUND))
-
+    listing = fetch_accommodation_listing(listing_service, source, id)
     dummy_user = make_dummy_user(get_current_user_email())
 
     dto = AccommodationListingDTO(listing, dummy_user)
@@ -172,6 +172,43 @@ def extract_listing_id_and_source(external_listing_id: str
             {'listingId': "source not found"}, NOT_FOUND))
 
     return source, id
+
+
+def fetch_accommodation_listing(listing_service, source, id
+                                ) -> AccommodationListing:
+    listing = listing_service.get_accommodation_listing(id, source)
+    if listing is None:
+        abort(make_response(
+            {'listingId': "listing not found"}, NOT_FOUND))
+
+    return listing
+
+
+@bp.delete("/accommodation/<listing_id>")
+@jwt_required()
+def delete_accommodation_listing(
+        listing_id: str, listing_service: BaseListingsService) -> Response:
+    source, id = extract_listing_id_and_source(listing_id)
+
+    if source != Source.internal:
+        abort(make_response(
+            {'listingId': "cannot delete external listing"}, FORBIDDEN))
+
+    listing = fetch_accommodation_listing(listing_service, source, id)
+
+    if listing.author_email != get_current_user_email():
+        abort(make_response(
+            {'listingId':
+              "currently logged in user is not the author of this listing"},
+            FORBIDDEN))
+
+    try:
+        listing_service.delete_accommodation_listing(uuid.UUID(id))
+    except ListingNotFoundError:
+        abort(make_response(
+            {'listingId': "listing not found"}, NOT_FOUND))
+
+    return make_response("", NO_CONTENT)
 
 
 @bp.get("/<listing_id>/photos/<photo_id>")
