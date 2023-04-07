@@ -7,7 +7,7 @@ from unittest.mock import patch
 import uuid
 from flask.testing import FlaskClient
 from app.listings.exceptions import ListingNotFoundError
-from app.listings.dtos import AccommodationSearchParams, CreateAccommodationForm
+from app.listings.dtos import AccommodationSearchParams, AccommodationForm
 from app.listings.models import AccommodationListing, AccommodationSearchResult, AccommodationSummary, Coordinates, Location, Source, UKAddress
 
 from app.listings.service import BaseListingsService
@@ -23,7 +23,7 @@ class MockListingService(BaseListingsService):
         return [model_search_result]
 
     def create_accommodation_listing(
-            self, form: CreateAccommodationForm, photos: list[bytes],
+            self, form: AccommodationForm, photos: list[bytes],
             author_email: str
     ) -> AccommodationListing:
         self.saved_photos.append(photos)

@@ -15,7 +15,7 @@ from config import Config
 from .models import (
     AccommodationListing, Source, User, ContactDetails)
 from .dtos import (
-    AccommodationSearchResultDTO, CreateAccommodationForm,
+    AccommodationSearchResultDTO, AccommodationForm,
     AccommodationListingDTO, AccommodationSearchParams, SearchResult, SourceDTO
 )
 from .models import Source, User, ContactDetails
@@ -130,7 +130,7 @@ def validate_and_get_create_accommodation_form():
         abort(make_response(
             {'address': "missing address field"}, BAD_REQUEST))
 
-    form = get_input(CreateAccommodationForm, request.form |
+    form = get_input(AccommodationForm, request.form |
                      {"address": address_file.stream.read().decode()})
 
     return form
