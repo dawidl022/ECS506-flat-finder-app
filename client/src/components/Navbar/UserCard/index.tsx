@@ -2,9 +2,13 @@ import React, { useRef, useState } from "react";
 
 import styles from "./UserCard.module.scss";
 import { useRouter } from "next/router";
+import { useCookies } from "react-cookie";
+import { useUser } from "@/contexts/UserContext";
 
 const UserCard = () => {
   const router = useRouter();
+  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+  const { user, setUser } = useUser();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -36,12 +40,12 @@ const UserCard = () => {
     };
   }, []);
   return (
-    <div ref={menuRef}>
+    <div className={styles.cardCon} ref={menuRef}>
       <button
         onClick={() => setIsOpen(prev => !prev)}
         className={styles.wrapper}
       >
-        <p>username</p>
+        <p>{user?.email}</p>
         <div className={styles.avaCon} />
         <div className={styles.arrCon}>
           <img
@@ -55,7 +59,7 @@ const UserCard = () => {
           <button
             onClick={() => {
               setIsOpen(false);
-              router.push("/profile/seagull");
+              router.push(`/profile/${user?.id}`);
             }}
             className={styles.menuItem}
           >
@@ -68,7 +72,6 @@ const UserCard = () => {
             className={styles.menuItem}
             onClick={() => {
               setIsOpen(false);
-              // TODO:
               router.push("/listings");
             }}
           >
@@ -80,7 +83,8 @@ const UserCard = () => {
           <button
             onClick={() => {
               setIsOpen(false);
-              // TODO: exit logic (delete cookie)
+              removeCookie("token");
+              setUser(null);
             }}
             className={styles.menuItem}
           >

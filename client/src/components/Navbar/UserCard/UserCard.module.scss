@@ -1,3 +1,7 @@
+.cardCon {
+  position: relative;
+}
+
 .wrapper {
   display: flex;
   align-items: center;
@@ -37,7 +41,8 @@
 
 .dropDown {
   position: absolute;
-  top: 80px;
+  top: 70px;
+  right: 0;
   width: 180px;
   background-color: #fff;
   border-radius: 12px;

@@ -14,20 +14,23 @@ type JwtPayload = {
 };
 
 const Navbar = () => {
-  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
-  // TODO: create user context (for now just boolean)
-  // const user = true;
-  const { user } = useUser();
+  const [cookies] = useCookies(["token"]);
+  const { user, setUser } = useUser();
 
   React.useEffect(() => {
+    if (!cookies.token) return;
     const payload = jwtDecode(cookies.token) as JwtPayload;
-    console.log(payload);
     new DefaultApi(
       new Configuration({
         basePath: "http://127.0.0.1:5000",
         accessToken: cookies.token,
       })
-    ).apiV1UsersUserIdProfileGet({ userId: payload.sub });
+    )
+      .apiV1UsersUserIdProfileGet({ userId: payload.sub })
+      .then(res => {
+        // console.log(res);
+        setUser(res);
+      });
   }, []);
 
   return (
