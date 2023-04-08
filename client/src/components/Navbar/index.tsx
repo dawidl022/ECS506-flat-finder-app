@@ -8,6 +8,11 @@ import { Configuration, DefaultApi } from "@/generated";
 import { useCookies } from "react-cookie";
 import jwtDecode from "jwt-decode";
 
+type JwtPayload = {
+  email: string;
+  sub: string;
+};
+
 const Navbar = () => {
   const [cookies, setCookie, removeCookie] = useCookies(["token"]);
   // TODO: create user context (for now just boolean)
@@ -15,14 +20,14 @@ const Navbar = () => {
   const { user } = useUser();
 
   React.useEffect(() => {
-    const payload = jwtDecode(cookies.token);
+    const payload = jwtDecode(cookies.token) as JwtPayload;
     console.log(payload);
     new DefaultApi(
       new Configuration({
         basePath: "http://127.0.0.1:5000",
         accessToken: cookies.token,
       })
-    ).apiV1UsersUserIdProfileGet(payload.userId);
+    ).apiV1UsersUserIdProfileGet({ userId: payload.sub });
   }, []);
 
   return (
