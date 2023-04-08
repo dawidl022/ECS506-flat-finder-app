@@ -18,7 +18,7 @@ class BaseUserService(ABC):
         pass
 
     @abstractmethod
-    def get_user(self, user_id) -> User | None:
+    def get_user(self, user_id: UUID) -> User | None:
         pass
 
     @abstractmethod

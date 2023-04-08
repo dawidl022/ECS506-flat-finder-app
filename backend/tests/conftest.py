@@ -7,8 +7,10 @@ from flask import Flask
 from flask.testing import FlaskClient, FlaskCliRunner
 
 from app.listings.service import BaseListingsService
-from app import register_blueprints
+from app import initialise_common_extensions, register_common_blueprints
+from app.user.user_service import BaseUserService
 from tests.listings.test_routes import MockListingService
+from tests.user.test_user_routes import MockUserService
 
 
 @pytest.fixture(autouse=True)
@@ -27,9 +29,11 @@ def neuter_jwt_identity():
 
 
 @pytest.fixture()
-def app(listings_service: MockListingService) -> Generator[Flask, None, None]:
+def app(listings_service: MockListingService, user_service: MockUserService
+        ) -> Generator[Flask, None, None]:
     app = Flask(__name__)
-    register_blueprints(app)
+    initialise_common_extensions(app)
+    register_common_blueprints(app)
 
     app.config.update({
         "TESTING": True,
@@ -39,7 +43,9 @@ def app(listings_service: MockListingService) -> Generator[Flask, None, None]:
     # other setup can go here
 
     # Inject mock dependencies
-    FlaskInjector(app=app, modules=[configure_mocks(listings_service)])
+    FlaskInjector(app=app, modules=[
+        configure_mocks(listings_service, user_service)
+    ])
 
     yield app
 
@@ -51,12 +57,22 @@ def listings_service() -> MockListingService:
     return MockListingService()
 
 
-def configure_mocks(listings_service: MockListingService):
+@pytest.fixture
+def user_service() -> MockUserService:
+    return MockUserService()
+
+
+def configure_mocks(listings_service: MockListingService, user_service: MockUserService):
     def wrapper(binder: Binder):
 
         binder.bind(
             BaseListingsService,  # type: ignore[type-abstract]
-            to=listings_service)
+            to=listings_service
+        )
+        binder.bind(
+            BaseUserService,  # type: ignore[type-abstract]
+            to=user_service
+        )
 
     return wrapper
 
