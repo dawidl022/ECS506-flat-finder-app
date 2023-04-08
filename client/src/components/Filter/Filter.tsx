@@ -4,7 +4,7 @@ import { Configuration, DefaultApi } from "@/generated";
 interface FilterProps {
   sources: { [key: string]: boolean };
   maxPrice: number | null;
-  handleApply: (source: string[], maxPrice: number) => void;
+  handleApply: (source: { [key: string]: boolean }, maxPrice: number) => void;
 }
 
 const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
@@ -44,9 +44,7 @@ const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
           })
       }
 
-      <button onClick={() => handleApply(Object.keys(chooseSources), price)}>
-        Apply
-      </button>
+      <button onClick={() => handleApply(chooseSources, price)}>Apply</button>
     </div>
   );
 };
