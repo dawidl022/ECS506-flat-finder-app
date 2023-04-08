@@ -9,14 +9,11 @@ interface FilterProps {
 
 const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
   const [chooseSources, setSource] = useState(sources);
-  //used to ensure that there is always 1 source selected
-  const [selectOneSource, setSelected] = useState(false);
   //set the max price to 0 if the prop is null
   const [price, setPrice] = useState(maxPrice || 0);
 
   const checkIfOneSourceIsSelected = () => {
     const selected = Object.values(chooseSources).some(value => value);
-    setSelected(selected);
     return selected;
   };
   
