@@ -3,14 +3,14 @@ import {
   ReactNode,
   SetStateAction,
   createContext,
+  useContext,
   useState,
 } from "react";
+import { UserProfile } from "@/generated";
 
 interface UserContextProps {
-  user: any;
-  token: string;
-  setUser: Dispatch<SetStateAction<any>>;
-  setToken: Dispatch<SetStateAction<string>>;
+  user: UserProfile | null;
+  setUser: Dispatch<SetStateAction<UserProfile | null>>;
 }
 
 interface UserContextProviderProps {
@@ -18,21 +18,22 @@ interface UserContextProviderProps {
 }
 
 const UserContext = createContext<UserContextProps>({
-  user: {},
-  token: "",
-  setUser: () => {},
-  setToken: () => {},
+  user: null,
+  setUser: () => null,
 });
 
+const useUser = () => {
+  return useContext(UserContext);
+};
+
 const UserContextProvider = ({ children }: UserContextProviderProps) => {
-  const [user, setUser] = useState({});
-  const [token, setToken] = useState("");
+  const [user, setUser] = useState<UserProfile | null>(null);
 
   return (
-    <UserContext.Provider value={{ user, setUser, token, setToken }}>
+    <UserContext.Provider value={{ user, setUser }}>
       {children}
     </UserContext.Provider>
   );
 };
 
-export { UserContextProvider, UserContext };
+export { UserContextProvider, useUser };

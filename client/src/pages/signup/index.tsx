@@ -5,16 +5,8 @@ import { Configuration, DefaultApi } from "@/generated";
 
 const SignUp = () => {
   // const handleSignUp = () => {
-  //   // TODO:
-  //   new DefaultApi(new Configuration({ basePath: "http://localhost:5000", accessToken: string }))
-  //     .apiV1ListingsAccommodationGet({
-  //       location: "London",
-  //       radius: 20,
-  //     })
-  //     .then(res => console.log(res))
-  //     .catch(er => console.log(er));
-  //   // fetch("http://127.0.0.1:5000/api/v1/listings/accommodation");
-  //   console.log("123");
+  //   const loginUrl = "http://127.0.0.1:5000/api/v1/login/google";
+  //   window.open(loginUrl, "_self", "width=500,height=600");
   // };
 
   return (
