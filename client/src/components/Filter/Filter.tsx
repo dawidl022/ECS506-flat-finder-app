@@ -3,13 +3,16 @@ import { FC, FormEvent, useState } from "react";
 interface FilterProps {
   sources: { [key: string]: boolean };
   maxPrice: number | null;
-  handleApply: (source: { [key: string]: boolean }, maxPrice: number) => void;
+  handleApply: (
+    source: { [key: string]: boolean },
+    maxPrice: number | null
+  ) => void;
 }
 
 const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
   const [chooseSources, setSource] = useState(sources);
   //set the max price to 0 if the prop is null
-  const [price, setPrice] = useState(maxPrice || 0);
+  const [price, setPrice] = useState(maxPrice ? maxPrice.toString() : "");
 
   const checkIfOneSourceIsSelected = () => {
     const selected = Object.values(chooseSources).some(value => value);
@@ -22,7 +25,7 @@ const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
       alert("Please select at least one source.");
       setSource(sources);
     } else {
-      handleApply(chooseSources, price);
+      handleApply(chooseSources, parseInt(price) || null);
     }
   };
 
@@ -36,7 +39,7 @@ const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
           id="maxPrice"
           value={price}
           min={0}
-          onChange={e => setPrice(parseInt(e.target.value))}
+          onChange={e => setPrice(e.target.value)}
         />
 
         <fieldset>
