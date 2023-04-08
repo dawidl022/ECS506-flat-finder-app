@@ -70,6 +70,14 @@ class Address(abc.ABC):
     def get_post_code(self) -> str:
         pass
 
+    @property
+    def full_address(self) -> str:
+        """
+        Get the full, human-readable address including the country. Can be used
+        to search for the location in e.g. Google Maps.
+        """
+        return f"{self.address}, {self.country_name}"
+
 
 @dataclass(frozen=True)
 class UKAddress(Address):
@@ -112,6 +120,7 @@ class AccommodationListing:
     number_of_rooms: int
 
     photo_ids: tuple[UUID, ...]
+
     source: Source
 
     def summarise(self) -> AccommodationSummary:
@@ -126,6 +135,15 @@ class AccommodationListing:
             post_code=self.location.address.get_post_code(),
             price=self.price
         )
+
+
+@dataclass(frozen=True)
+class ExternalAccommodationListing(AccommodationListing):
+    original_listing_url: str
+    listing_id: int
+    photo_urls: list[str]
+    short_description: str
+    author_phone: str
 
 
 @dataclass(frozen=True)

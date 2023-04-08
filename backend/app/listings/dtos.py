@@ -8,6 +8,8 @@ from marshmallow import Schema, fields
 import marshmallow
 from marshmallow.validate import Range
 import dacite
+from app.user.user_dtos import UserDTO
+from app.user.user_models import User
 
 from app.util.schema import Schemable
 from app.listings.models import (
@@ -15,7 +17,6 @@ from app.listings.models import (
     UKAddress)
 from app.util.encoding import CamelCaseDecoder
 from app.listings.models import Address, AccommodationListing
-from app.user.user_model import User
 
 
 def validate_sources(sources: str) -> str:
@@ -123,7 +124,7 @@ class AccommodationForm(Schemable):
 class AuthorDTO:
     def __init__(self, author: User) -> None:
         self.name = author.name
-        self.userProfile = author
+        self.userProfile = UserDTO(author)
 
 
 class ContactInfoDTO:
