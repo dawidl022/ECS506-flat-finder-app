@@ -29,6 +29,7 @@ const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
   return (
     <div>
       <form onSubmit={handleSubmit}>
+        <label htmlFor="maxPrice">Max Price</label>
         <input
           type="number"
           name="maxPrice"
@@ -39,6 +40,7 @@ const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
         />
 
         <fieldset>
+          <legend>Sources</legend>
           {sources &&
             Object.keys(sources).map((source, index) => {
               return (
