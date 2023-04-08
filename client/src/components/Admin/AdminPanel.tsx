@@ -42,12 +42,8 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     }
   };
 
-  users.map((user: User) => {
-    if (user.id === currentUserId && !user.isAdmin) {
-      isCurrentUserAdmin = true;
-    } else {
-      return;
-    }
+  api.apiV1AdminsUserIdGet({ userId: currentUserId }).then(() => {
+    isCurrentUserAdmin = true;
   });
 
   if (isCurrentUserAdmin) {
