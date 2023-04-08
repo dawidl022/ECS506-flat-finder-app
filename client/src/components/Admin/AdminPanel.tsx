@@ -18,14 +18,14 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
   let isCurrentUserAdmin = false;
   const router = useRouter();
 
-  // api
-  //   .apiV1UsersGet()
-  //   .then((users: User[]) => {
-  //     setUsers(users);
-  //   })
-  //   .catch(err => {
-  //     alert(err);
-  //   });
+  api
+    .apiV1UsersGet()
+    .then((users: User[]) => {
+      setUsers(users);
+    })
+    .catch(err => {
+      alert(err);
+    });
 
   const removeUserFromSystem = (index: number) => {
     if (
