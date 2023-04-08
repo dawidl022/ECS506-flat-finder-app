@@ -29,7 +29,7 @@ const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <label htmlFor="maxPrice">Max Price</label>
+        <label htmlFor="maxPrice">Max Price: </label>
         <input
           type="number"
           name="maxPrice"
