@@ -4,13 +4,23 @@ import {
   SetStateAction,
   createContext,
   useContext,
+  useEffect,
   useState,
 } from "react";
-import { UserProfile } from "@/generated";
+import { Configuration, DefaultApi, UserProfile } from "@/generated";
+import { useCookies } from "react-cookie";
+import jwtDecode from "jwt-decode";
+import useApiConfig from "@/hooks/useApiConfig";
+
+type JwtPayload = {
+  email: string;
+  sub: string;
+};
 
 interface UserContextProps {
   user: UserProfile | null;
   setUser: Dispatch<SetStateAction<UserProfile | null>>;
+  logout: () => void;
 }
 
 interface UserContextProviderProps {
@@ -20,20 +30,35 @@ interface UserContextProviderProps {
 const UserContext = createContext<UserContextProps>({
   user: null,
   setUser: () => null,
+  logout: () => null,
 });
-
-const useUser = () => {
-  return useContext(UserContext);
-};
 
 const UserContextProvider = ({ children }: UserContextProviderProps) => {
   const [user, setUser] = useState<UserProfile | null>(null);
+  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+
+  const { config, token } = useApiConfig();
+
+  const logout = () => {
+    removeCookie("token");
+    setUser(null);
+  };
+
+  useEffect(() => {
+    if (!token) return;
+    const payload = jwtDecode(token) as JwtPayload;
+    new DefaultApi(new Configuration(config))
+      .apiV1UsersUserIdProfileGet({ userId: payload.sub })
+      .then(res => {
+        setUser(res);
+      });
+  }, []);
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser, logout }}>
       {children}
     </UserContext.Provider>
   );
 };
 
-export { UserContextProvider, useUser };
+export { UserContextProvider, UserContext };

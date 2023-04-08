@@ -2,13 +2,11 @@ import React, { useRef, useState } from "react";
 
 import styles from "./UserCard.module.scss";
 import { useRouter } from "next/router";
-import { useCookies } from "react-cookie";
-import { useUser } from "@/contexts/UserContext";
+import useUser from "@/hooks/useUser";
 
 const UserCard = () => {
   const router = useRouter();
-  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
-  const { user, setUser } = useUser();
+  const { user, logout } = useUser();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -83,8 +81,8 @@ const UserCard = () => {
           <button
             onClick={() => {
               setIsOpen(false);
-              removeCookie("token");
-              setUser(null);
+              logout();
+              router.push("/auth");
             }}
             className={styles.menuItem}
           >
