@@ -11,18 +11,18 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
   const api = new DefaultApi(
     new Configuration({ basePath: "http://127.0.0.1:5000" })
   );
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<User[]>([{ id: "1",name: "John",email: "lol@email.comm", isAdmin: true},{ id: "2", name: "Jane",email: "bey@email.com", isAdmin: false}]);
   let isCurrentUserAdmin = false;
   const router = useRouter();
 
-  api
-    .apiV1UsersGet()
-    .then((users: User[]) => {
-      setUsers(users);
-    })
-    .catch(err => {
-      alert(err);
-    });
+  // api
+  //   .apiV1UsersGet()
+  //   .then((users: User[]) => {
+  //     setUsers(users);
+  //   })
+  //   .catch(err => {
+  //     alert(err);
+  //   });
 
   const removeUserFromSystem = (index: number) => {
     if (confirm("Are you sure you want to remove " + users[index].name + "?")) {
@@ -42,60 +42,41 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
 
   users.map((user: User) => {
     if (user.id === currentUserId && !user.isAdmin) {
-      isCurrentUserAdmin = true;
+      isCurrentUserAdmin = (true);
     } else {
       return;
     }
   });
 
-  if (isCurrentUserAdmin) {
-    return (
-      <div>
-        <h3> Administrator Access Only </h3>
-        <button type="button" onClick={() => router.push("/index")}>
-          Return To Homepage
-        </button>
-      </div>
-    );
-  } else {
+ if (isCurrentUserAdmin) {
+  return (
+    <div>
+      <h3> Administrator Access Only </h3>
+      <button type="button" onClick={() => router.push("/index")}>Return To Homepage</button>
+    </div>
+  );
+ } else {
     return (
       <div>
         {/* get each user and display their email */}
-        {users.map((user: User, index) => {
-          {
-            if (user.id === currentUserId) {
-              return (
-                <div key={index}>
-                  <table>
-                    <tr>
-                      <td>{user.name}</td>
-                      <td>Email: {user.email}</td>
-                      <td>Admin permissions: {user.isAdmin.toString()} </td>
-                    </tr>
-                  </table>
-                </div>
-              );
-            } else {
-              return (
-                <div key={index}>
-                  <table>
-                    <tr>
-                      <td>{user.name}</td>
-                      <td>Email: {user.email}</td>
-                      <td>Admin permissions: {user.isAdmin.toString()} </td>
-                      <button
-                        type="button"
-                        onClick={() => removeUserFromSystem(index)}
-                      >
-                        Remove User
-                      </button>
-                    </tr>
-                  </table>
-                </div>
-              );
-            }
-          }
-        })}
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Email</th> 
+            <th>Admin </th>
+          </tr>
+
+          {users.map((user: User, index) => {
+            return (
+              <tr key={index}>
+                <td>{user.name}</td>
+                <td>{user.email}</td>
+                <td>{user.isAdmin ? "Yes" : "No"}</td>
+                { user.isAdmin ? <td></td> : <td><button type="button" onClick={() => removeUserFromSystem(index)}>Remove User</button></td> }
+              </tr>
+            );
+          })}
+      </table>
       </div>
     );
   }
