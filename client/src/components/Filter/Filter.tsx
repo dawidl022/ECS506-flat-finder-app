@@ -23,10 +23,11 @@ const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
         alert("Please select at least one source.");
         //reset form
         setSource(sources);
+    } else {
+        // form submission
+        handleApply(chooseSources, price);
     }
-    // form submission
   };
-  
 
   return (
     <div>
