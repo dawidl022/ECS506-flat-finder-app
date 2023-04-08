@@ -31,15 +31,10 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     if (
       confirm("Are you sure you want to remove " + users[index].email + "?")
     ) {
-      const updatedUsers = users.filter(
-        (user: User) => user.id !== users[index].id
-      );
-      setUsers(updatedUsers);
-
       api
         .apiV1UsersUserIdDelete({ userId: users[index].id })
-        .then(res => {
-          console.log(res);
+        .then(() => {
+          setUsers(users.filter((user: User) => user.id !== users[index].id));
         })
         .catch(err => {
           alert("User failed to be removed. \nError:" + err);
