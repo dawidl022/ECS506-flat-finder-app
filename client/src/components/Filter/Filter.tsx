@@ -11,7 +11,7 @@ interface FilterProps {
 
 const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
   const [chooseSources, setSource] = useState(sources);
-  //set the max price to 0 if the prop is null
+  //set the max price to blank if the prop is null
   const [price, setPrice] = useState(maxPrice ? maxPrice.toString() : "");
 
   const checkIfOneSourceIsSelected = () => {
