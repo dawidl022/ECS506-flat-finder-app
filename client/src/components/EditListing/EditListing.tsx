@@ -1,5 +1,11 @@
 import {FC} from 'react';
-const EditListing: FC = () => {
+
+interface EditListingProps {
+    listingType: "seeking" | "accommodation";
+    listingId: string;
+}
+
+const EditListing: FC<EditListingProps> = (listingType, listingId) => {
     return (
         <div>
         </div>
