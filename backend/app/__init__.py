@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_injector import FlaskInjector
 from flask_jwt_extended import JWTManager
+from flask_uuid import FlaskUUID
 from injector import Binder
 from app.listings.service import (
     GeocodingService, ListingsService, BaseListingsService)
@@ -13,9 +14,22 @@ from app.listings.repository import (
 from config import Config
 
 
-def register_blueprints(app: Flask) -> None:
+def register_common_blueprints(app: Flask) -> None:
+    """
+    Register blueprints common to both test and production setup
+    """
     from app.listings import listings_bp
     app.register_blueprint(listings_bp)
+
+    from app.user import users_bp
+    app.register_blueprint(users_bp)
+
+
+def initialise_common_extensions(app: Flask) -> None:
+    """
+    Initialise extensions common to both test and production setup
+    """
+    FlaskUUID(app)
 
 
 def create_app(config_class: type = Config) -> Flask:
@@ -25,9 +39,10 @@ def create_app(config_class: type = Config) -> Flask:
     # Initialize Flask extensions
     CORS(app, resources={r"/api/*": {"origins": [Config().FRONTEND_URL]}})
     JWTManager(app)
+    initialise_common_extensions(app)
 
     # Register blueprints
-    register_blueprints(app)
+    register_common_blueprints(app)
 
     from app.auth.google import auth_bp
     app.register_blueprint(auth_bp)

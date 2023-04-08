@@ -1,11 +1,12 @@
 from http.client import (
-    BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, UNAUTHORIZED)
+    BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND)
 import os
 import uuid
 
 from flask import Blueprint, Response, abort, jsonify, make_response, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import jwt_required
 from werkzeug.datastructures import FileStorage
+from app.auth.jwt import get_current_user_email
 from app.listings.exceptions import ListingNotFoundError
 
 from app.util.marshmallow import get_params, get_input
@@ -13,7 +14,7 @@ from app.util.encoding import CamelCaseEncoder
 from app.util.encoding import CamelCaseDecoder
 from config import Config
 from .models import AccommodationListing, Source
-from app.user.user_model import User, ContactDetails
+from app.user.user_models import User, ContactDetails
 from .dtos import (
     AccommodationSearchResultDTO, AccommodationForm,
     AccommodationListingDTO, AccommodationSearchParams, SearchResult, SourceDTO
@@ -84,20 +85,6 @@ def create_accommodation_listing(listing_service: BaseListingsService
     dto = AccommodationListingDTO(listing, dummy_user)
 
     return jsonify(dto)
-
-
-def get_current_user_email():
-    """
-    get user email from JWT token in header of request
-    """
-    current_user_id = get_jwt_identity()
-    current_user_email = current_user_id.get("email")
-
-    if current_user_email is None:
-        abort(make_response(
-            {'token': "invalid bearer token"}, UNAUTHORIZED))
-
-    return current_user_email
 
 
 def validate_and_get_uploaded_photos():
