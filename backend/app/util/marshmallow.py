@@ -38,4 +38,4 @@ def get_form(type: Type[T]) -> T:
 
 
 def get_body(type: Type[T]) -> T:
-    return get_input(type, request.json)
+    return get_input(type, cast(dict[str, Any], request.json))
