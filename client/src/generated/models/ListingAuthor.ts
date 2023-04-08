@@ -13,8 +13,15 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { UserProfile } from './UserProfile';
+import {
+    UserProfileFromJSON,
+    UserProfileFromJSONTyped,
+    UserProfileToJSON,
+} from './UserProfile';
+
 /**
- * 
+ * If the listing author is a consultant, the userProfile property is present containing the consultant's profile
  * @export
  * @interface ListingAuthor
  */
@@ -25,6 +32,12 @@ export interface ListingAuthor {
      * @memberof ListingAuthor
      */
     name: string;
+    /**
+     * 
+     * @type {UserProfile}
+     * @memberof ListingAuthor
+     */
+    userProfile?: UserProfile;
 }
 
 /**
@@ -48,6 +61,7 @@ export function ListingAuthorFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'name': json['name'],
+        'userProfile': !exists(json, 'userProfile') ? undefined : UserProfileFromJSON(json['userProfile']),
     };
 }
 
@@ -61,6 +75,7 @@ export function ListingAuthorToJSON(value?: ListingAuthor | null): any {
     return {
         
         'name': value.name,
+        'userProfile': UserProfileToJSON(value.userProfile),
     };
 }
 

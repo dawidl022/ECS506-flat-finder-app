@@ -1,80 +1,49 @@
-import { FC, useState, useEffect } from "react";
-import { DefaultApi } from "@/generated/apis/DefaultApi";
-import { AccommodationDetails as AccommodationDetailsModel } from "@/generated/models/AccommodationDetails";
+import { FC } from "react";
+
+import { Accommodation } from "@/generated/models/Accommodation";
 import ContactDetails from "@/components/Listing/ContactDetails";
 
 interface AccommodationDetailsProps {
-  listingId: string;
+  accommodation: Accommodation;
 }
 
-const AccommodationDetails: FC<AccommodationDetailsProps> = ({ listingId }) => {
-  const [data, setData] = useState<AccommodationDetailsModel | null>(null);
-  const [error, setError] = useState(false);
-  const {
-    title,
-    description,
-    accommodationType,
-    numberOfRooms,
-    source,
-    price,
-    address,
-    originalListingUrl,
-    contactInfo,
-  } = data?.accommodation ?? {};
-
-  useEffect(() => {
-    new DefaultApi()
-      .apiV1ListingsAccommodationListingIdGet({
-        listingId: listingId,
-      })
-      .then(res => setData(res))
-      .catch(() => setError(true));
-  }, [listingId]);
-
+const AccommodationDetails: FC<AccommodationDetailsProps> = ({
+  accommodation,
+}) => {
   return (
-    <div>
-      {error ? (
-        <p>Error fetching data</p>
-      ) : !data ? (
-        <p>Loading</p>
-      ) : (
-        <>
-          <div>
-            {/* TODO: Photo gallery component */}
+    <>
+      <div>
+        {/* TODO: Photo gallery component */}
 
-            {/* 
-                Tags not included as this can be implemented alongside styling - eg. 
-                price may not have a tag 'price', it may just display the value
-                with a different font weight
-            */}
-            <h1>{title}</h1>
-            {description && <p>{description}</p>}
-            {accommodationType && <p>{accommodationType}</p>}
-            {numberOfRooms && <p>{numberOfRooms}</p>}
-            {source && <p>{source}</p>}
-            {price && <p>{`£${price}`}</p>}
-            {originalListingUrl && (
-              <a href={originalListingUrl}>Original Listing</a>
-            )}
-          </div>
-          <div>
-            <h3>Address</h3>
-            {address && <p>{address.line1}</p>}
-            {address && <p>{address.line2}</p>}
-            {address && <p>{address.town}</p>}
-            {address && <p>{address.postCode}</p>}
-          </div>
-          <div>
-            <h3>Contact Details</h3>
-            <ContactDetails
-              phoneNumber={contactInfo?.phoneNumber ?? null}
-              emailAddress={contactInfo?.email ?? null}
-            />
-          </div>
-          <div>{/* TODO: Author details */}</div>
-        </>
-      )}
-    </div>
+        {/* 
+            Tags not included as this can be implemented alongside styling - eg. 
+            price may not have a tag 'price', it may just display the value
+            with a different font weight
+        */}
+        <h1>{accommodation.title}</h1>
+        <p>{accommodation.description}</p>
+        {<p>{accommodation.accommodationType}</p>}
+        {<p>{accommodation.numberOfRooms}</p>}
+        <p>{accommodation.source}</p>
+        {<p>{`£${accommodation.price}`}</p>}
+        {<a href={accommodation.originalListingUrl}>Original Listing</a>}
+      </div>
+      <div>
+        <h3>Address</h3>
+        <p>{accommodation.address.line1}</p>
+        <p>{accommodation.address.line2}</p>
+        <p>{accommodation.address.town}</p>
+        <p>{accommodation.address.postCode}</p>
+      </div>
+      <div>
+        <h3>Contact Details</h3>
+        <ContactDetails
+          phoneNumber={accommodation.contactInfo?.phoneNumber ?? null}
+          emailAddress={accommodation.contactInfo?.email ?? null}
+        />
+      </div>
+      <div>{/* TODO: Author details */}</div>
+    </>
   );
 };
 

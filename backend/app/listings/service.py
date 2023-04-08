@@ -1,49 +1,175 @@
-from app.listings.models import AccommodationSearchResult, AccommodationSummary
+import abc
+import dataclasses
+import uuid
+import time
+from app.listings.exceptions import ListingNotFoundError
+from app.listings.models import (
+    AccommodationSearchResult, Address, Coordinates, Photo, Source)
+from app.listings.dtos import (
+    AccommodationForm, AccommodationSearchParams)
+from app.listings.models import AccommodationListing, Location
+from app.listings.repository import (
+    AccommodationListingRepository, ListingPhotoRepository)
 
 
-class ListingsService():
+class BaseGeocodingService(abc.ABC):
+    @abc.abstractmethod
+    def get_coords(self, addr: Address) -> Coordinates:
+        pass
 
-    def search_accommodation_listings(self) -> list[AccommodationSearchResult]:
+    @abc.abstractmethod
+    def search_coords(self, location_query: str) -> Coordinates:
+        pass
+
+    @abc.abstractmethod
+    def calc_distance(self, c1: Coordinates, c2: Coordinates) -> float:
+        pass
+
+
+class GeocodingService(BaseGeocodingService):
+    def get_coords(self, addr: Address) -> Coordinates:
         """
-        TODO take filters as parameters
-        TODO implement business logic
-        :returns stub response
+        TODO turn address into coordinates using geopy module
         """
-        thumbnail_urls = [
-            "https://fastly.picsum.photos/id/308/1200/1200"
-            ".jpg?hmac=2c1705rmBMgsQTZ1I9Uu74cRpA4Fxdl0THWV8wfV5VQ",
-            "https://fastly.picsum.photos/id/163/1200/1200"
-            ".jpg?hmac=ZOvAYvHz98oGUbqnNC_qldUszdxrzrNdmZjkyxzukt8",
-        ]
-        return [
-            AccommodationSearchResult(
-                distance=1.2,
-                is_favourite=True,
-                accommodation=AccommodationSummary(
-                    id="internal-1",
-                    title="Flat",
-                    short_description="Very nice beautiful flat to live in",
-                    thumbnail_url=thumbnail_urls[0],
-                    accommodation_type="flat",
-                    number_of_rooms=2,
-                    source="internal",
-                    price=1020,
-                    post_code="EA1 7UP"
-                )
-            ),
-            AccommodationSearchResult(
-                distance=1.2,
-                is_favourite=False,
-                accommodation=AccommodationSummary(
-                    id="zoopla-1",
-                    title="Room",
-                    short_description="A small cozy room perfect for students",
-                    thumbnail_url=thumbnail_urls[1],
-                    accommodation_type="room",
-                    number_of_rooms=1,
-                    source="zoopla",
-                    price=455.50,
-                    post_code="ZO1 8N"
-                )
+        addr.address
+        return Coordinates(0, 0)
+
+    def search_coords(self, location_query: str) -> Coordinates:
+        """
+        TODO turn address into coordinates using geopy module
+        """
+        return Coordinates(0, 0)
+
+    def calc_distance(self, c1: Coordinates, c2: Coordinates) -> float:
+        """
+        TODO calc distance using geopy module
+        """
+        return 0
+
+
+class BaseListingsService(abc.ABC):
+    @abc.abstractmethod
+    def search_accommodation_listings(self, params: AccommodationSearchParams
+                                      ) -> list[AccommodationSearchResult]:
+        pass
+
+    @abc.abstractmethod
+    def create_accommodation_listing(
+        self, form: AccommodationForm, photos: list[bytes],
+        author_email: str
+    ) -> AccommodationListing:
+        pass
+
+    @abc.abstractmethod
+    def get_accommodation_listing(self, listing_id: str, source: Source
+                                  ) -> AccommodationListing | None:
+        pass
+
+    @abc.abstractmethod
+    def update_accommodation_listing(
+        self, listing_id: uuid.UUID, form: AccommodationForm
+    ) -> AccommodationListing:
+        pass
+
+    @abc.abstractmethod
+    def delete_accommodation_listing(self, listing_id: uuid.UUID) -> None:
+        pass
+
+    @abc.abstractmethod
+    def get_available_sources(self, location_query: str) -> list[Source]:
+        pass
+
+
+class ListingsService(BaseListingsService):
+
+    def __init__(self, geocoder: BaseGeocodingService,
+                 accommodation_listing_repo: AccommodationListingRepository,
+                 listing_photo_repo: ListingPhotoRepository) -> None:
+        self.geocoder = geocoder
+        self.accommodation_listing_repo = accommodation_listing_repo
+        self.listing_photo_repo = listing_photo_repo
+
+    def search_accommodation_listings(self, params: AccommodationSearchParams
+                                      ) -> list[AccommodationSearchResult]:
+        coords = self.geocoder.search_coords(params.location)
+        listings: list[AccommodationListing] = []
+        search_all_sources = params.sources is None
+
+        if search_all_sources or Source.internal in params.sources_list:
+            listings += self.accommodation_listing_repo.search_by_location(
+                coords=coords,
+                radius=params.radius,
+                order_by=params.sort_by,
+                page=params.page,
+                size=params.size,
+                max_price=params.max_price
             )
-        ]
+
+        return [AccommodationSearchResult(
+            distance=self.geocoder.calc_distance(coords, acc.location.coords),
+            is_favourite=False,
+            accommodation=acc.summarise()
+        ) for acc in listings]
+
+    def create_accommodation_listing(
+            self, form: AccommodationForm, photos: list[bytes],
+            author_email: str
+    ) -> AccommodationListing:
+
+        listing_photos = [Photo(id=uuid.uuid4(), blob=photo)
+                          for photo in photos]
+
+        listing = AccommodationListing(
+            id=uuid.uuid4(),
+            location=Location(
+                coords=self.geocoder.get_coords(form.decoded_address),
+                address=form.decoded_address
+            ),
+            price=form.price,
+            created_at=time.time(),
+            author_email=author_email,
+            title=form.title,
+            description=form.description,
+            accommodation_type=form.accommodation_type,
+            number_of_rooms=form.number_of_rooms,
+            photo_ids=tuple(photo.id for photo in listing_photos),
+            source=Source.internal
+        )
+
+        self.listing_photo_repo.save_photos(listing_photos)
+        self.accommodation_listing_repo.save_listing(listing)
+
+        return listing
+
+    def get_accommodation_listing(self, listing_id: str, source: Source
+                                  ) -> AccommodationListing | None:
+        if source == source.internal:
+            id = uuid.UUID(listing_id)
+            return self.accommodation_listing_repo.get_listing_by_id(id)
+
+        raise ValueError("Unknown source for accommodation listing")
+
+    def update_accommodation_listing(
+        self, listing_id: uuid.UUID, form: AccommodationForm
+    ) -> AccommodationListing:
+        listing = self.accommodation_listing_repo.get_listing_by_id(listing_id)
+
+        if listing is None:
+            raise ListingNotFoundError()
+
+        updated_listing = dataclasses.replace(
+            listing,
+            **form.to_dict(),
+            location=dataclasses.replace(
+                listing.location, address=form.decoded_address)
+        )
+
+        self.accommodation_listing_repo.save_listing(updated_listing)
+
+        return updated_listing
+
+    def delete_accommodation_listing(self, listing_id: uuid.UUID) -> None:
+        self.accommodation_listing_repo.delete_listing(listing_id)
+
+    def get_available_sources(self, location_query: str) -> list[Source]:
+        return [s for s in Source]

@@ -37,7 +37,7 @@ export interface SeekingDetails {
      * @type {Seeking}
      * @memberof SeekingDetails
      */
-    accommodation?: Seeking;
+    seeking: Seeking;
 }
 
 /**
@@ -46,6 +46,7 @@ export interface SeekingDetails {
 export function instanceOfSeekingDetails(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "isFavourite" in value;
+    isInstance = isInstance && "seeking" in value;
 
     return isInstance;
 }
@@ -61,7 +62,7 @@ export function SeekingDetailsFromJSONTyped(json: any, ignoreDiscriminator: bool
     return {
         
         'isFavourite': json['isFavourite'],
-        'accommodation': !exists(json, 'accommodation') ? undefined : SeekingFromJSON(json['accommodation']),
+        'seeking': SeekingFromJSON(json['seeking']),
     };
 }
 
@@ -75,7 +76,7 @@ export function SeekingDetailsToJSON(value?: SeekingDetails | null): any {
     return {
         
         'isFavourite': value.isFavourite,
-        'accommodation': SeekingToJSON(value.accommodation),
+        'seeking': SeekingToJSON(value.seeking),
     };
 }
 

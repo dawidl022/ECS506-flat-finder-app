@@ -15,11 +15,11 @@
 
 import * as runtime from '../runtime';
 import type {
+  Accommodation,
   AccommodationAddress,
   AccommodationDetails,
   AccommodationFormBase,
-  AccommodationSearchResultsInner,
-  Location,
+  AccommodationSearch,
   SeekingDetails,
   SeekingFormBase,
   SeekingSearchResultsInner,
@@ -29,16 +29,16 @@ import type {
   UserProfileForm,
 } from '../models';
 import {
+    AccommodationFromJSON,
+    AccommodationToJSON,
     AccommodationAddressFromJSON,
     AccommodationAddressToJSON,
     AccommodationDetailsFromJSON,
     AccommodationDetailsToJSON,
     AccommodationFormBaseFromJSON,
     AccommodationFormBaseToJSON,
-    AccommodationSearchResultsInnerFromJSON,
-    AccommodationSearchResultsInnerToJSON,
-    LocationFromJSON,
-    LocationToJSON,
+    AccommodationSearchFromJSON,
+    AccommodationSearchToJSON,
     SeekingDetailsFromJSON,
     SeekingDetailsToJSON,
     SeekingFormBaseFromJSON,
@@ -138,26 +138,16 @@ export interface ApiV1ListingsSeekingListingIdPutRequest {
 export interface ApiV1ListingsSeekingPostRequest {
     title: string;
     description: string;
-    preferredLocation: Location;
+    preferredLocation: string;
     photos?: Array<Blob>;
+}
+
+export interface ApiV1SourcesAccommodationGetRequest {
+    location?: string;
 }
 
 export interface ApiV1UsersUserIdDeleteRequest {
     userId: string;
-}
-
-export interface ApiV1UsersUserIdFavouritesGetRequest {
-    userId: string;
-}
-
-export interface ApiV1UsersUserIdFavouritesListingIdDeleteRequest {
-    userId: string;
-    listingId: string;
-}
-
-export interface ApiV1UsersUserIdFavouritesListingIdPutRequest {
-    userId: string;
-    listingId: string;
 }
 
 export interface ApiV1UsersUserIdListingsGetRequest {
@@ -166,19 +156,6 @@ export interface ApiV1UsersUserIdListingsGetRequest {
 
 export interface ApiV1UsersUserIdProfileGetRequest {
     userId: string;
-}
-
-export interface ApiV1UsersUserIdProfilePhotoDeleteRequest {
-    userId: string;
-}
-
-export interface ApiV1UsersUserIdProfilePhotoGetRequest {
-    userId: string;
-}
-
-export interface ApiV1UsersUserIdProfilePhotoPutRequest {
-    userId: string;
-    body?: Blob;
 }
 
 export interface ApiV1UsersUserIdProfilePutRequest {
@@ -203,6 +180,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/admins/{userId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
             method: 'DELETE',
@@ -233,6 +218,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/admins/{userId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
             method: 'GET',
@@ -263,6 +256,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/admins/{userId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
             method: 'PUT',
@@ -283,7 +284,7 @@ export class DefaultApi extends runtime.BaseAPI {
     /**
      * Get a list of accommodation listings, optionally filtered and sorted
      */
-    async apiV1ListingsAccommodationGetRaw(requestParameters: ApiV1ListingsAccommodationGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<AccommodationSearchResultsInner>>> {
+    async apiV1ListingsAccommodationGetRaw(requestParameters: ApiV1ListingsAccommodationGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccommodationSearch>> {
         if (requestParameters.location === null || requestParameters.location === undefined) {
             throw new runtime.RequiredError('location','Required parameter requestParameters.location was null or undefined when calling apiV1ListingsAccommodationGet.');
         }
@@ -324,6 +325,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/listings/accommodation`,
             method: 'GET',
@@ -331,13 +340,13 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(AccommodationSearchResultsInnerFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => AccommodationSearchFromJSON(jsonValue));
     }
 
     /**
      * Get a list of accommodation listings, optionally filtered and sorted
      */
-    async apiV1ListingsAccommodationGet(requestParameters: ApiV1ListingsAccommodationGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<AccommodationSearchResultsInner>> {
+    async apiV1ListingsAccommodationGet(requestParameters: ApiV1ListingsAccommodationGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccommodationSearch> {
         const response = await this.apiV1ListingsAccommodationGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -355,6 +364,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/listings/accommodation/{listingId}`.replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))),
             method: 'DELETE',
@@ -385,6 +402,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/listings/accommodation/{listingId}`.replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))),
             method: 'GET',
@@ -418,6 +443,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/listings/accommodation/{listingId}`.replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))),
             method: 'PUT',
@@ -442,7 +475,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * Create an accommodation listing as the currently logged in user. Listing will be made visible to other users.
      * Create a new accommodation listing
      */
-    async apiV1ListingsAccommodationPostRaw(requestParameters: ApiV1ListingsAccommodationPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccommodationDetails>> {
+    async apiV1ListingsAccommodationPostRaw(requestParameters: ApiV1ListingsAccommodationPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Accommodation>> {
         if (requestParameters.title === null || requestParameters.title === undefined) {
             throw new runtime.RequiredError('title','Required parameter requestParameters.title was null or undefined when calling apiV1ListingsAccommodationPost.');
         }
@@ -475,6 +508,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const consumes: runtime.Consume[] = [
             { contentType: 'multipart/form-data' },
         ];
@@ -529,14 +570,14 @@ export class DefaultApi extends runtime.BaseAPI {
             body: formParams,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AccommodationDetailsFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => AccommodationFromJSON(jsonValue));
     }
 
     /**
      * Create an accommodation listing as the currently logged in user. Listing will be made visible to other users.
      * Create a new accommodation listing
      */
-    async apiV1ListingsAccommodationPost(requestParameters: ApiV1ListingsAccommodationPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccommodationDetails> {
+    async apiV1ListingsAccommodationPost(requestParameters: ApiV1ListingsAccommodationPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Accommodation> {
         const response = await this.apiV1ListingsAccommodationPostRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -557,6 +598,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/listings/{listingId}/photos/{photoId}`.replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))).replace(`{${"photoId"}}`, encodeURIComponent(String(requestParameters.photoId))),
             method: 'DELETE',
@@ -590,6 +639,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/listings/{listingId}/photos/{photoId}`.replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))).replace(`{${"photoId"}}`, encodeURIComponent(String(requestParameters.photoId))),
             method: 'GET',
@@ -622,6 +679,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'image';
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/listings/{listingId}/photos`.replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))),
             method: 'POST',
@@ -672,6 +737,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/listings/seeking`,
             method: 'GET',
@@ -703,6 +776,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/listings/seeking/{listingId}`.replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))),
             method: 'DELETE',
@@ -733,6 +814,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/listings/seeking/{listingId}`.replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))),
             method: 'GET',
@@ -766,6 +855,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/listings/seeking/{listingId}`.replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))),
             method: 'PUT',
@@ -807,6 +904,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const consumes: runtime.Consume[] = [
             { contentType: 'multipart/form-data' },
         ];
@@ -838,8 +943,8 @@ export class DefaultApi extends runtime.BaseAPI {
         }
 
         if (requestParameters.preferredLocation !== undefined) {
-            formParams.append('preferredLocation', new Blob([JSON.stringify(LocationToJSON(requestParameters.preferredLocation))], { type: "application/json", }));
-                    }
+            formParams.append('preferredLocation', requestParameters.preferredLocation as any);
+        }
 
         const response = await this.request({
             path: `/api/v1/listings/seeking`,
@@ -862,6 +967,73 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * Once authentication is successful, a redirect back to the frontend (frontend URL is statically set on the server) occurs along with a Set-Cookie header with a \"token\" entry containing the JWT token for subsequent requests requiring authentication. Unsuccessful authentication is not currently being handled gracefully.
+     * Login into the application with Google Single Sign-On (SSO)
+     */
+    async apiV1LoginGooglePostRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/login/google`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Once authentication is successful, a redirect back to the frontend (frontend URL is statically set on the server) occurs along with a Set-Cookie header with a \"token\" entry containing the JWT token for subsequent requests requiring authentication. Unsuccessful authentication is not currently being handled gracefully.
+     * Login into the application with Google Single Sign-On (SSO)
+     */
+    async apiV1LoginGooglePost(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiV1LoginGooglePostRaw(initOverrides);
+    }
+
+    /**
+     * If location is not provided, all sources currently supported by the application will be returned. If location is provided, all sources that offer listings in the same country as the location query parameter will be returned. E.g. if location is set to \"London\", sources that only offer listings in the USA will be excluded from the results.
+     * Get the available listing sources, optionally filtered by location
+     */
+    async apiV1SourcesAccommodationGetRaw(requestParameters: ApiV1SourcesAccommodationGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
+        const queryParameters: any = {};
+
+        if (requestParameters.location !== undefined) {
+            queryParameters['location'] = requestParameters.location;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/v1/sources/accommodation`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * If location is not provided, all sources currently supported by the application will be returned. If location is provided, all sources that offer listings in the same country as the location query parameter will be returned. E.g. if location is set to \"London\", sources that only offer listings in the USA will be excluded from the results.
+     * Get the available listing sources, optionally filtered by location
+     */
+    async apiV1SourcesAccommodationGet(requestParameters: ApiV1SourcesAccommodationGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
+        const response = await this.apiV1SourcesAccommodationGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Get all users registered in system
      */
     async apiV1UsersGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<User>>> {
@@ -869,6 +1041,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/users`,
             method: 'GET',
@@ -900,6 +1080,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/users/{userId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
             method: 'DELETE',
@@ -919,108 +1107,6 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get all accommodation and seeking listings favourited by given user. Favourite lists are private to each user, so only account owner can retrieve this list.
-     * Get all listings favourited by a user
-     */
-    async apiV1UsersUserIdFavouritesGetRaw(requestParameters: ApiV1UsersUserIdFavouritesGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<UserListingsInner>>> {
-        if (requestParameters.userId === null || requestParameters.userId === undefined) {
-            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdFavouritesGet.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/v1/users/{userId}/favourites`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(UserListingsInnerFromJSON));
-    }
-
-    /**
-     * Get all accommodation and seeking listings favourited by given user. Favourite lists are private to each user, so only account owner can retrieve this list.
-     * Get all listings favourited by a user
-     */
-    async apiV1UsersUserIdFavouritesGet(requestParameters: ApiV1UsersUserIdFavouritesGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<UserListingsInner>> {
-        const response = await this.apiV1UsersUserIdFavouritesGetRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Remove listing with the given listingId from the user\'s favourites. This operation is a noop if the user doesn\'t have the listing in their favourites. Favourite lists are private to each user, so only account owner can remove the favourite from the list.
-     * Remove listing from user favourites
-     */
-    async apiV1UsersUserIdFavouritesListingIdDeleteRaw(requestParameters: ApiV1UsersUserIdFavouritesListingIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.userId === null || requestParameters.userId === undefined) {
-            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdFavouritesListingIdDelete.');
-        }
-
-        if (requestParameters.listingId === null || requestParameters.listingId === undefined) {
-            throw new runtime.RequiredError('listingId','Required parameter requestParameters.listingId was null or undefined when calling apiV1UsersUserIdFavouritesListingIdDelete.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/v1/users/{userId}/favourites/{listingId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))).replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))),
-            method: 'DELETE',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     * Remove listing with the given listingId from the user\'s favourites. This operation is a noop if the user doesn\'t have the listing in their favourites. Favourite lists are private to each user, so only account owner can remove the favourite from the list.
-     * Remove listing from user favourites
-     */
-    async apiV1UsersUserIdFavouritesListingIdDelete(requestParameters: ApiV1UsersUserIdFavouritesListingIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiV1UsersUserIdFavouritesListingIdDeleteRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     * Add listing with the given listingId to the user\'s favourites. This operation is a noop if the user already has the listing in their favourites. Favourite lists are private to each user, so only account owner can add the favourite to the list.
-     * Add listing to user favourites
-     */
-    async apiV1UsersUserIdFavouritesListingIdPutRaw(requestParameters: ApiV1UsersUserIdFavouritesListingIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.userId === null || requestParameters.userId === undefined) {
-            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdFavouritesListingIdPut.');
-        }
-
-        if (requestParameters.listingId === null || requestParameters.listingId === undefined) {
-            throw new runtime.RequiredError('listingId','Required parameter requestParameters.listingId was null or undefined when calling apiV1UsersUserIdFavouritesListingIdPut.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/v1/users/{userId}/favourites/{listingId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))).replace(`{${"listingId"}}`, encodeURIComponent(String(requestParameters.listingId))),
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     * Add listing with the given listingId to the user\'s favourites. This operation is a noop if the user already has the listing in their favourites. Favourite lists are private to each user, so only account owner can add the favourite to the list.
-     * Add listing to user favourites
-     */
-    async apiV1UsersUserIdFavouritesListingIdPut(requestParameters: ApiV1UsersUserIdFavouritesListingIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiV1UsersUserIdFavouritesListingIdPutRaw(requestParameters, initOverrides);
-    }
-
-    /**
      * Get all accommodation and seeking listings created by given user
      * Get all listings created by a user
      */
@@ -1033,6 +1119,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/users/{userId}/listings`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
             method: 'GET',
@@ -1064,6 +1158,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/users/{userId}/profile`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
             method: 'GET',
@@ -1083,99 +1185,6 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Delete the user\'s profile picture
-     */
-    async apiV1UsersUserIdProfilePhotoDeleteRaw(requestParameters: ApiV1UsersUserIdProfilePhotoDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.userId === null || requestParameters.userId === undefined) {
-            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdProfilePhotoDelete.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/v1/users/{userId}/profile/photo`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
-            method: 'DELETE',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     * Delete the user\'s profile picture
-     */
-    async apiV1UsersUserIdProfilePhotoDelete(requestParameters: ApiV1UsersUserIdProfilePhotoDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiV1UsersUserIdProfilePhotoDeleteRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     * Get the profile picture of a user
-     */
-    async apiV1UsersUserIdProfilePhotoGetRaw(requestParameters: ApiV1UsersUserIdProfilePhotoGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Blob>> {
-        if (requestParameters.userId === null || requestParameters.userId === undefined) {
-            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdProfilePhotoGet.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/v1/users/{userId}/profile/photo`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.BlobApiResponse(response);
-    }
-
-    /**
-     * Get the profile picture of a user
-     */
-    async apiV1UsersUserIdProfilePhotoGet(requestParameters: ApiV1UsersUserIdProfilePhotoGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Blob> {
-        const response = await this.apiV1UsersUserIdProfilePhotoGetRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Can be used to both upload for the first time as well as update the profile photo of the currently logged in user.
-     * Upload the user\'s profile picture
-     */
-    async apiV1UsersUserIdProfilePhotoPutRaw(requestParameters: ApiV1UsersUserIdProfilePhotoPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.userId === null || requestParameters.userId === undefined) {
-            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling apiV1UsersUserIdProfilePhotoPut.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'image';
-
-        const response = await this.request({
-            path: `/api/v1/users/{userId}/profile/photo`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-            body: requestParameters.body as any,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     * Can be used to both upload for the first time as well as update the profile photo of the currently logged in user.
-     * Upload the user\'s profile picture
-     */
-    async apiV1UsersUserIdProfilePhotoPut(requestParameters: ApiV1UsersUserIdProfilePhotoPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiV1UsersUserIdProfilePhotoPutRaw(requestParameters, initOverrides);
-    }
-
-    /**
      * Can be used to both complete for the first time as well as update the profile of the currently logged in user.
      * Update user profile
      */
@@ -1190,6 +1199,14 @@ export class DefaultApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
         const response = await this.request({
             path: `/api/v1/users/{userId}/profile`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
             method: 'PUT',

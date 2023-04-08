@@ -1,3 +1,5 @@
+from unittest.mock import patch
+import uuid
 from flask_injector import FlaskInjector
 from injector import Binder
 import pytest
@@ -5,43 +7,94 @@ from typing import Generator
 from flask import Flask
 from flask.testing import FlaskClient, FlaskCliRunner
 
-from app import create_app
-from app.listings.service import ListingsService
+from app.listings.service import BaseListingsService
+from app import initialise_common_extensions, register_common_blueprints
+from app.user.user_service import BaseUserService
+from tests.listings.test_routes import MockListingService
+from tests.user.test_user_routes import MockUserService
+
+
+@pytest.fixture(autouse=True)
+def neuter_jwt():
+    with patch("flask_jwt_extended.view_decorators.verify_jwt_in_request") as mock_get_jwt_identity:
+        yield
+
+
+_mock_currently_logged_in_user_id = uuid.uuid4()
+
+
+@pytest.fixture
+def currently_logged_in_user_id() -> uuid.UUID:
+    return _mock_currently_logged_in_user_id
+
+
+@pytest.fixture(autouse=True)
+def neuter_jwt_identity():
+    with patch("app.auth.jwt.get_jwt") as mock_get_jwt_local, \
+            patch("flask_jwt_extended.utils.get_jwt") as mock_get_jwt_lib:
+        return_value = {
+            "sub": _mock_currently_logged_in_user_id,
+            "email": "unittest@user.com"
+        }
+        mock_get_jwt_local.return_value = return_value
+        mock_get_jwt_lib.return_value = return_value
+        yield
 
 
 @pytest.fixture()
-def app() -> Generator[Flask, None, None]:
-    app = create_app()
+def app(listings_service: MockListingService, user_service: MockUserService
+        ) -> Generator[Flask, None, None]:
+    app = Flask(__name__)
+    initialise_common_extensions(app)
+    register_common_blueprints(app)
+
     app.config.update({
         "TESTING": True,
+        'JWT_IDENTITY_CLAIM': 'sub'
     })
 
     # other setup can go here
 
     # Inject mock dependencies
-    FlaskInjector(app=app, modules=[configure_mocks])
+    FlaskInjector(app=app, modules=[
+        configure_mocks(listings_service, user_service)
+    ])
 
     yield app
 
     # clean up / reset resources here
 
 
-def configure_mocks(binder: Binder):
-    binder.bind(
-        ListingsService, to=MockListingService()
-    )
+@pytest.fixture
+def listings_service() -> MockListingService:
+    return MockListingService()
 
 
-class MockListingService(ListingsService):
-    def search_accommodation_listings(self):
-        return []
+@pytest.fixture
+def user_service() -> MockUserService:
+    return MockUserService()
 
 
-@pytest.fixture()
+def configure_mocks(listings_service: MockListingService, user_service: MockUserService):
+    def wrapper(binder: Binder):
+
+        binder.bind(
+            BaseListingsService,  # type: ignore[type-abstract]
+            to=listings_service
+        )
+        binder.bind(
+            BaseUserService,  # type: ignore[type-abstract]
+            to=user_service
+        )
+
+    return wrapper
+
+
+@ pytest.fixture()
 def client(app: Flask) -> FlaskClient:
     return app.test_client()
 
 
-@pytest.fixture()
+@ pytest.fixture()
 def runner(app: Flask) -> FlaskCliRunner:
     return app.test_cli_runner()
