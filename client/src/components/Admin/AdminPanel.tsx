@@ -26,9 +26,9 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
 
   const removeUserFromSystem = (index: number) => {
     if (confirm("Are you sure you want to remove " + users[index].email + "?")) {
-      const updatedUsers = [...users];
-      updatedUsers.splice(index, 1);
+      const updatedUsers = users.filter((user: User) => user.id !== users[index].id);
       setUsers(updatedUsers);
+      
       api
         .apiV1UsersUserIdDelete({ userId: users[index].id })
         .then(res => {
