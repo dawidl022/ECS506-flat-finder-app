@@ -21,10 +21,8 @@ const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
     e.preventDefault();
     if (!checkIfOneSourceIsSelected()) {
       alert("Please select at least one source.");
-      //reset form
       setSource(sources);
     } else {
-      // form submission
       handleApply(chooseSources, price);
     }
   };
@@ -42,28 +40,26 @@ const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
         />
 
         <fieldset>
-          {
-            /* creating a checkbox per source by mapping the dictionary */ sources &&
-              Object.keys(sources).map((source, index) => {
-                return (
-                  <div key={index}>
-                    <label htmlFor={source}>{source} </label>
-                    <input
-                      type="checkbox"
-                      name={source}
-                      id={source}
-                      checked={chooseSources[source]}
-                      onChange={() =>
-                        setSource({
-                          ...chooseSources,
-                          [source]: !chooseSources[source],
-                        })
-                      }
-                    />
-                  </div>
-                );
-              })
-          }
+          {sources &&
+            Object.keys(sources).map((source, index) => {
+              return (
+                <div key={index}>
+                  <label htmlFor={source}>{source} </label>
+                  <input
+                    type="checkbox"
+                    name={source}
+                    id={source}
+                    checked={chooseSources[source]}
+                    onChange={() =>
+                      setSource({
+                        ...chooseSources,
+                        [source]: !chooseSources[source],
+                      })
+                    }
+                  />
+                </div>
+              );
+            })}
         </fieldset>
         <button>Apply</button>
       </form>
