@@ -1,17 +1,23 @@
-from http.client import BAD_REQUEST, UNAUTHORIZED
+from http.client import (
+    BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, UNAUTHORIZED)
 import os
 import uuid
 
 from flask import Blueprint, Response, abort, jsonify, make_response, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from werkzeug.datastructures import FileStorage
+from app.listings.exceptions import ListingNotFoundError
 
 from app.util.marshmallow import get_params, get_input
 from app.util.encoding import CamelCaseEncoder
 from app.util.encoding import CamelCaseDecoder
 from config import Config
-from .dtos import CreateAccommodationForm, AccommodationListingDTO
-from .models import AccommodationSearchParams, User, ContactDetails
+from .models import AccommodationListing, Source
+from app.user.user_model import User, ContactDetails
+from .dtos import (
+    AccommodationSearchResultDTO, AccommodationForm,
+    AccommodationListingDTO, AccommodationSearchParams, SearchResult, SourceDTO
+)
 from .service import BaseListingsService
 
 bp = Blueprint("listings", __name__, url_prefix=f"{Config.ROOT}/listings")
@@ -21,14 +27,43 @@ bp.json_decoder = CamelCaseDecoder
 MAX_PHOTO_SIZE = 5 * 1024 * 1024  # 5MB
 
 
+def make_dummy_user(user_email: str):
+    """
+    TODO remove once user service implemented
+    """
+    dummy_user = User(
+        id=uuid.UUID("7a5a9895-94d1-44f4-a4b8-2bf41da8a81a"),
+        email=user_email,
+        name="Example User",
+        contact_details=ContactDetails(
+            phone_number="+44 78912 345678",
+        )
+    )
+
+    return dummy_user
+
+
 @bp.get("/accommodation")
+@jwt_required()
 def get_accommodation_listings(listings_service: BaseListingsService
                                ) -> Response:
     params = get_params(AccommodationSearchParams)
 
-    listings = listings_service.search_accommodation_listings()
+    listings = listings_service.search_accommodation_listings(params)
+    sources = listings_service.get_available_sources(params.location)
 
-    return jsonify(listings)
+    result = SearchResult(
+        sources=[
+            SourceDTO(s, enabled=params.sources is None or s in params.sources)
+            for s in sources
+        ],
+        search_results=[
+            AccommodationSearchResultDTO(listing)
+            for listing in listings
+        ]
+    )
+
+    return jsonify(result)
 
 
 @bp.post("/accommodation")
@@ -41,14 +76,7 @@ def create_accommodation_listing(listing_service: BaseListingsService
     current_user_email = get_current_user_email()
 
     # TODO fetch profile from UserService
-    dummy_user = User(
-        id=uuid.UUID("7a5a9895-94d1-44f4-a4b8-2bf41da8a81a"),
-        email=current_user_email,
-        name="Example User",
-        contact_details=ContactDetails(
-            phone_number="+44 78912 345678",
-        )
-    )
+    dummy_user = make_dummy_user(current_user_email)
 
     listing = listing_service.create_accommodation_listing(
         form, photos, dummy_user.email)
@@ -101,7 +129,7 @@ def validate_and_get_create_accommodation_form():
         abort(make_response(
             {'address': "missing address field"}, BAD_REQUEST))
 
-    form = get_input(CreateAccommodationForm, request.form |
+    form = get_input(AccommodationForm, request.form |
                      {"address": address_file.stream.read().decode()})
 
     return form
@@ -114,6 +142,102 @@ def file_size(file: FileStorage) -> int:
     size = file.stream.seek(0, os.SEEK_END)
     file.stream.seek(0, os.SEEK_SET)
     return size
+
+
+@bp.get("/accommodation/<listing_id>")
+@jwt_required()
+def get_accommodation_listing(
+        listing_id: str, listing_service: BaseListingsService) -> Response:
+    source, id = extract_listing_id_and_source(listing_id)
+
+    listing = fetch_accommodation_listing(listing_service, source, id)
+    dummy_user = make_dummy_user(get_current_user_email())
+
+    dto = AccommodationListingDTO(listing, dummy_user)
+    return jsonify(dto)
+
+
+def extract_listing_id_and_source(external_listing_id: str
+                                  ) -> tuple[Source, str]:
+    parts = external_listing_id.split('_')
+    if len(parts) != 2:
+        abort(make_response(
+            {'listingId': "invalid listing id format"}, BAD_REQUEST))
+
+    try:
+        source, id = Source(parts[0]), parts[1]
+    except ValueError:
+        abort(make_response(
+            {'listingId': "source not found"}, NOT_FOUND))
+
+    return source, id
+
+
+def fetch_accommodation_listing(listing_service, source, id
+                                ) -> AccommodationListing:
+    listing = listing_service.get_accommodation_listing(id, source)
+    if listing is None:
+        abort(make_response(
+            {'listingId': "listing not found"}, NOT_FOUND))
+
+    return listing
+
+
+@bp.put("/accommodation/<listing_id>")
+@jwt_required()
+def put_accommodation_listing(
+        listing_id: str, listing_service: BaseListingsService) -> Response:
+    form = validate_and_get_create_accommodation_form()
+
+    listing = get_accommodation_listing_authored_by_current_user(
+        listing_id, listing_service, action="update")
+
+    try:
+        updated_listing = listing_service.update_accommodation_listing(
+            listing.id, form)
+    except ListingNotFoundError:
+        abort(make_response(
+            {'listingId': "listing not found"}, NOT_FOUND))
+
+    dummy_user = make_dummy_user(get_current_user_email())
+
+    return jsonify(AccommodationListingDTO(updated_listing, dummy_user))
+
+
+def get_accommodation_listing_authored_by_current_user(
+        listing_id: str, listing_service: BaseListingsService, action: str
+) -> AccommodationListing:
+    source, id = extract_listing_id_and_source(listing_id)
+
+    if source != Source.internal:
+        abort(make_response(
+            {'listingId': f"cannot {action} external listing"}, FORBIDDEN))
+
+    listing = fetch_accommodation_listing(listing_service, source, id)
+
+    if listing.author_email != get_current_user_email():
+        abort(make_response(
+            {'listingId':
+              "currently logged in user is not the author of this listing"},
+            FORBIDDEN))
+
+    return listing
+
+
+@bp.delete("/accommodation/<listing_id>")
+@jwt_required()
+def delete_accommodation_listing(
+        listing_id: str, listing_service: BaseListingsService) -> Response:
+    listing = get_accommodation_listing_authored_by_current_user(
+        listing_id, listing_service, action="delete")
+
+    try:
+        listing_service.delete_accommodation_listing(listing.id)
+    except ListingNotFoundError:
+        abort(make_response(
+            {'listingId': "listing not found"}, NOT_FOUND))
+
+    return make_response("", NO_CONTENT)
 
 
 @bp.get("/<listing_id>/photos/<photo_id>")
