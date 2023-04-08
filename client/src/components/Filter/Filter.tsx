@@ -1,5 +1,4 @@
 import { FC, FormEvent, useState } from "react";
-import { Configuration, DefaultApi } from "@/generated";
 
 interface FilterProps {
   sources: { [key: string]: boolean };
