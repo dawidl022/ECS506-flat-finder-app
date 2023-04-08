@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import Tabs from "../Tabs";
 import { useRouter } from "next/router";
 import SeekingForm from "./SeekingForm";
