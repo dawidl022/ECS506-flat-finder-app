@@ -42,20 +42,22 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
 
   users.map((user: User) => {
     if (user.id === currentUserId && !user.isAdmin) {
-      isCurrentUserAdmin = (true);
+      isCurrentUserAdmin = true;
     } else {
       return;
     }
   });
 
- if (isCurrentUserAdmin) {
-  return (
-    <div>
-      <h3> Administrator Access Only </h3>
-      <button type="button" onClick={() => router.push("/index")}>Return To Homepage</button>
-    </div>
-  );
- } else {
+  if (isCurrentUserAdmin) {
+    return (
+      <div>
+        <h3> Administrator Access Only </h3>
+        <button type="button" onClick={() => router.push("/index")}>
+          Return To Homepage
+        </button>
+      </div>
+    );
+  } else {
     return (
       <div>
         {/* get each user and display their email */}
