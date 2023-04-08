@@ -19,7 +19,7 @@ const InfiniteListings: FC<AccommodationDetailsProps> = ({ location, radius, max
   const [error, setError] = useState(false);
 
   const getMoreAccommodation = async () => {    
-    new DefaultApi()
+    await new DefaultApi()
       .apiV1ListingsAccommodationGet({
         location: location,
         radius: radius,
@@ -42,7 +42,7 @@ const InfiniteListings: FC<AccommodationDetailsProps> = ({ location, radius, max
         <InfiniteScroll
             dataLength={data.length}
             next={getMoreAccommodation}
-            hasMore={!error}
+            hasMore={data.length !== 10}
             loader={<h4>Loading...</h4>}
             endMessage={
                 <p style={{ textAlign: 'center' }}>
