@@ -1,7 +1,7 @@
 import dataclasses
 import unittest
 from uuid import uuid4
-from app.user.user_model import ContactDetails, User
+from app.user.user_models import ContactDetails, User
 
 from app.user.user_repository import InMemoryUserRepository
 

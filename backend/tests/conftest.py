@@ -1,4 +1,5 @@
 from unittest.mock import patch
+import uuid
 from flask_injector import FlaskInjector
 from injector import Binder
 import pytest
@@ -19,12 +20,24 @@ def neuter_jwt():
         yield
 
 
+_mock_currently_logged_in_user_id = uuid.uuid4()
+
+
+@pytest.fixture
+def currently_logged_in_user_id() -> uuid.UUID:
+    return _mock_currently_logged_in_user_id
+
+
 @pytest.fixture(autouse=True)
 def neuter_jwt_identity():
-    with patch("flask_jwt_extended.utils.get_jwt") as mock_get_jwt_identity:
-        mock_get_jwt_identity.return_value = {
-            "sub": {"email": "unittest@user.com"}
+    with patch("app.auth.jwt.get_jwt") as mock_get_jwt_local, \
+            patch("flask_jwt_extended.utils.get_jwt") as mock_get_jwt_lib:
+        return_value = {
+            "sub": _mock_currently_logged_in_user_id,
+            "email": "unittest@user.com"
         }
+        mock_get_jwt_local.return_value = return_value
+        mock_get_jwt_lib.return_value = return_value
         yield
 
 

@@ -434,9 +434,9 @@ def test_put_accommodation_listing__given_no_listing_found__returns_not_found(
 
 def test_put_accommodation_listing__given_author_mismatch__returns_forbidden(
         client: FlaskClient, listings_service: MockListingService):
-    with patch("flask_jwt_extended.utils.get_jwt") as mock_get_jwt_identity:
+    with patch("app.auth.jwt.get_jwt") as mock_get_jwt_identity:
         mock_get_jwt_identity.return_value = {
-            "sub": {"email": "not-the-author@example.com"}
+            "email": "not-the-author@example.com"
         }
 
         response = client.put(
@@ -528,9 +528,9 @@ def test_delete_accommodation_listing__given_no_listing_found__returns_not_found
 
 def test_delete_accommodation_listing__given_author_mismatch__returns_forbidden(
         client: FlaskClient, listings_service: MockListingService):
-    with patch("flask_jwt_extended.utils.get_jwt") as mock_get_jwt_identity:
+    with patch("app.auth.jwt.get_jwt") as mock_get_jwt_identity:
         mock_get_jwt_identity.return_value = {
-            "sub": {"email": "not-the-author@example.com"}
+            "email": "not-the-author@example.com"
         }
 
         response = client.delete(

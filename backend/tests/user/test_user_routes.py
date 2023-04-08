@@ -1,10 +1,10 @@
-from http.client import NOT_FOUND, OK
+from http.client import BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, OK
 import json
 import uuid
 from flask.testing import FlaskClient
-from app.user.user_model import ContactDetails, User, UserProfileForm
-
-from app.user.user_service import BaseUserService
+from app.user.user_dtos import UserProfileForm
+from app.user.user_models import ContactDetails, User
+from app.user.user_service import BaseUserService, UserNotFoundError
 
 registered_user_id = uuid.uuid4()
 registered_user = User(
@@ -15,6 +15,11 @@ registered_user = User(
 
 
 class MockUserService(BaseUserService):
+
+    def __init__(self) -> None:
+        self.deleted_user_ids: list[uuid.UUID] = []
+        self.updated_users: list[tuple[uuid.UUID, UserProfileForm]] = []
+
     def get_user(self, user_id) -> User | None:
         if user_id == registered_user_id:
             return registered_user
@@ -24,13 +29,13 @@ class MockUserService(BaseUserService):
         return uuid.uuid4()
 
     def update_user(self, user_id: uuid.UUID, profile: UserProfileForm) -> None:
-        pass
+        self.updated_users.append((user_id, profile))
 
+        if user_id in self.deleted_user_ids:
+            raise UserNotFoundError()
 
-def test_get_user__given_invalid_id_format__returns_not_found(client: FlaskClient):
-    response = client.get("/api/v1/users/whatever/profile")
-
-    assert response.status_code == NOT_FOUND
+    def delete_user(self, user_id: uuid.UUID) -> None:
+        self.deleted_user_ids.append(user_id)
 
 
 def test_get_user__given_id_not_mapped_to_user__returns_not_found(client: FlaskClient):
@@ -52,3 +57,70 @@ def test_get_user__given_valid_id__returns_user_profile(client: FlaskClient):
         }
     }
     assert response.status_code == OK
+
+
+def test_put_user__given_no_payload__returns_bad_request(client: FlaskClient, currently_logged_in_user_id: uuid.UUID):
+    response = client.put(
+        f"/api/v1/users/{currently_logged_in_user_id}/profile")
+
+    assert response.status_code == BAD_REQUEST
+
+
+def test_put_user__given_id_differers_from_logged_in_user__returns_forbidden(client: FlaskClient):
+    response = client.put(f"/api/v1/users/{uuid.uuid4()}/profile", json={})
+
+    assert b'{"userId":"user not owner of profile"}' in response.data
+    assert response.status_code == FORBIDDEN
+
+
+def test_put_user__given_invalid_payload__returns_bad_request(client: FlaskClient, currently_logged_in_user_id: uuid.UUID):
+    response = client.put(
+        f"/api/v1/users/{currently_logged_in_user_id}/profile", json={})
+
+    assert b'{"contactDetails":["Missing data for required field."],"name":["Missing data for required field."]}' in response.data
+    assert response.status_code == BAD_REQUEST
+
+
+def test_put_user__given_user_not_found__returns_not_found(
+        client: FlaskClient, user_service: MockUserService,
+        currently_logged_in_user_id: uuid.UUID):
+
+    user_service.delete_user(currently_logged_in_user_id)
+
+    response = client.put(
+        f"/api/v1/users/{currently_logged_in_user_id}/profile", json={
+            "name": "New test user!",
+            "contactDetails": {}
+        })
+
+    assert b'{"userId":"user not found"}' in response.data
+    assert response.status_code == NOT_FOUND
+
+
+def test_put_user__given_valid_payload__updates_profile_and_returns_no_content(
+        client: FlaskClient,
+        user_service: MockUserService,
+        currently_logged_in_user_id: uuid.UUID):
+
+    new_name = "New test user!"
+    new_phone_number = "+48 789 123 456"
+    response = client.put(
+        f"/api/v1/users/{currently_logged_in_user_id}/profile", json={
+            "name": new_name,
+            "contactDetails": {
+                "phoneNumber": new_phone_number
+            }
+        })
+
+    print(response.data)
+    assert response.status_code == NO_CONTENT
+    assert len(user_service.updated_users) == 1
+    assert user_service.updated_users[0] == (
+        currently_logged_in_user_id,
+        UserProfileForm(
+            name=new_name,
+            contact_details=ContactDetails(
+                phone_number=new_phone_number
+            )
+        )
+    )

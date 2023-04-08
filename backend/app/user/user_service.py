@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 import dataclasses
 from uuid import UUID, uuid4
-from app.user.user_model import ContactDetails, User, UserProfileForm
+from app.user.user_dtos import UserProfileForm
+from app.user.user_models import ContactDetails, User
 
 from app.user.user_repository import UserRepository
 

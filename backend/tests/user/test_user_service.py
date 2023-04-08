@@ -1,7 +1,8 @@
 import unittest
 import uuid
+from app.user.user_dtos import UserProfileForm
 
-from app.user.user_model import ContactDetails, User, UserProfileForm
+from app.user.user_models import ContactDetails, User
 from app.user.user_repository import InMemoryUserRepository
 from app.user.user_service import UserNotFoundError, UserService
 
