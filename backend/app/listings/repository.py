@@ -4,7 +4,7 @@ from typing import Callable
 from uuid import UUID
 from geopy import distance
 
-from .exceptions import ListingNotFoundError
+from .exceptions import ListingNotFoundError, PhotoNotFoundError
 from .models import AccommodationListing, Coordinates, Photo, SortBy
 
 
@@ -95,14 +95,19 @@ class ListingPhotoRepository(ABC):
 
 class InMemoryPhotoRepository(ListingPhotoRepository):
 
+    def __init__(self) -> None:
+        self.photos: dict[UUID, Photo] = {}
+
     def get_photo_by_id(self, photo_id: UUID) -> Photo | None:
-        # TODO
-        pass
+        return self.photos.get(photo_id)
 
     def save_photos(self, photos: list[Photo]) -> None:
-        # TODO
-        pass
+        for photo in photos:
+            self.photos[photo.id] = photo
 
     def delete_photos(self, photo_ids: list[UUID]) -> None:
-        # TODO
-        pass
+        for id in photo_ids:
+            try:
+                del self.photos[id]
+            except KeyError:
+                raise PhotoNotFoundError()
