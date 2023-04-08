@@ -15,8 +15,7 @@ const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
   const [price, setPrice] = useState(maxPrice ? maxPrice.toString() : "");
 
   const checkIfOneSourceIsSelected = () => {
-    const selected = Object.values(chooseSources).some(value => value);
-    return selected;
+    return Object.values(chooseSources).some(value => value);
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -25,7 +24,16 @@ const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
       alert("Please select at least one source.");
       setSource(sources);
     } else {
-      handleApply(chooseSources, parseInt(price) || null);
+      //confirm button if price is 0
+      if (parseInt(price) === 0) {
+        if (confirm("Are you sure you want to set the max price to 0?")) {
+          handleApply(chooseSources, parseInt(price) || 0);
+        } else {
+          handleApply(chooseSources, parseInt(price) || null);
+        }
+      } else {
+        handleApply(chooseSources, parseInt(price));
+      }
     }
   };
 
