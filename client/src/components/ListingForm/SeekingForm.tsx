@@ -30,7 +30,7 @@ const SeekingForm: FC = ({}) => {
 
   const handleSubmit = (e: FormEvent<HTMLElement>) => {
     e.preventDefault();
-    new DefaultApi(new Configuration({ basePath: "http://127.0.0.1:" }))
+    new DefaultApi(new Configuration({ basePath: "http://127.0.0.1:5000" }))
       .apiV1ListingsSeekingPost({
         title,
         description,
