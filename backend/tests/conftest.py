@@ -33,7 +33,7 @@ def neuter_jwt_identity():
     with patch("app.auth.jwt.get_jwt") as mock_get_jwt_local, \
             patch("flask_jwt_extended.utils.get_jwt") as mock_get_jwt_lib:
         return_value = {
-            "sub": _mock_currently_logged_in_user_id,
+            "sub": str(_mock_currently_logged_in_user_id),
             "email": "unittest@user.com"
         }
         mock_get_jwt_local.return_value = return_value

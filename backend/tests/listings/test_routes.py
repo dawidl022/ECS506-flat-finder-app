@@ -1,6 +1,6 @@
 import dataclasses
-from http.client import BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, OK
-from io import SEEK_SET, BytesIO
+from http.client import BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, OK, SERVICE_UNAVAILABLE
+from io import BytesIO
 import json
 import time
 from typing import cast
@@ -9,9 +9,12 @@ import uuid
 from flask.testing import FlaskClient
 from app.listings.exceptions import ListingNotFoundError
 from app.listings.dtos import AccommodationSearchParams, AccommodationForm
-from app.listings.models import AccommodationListing, AccommodationSearchResult, AccommodationSummary, Coordinates, Location, Source, UKAddress
+from app.listings.models import AccommodationListing, AccommodationSearchResult, AccommodationSummary, Coordinates, ExternalAccommodationListing, InternalAccommodationSummary, ListingSummary, Location, Source, UKAddress, InternalAccommodationListing
 
 from app.listings.service import BaseListingsService
+from app.clients.APIException import APIException
+from app.listings.service import SearchResult
+from app.user.user_models import ContactDetails, User
 
 
 class MockListingService(BaseListingsService):
@@ -21,9 +24,13 @@ class MockListingService(BaseListingsService):
         self.deleted_listing_ids: list[uuid.UUID] = []
         self.updated_listings: list[tuple[uuid.UUID, AccommodationForm]] = []
         self.failed_update_listing_id = uuid.uuid4()
+        self.api_exception_location = "Antarctica"
+        self.api_exception_listing_id = uuid.uuid4()
 
-    def search_accommodation_listings(self, params: AccommodationSearchParams) -> list[AccommodationSearchResult]:
-        return [model_search_result]
+    def search_accommodation_listings(self, params: AccommodationSearchParams) -> SearchResult:
+        if params.location == self.api_exception_location:
+            return SearchResult([], {Source.zoopla})
+        return SearchResult([model_search_result], set())
 
     def create_accommodation_listing(
             self, form: AccommodationForm, photos: list[bytes],
@@ -38,6 +45,10 @@ class MockListingService(BaseListingsService):
             return model_listing
         elif source == model_listing.source and listing_id == str(self.failed_update_listing_id):
             return dataclasses.replace(model_listing, id=uuid.UUID(listing_id))
+        elif source == Source.zoopla and listing_id == str(self.api_exception_listing_id):
+            raise APIException()
+        elif source == Source.zoopla and listing_id == model_external_listing.id:
+            return model_external_listing
         return None
 
     def update_accommodation_listing(self, listing_id: uuid.UUID, form: AccommodationForm) -> AccommodationListing:
@@ -61,8 +72,14 @@ class MockListingService(BaseListingsService):
     def get_available_sources(self, location_query: str) -> list[Source]:
         return [Source.internal, Source.zoopla]
 
+    def get_listings_authored_by(self, user_email: str
+                                 ) -> list[ListingSummary]:
+        if user_email == model_listing.author_email:
+            return [model_listing_summary]
+        return []
 
-model_listing = AccommodationListing(
+
+model_listing = InternalAccommodationListing(
     id=uuid.uuid4(),
     location=Location(
         coords=Coordinates(51.524067, -0.040374),
@@ -85,9 +102,58 @@ model_listing = AccommodationListing(
 
 address = cast(UKAddress, model_listing.location.address)
 
+model_listing_summary = InternalAccommodationSummary(
+    id=str(model_listing.id),
+    title=model_listing.title,
+    short_description=model_listing.description,
+    accommodation_type=model_listing.accommodation_type,
+    number_of_rooms=model_listing.number_of_rooms,
+    source=model_listing.source,
+    post_code=cast(UKAddress, model_listing.location.address).post_code,
+    thumbnail_id=model_listing.photo_ids[0],
+    price=model_listing.price,
+)
+
+model_search_result = AccommodationSearchResult(
+    distance=10,
+    is_favourite=True,
+    accommodation=model_listing_summary
+)
+
+model_listing_author_name = "Model listing author"
+model_listing_author_phone = "+44 77812 713912"
+model_listing_author = User(
+    id=uuid.uuid4(),
+    name=model_listing_author_name,
+    email=model_listing.author_email,
+    contact_details=ContactDetails(phone_number=model_listing_author_phone)
+)
+
+
+model_external_listing = ExternalAccommodationListing(
+    id=str(uuid.uuid4()),
+    location=model_listing.location,
+    created_at=model_listing.created_at,
+    price=model_listing.price,
+    author_name=model_listing_author_name,
+    author_phone=model_listing_author_phone,
+    title="Some random title",
+    description="Amazing accommodation!! A great place to stay",
+    accommodation_type="Flat",
+    number_of_rooms=3,
+    photo_urls=[
+        "https://fastly.picsum.photos/id/308/1200/1200"
+        ".jpg?hmac=2c1705rmBMgsQTZ1I9Uu74cRpA4Fxdl0THWV8wfV5VQ",
+        "https://fastly.picsum.photos/id/163/1200/1200"
+        ".jpg?hmac=ZOvAYvHz98oGUbqnNC_qldUszdxrzrNdmZjkyxzukt8",
+    ],
+    source=Source.zoopla,
+    original_listing_url="http://example.com",
+    _short_description="Stay here"
+)
 
 model_listing_json = {
-    "id": "internal/" + str(model_listing.id),
+    "id": "internal_" + str(model_listing.id),
     "title": model_listing.title,
     "description": model_listing.description,
     "photoUrls": [
@@ -106,49 +172,59 @@ model_listing_json = {
         "postCode": address.post_code,
     },
     "author": {
-        "name": "Example User",
+        "name": model_listing_author.name,
         "userProfile": {
-                "id": "7a5a9895-94d1-44f4-a4b8-2bf41da8a81a",
-                "email": "unittest@user.com",
-                "name": "Example User",
-                "contactDetails": {
-                    "phoneNumber": "+44 78912 345678",
-                },
+            "id": str(model_listing_author.id),
+            "email": model_listing_author.email,
+            "name": model_listing_author.name,
+            "contactDetails": {
+                "phoneNumber": model_listing_author.contact_details.phone_number,
+            },
         },
     },
     "contactInfo": {
-        "email": "unittest@user.com",
-        "phoneNumber": "+44 78912 345678",
-    }
+        "email": model_listing_author.email,
+        "phoneNumber": model_listing_author.contact_details.phone_number,
+    },
+    "originalListingUrl": None
 }
 
-model_listing_summary = AccommodationSummary(
-    id=str(model_listing.id),
-    title=model_listing.title,
-    short_description=model_listing.description,
-    accommodation_type=model_listing.accommodation_type,
-    number_of_rooms=model_listing.number_of_rooms,
-    source=model_listing.source,
-    post_code=cast(UKAddress, model_listing.location.address).post_code,
-    thumbnail_id=model_listing.photo_ids[0],
-    price=model_listing.price,
-)
-
-model_search_result = AccommodationSearchResult(
-    distance=10,
-    is_favourite=True,
-    accommodation=model_listing_summary
-)
+model_external_listing_json = {
+    "id": "zoopla_" + model_external_listing.id,
+    "title": model_external_listing.title,
+    "description": model_external_listing.description,
+    "photoUrls": model_external_listing.photo_urls,
+    "accommodationType": model_external_listing.accommodation_type,
+    "numberOfRooms": model_external_listing.number_of_rooms,
+    "source": "zoopla",
+    "price": model_external_listing.price,
+    "address": {
+        "country": "uk",
+        "line1": address.line1,
+        "line2": address.line2,
+        "town": address.town,
+        "postCode": address.post_code,
+    },
+    "author": {
+        "name": model_external_listing.author_name,
+        "userProfile": None,
+    },
+    "contactInfo": {
+        "email": None,
+        "phoneNumber": model_external_listing.author_phone,
+    },
+    "originalListingUrl": model_external_listing.original_listing_url
+}
 
 search_results_json = [
     {
         "distance": model_search_result.distance,
         "isFavourite": model_search_result.is_favourite,
         "accommodation": {
-            "id": model_listing_summary.id,
+            "id": "internal_" + model_listing_summary.id,
             "title": model_listing_summary.title,
             "shortDescription": model_listing_summary.short_description,
-            "thumbnailUrl": f"/api/v1/listings/{model_listing_summary.id}/photos/{model_listing_summary.thumbnail_id}",
+            "thumbnailUrl": f"/api/v1/listings/{model_listing_summary.id}/photos/{model_listing.photo_ids[0]}",
             "accommodationType": model_listing_summary.accommodation_type,
             "numberOfRooms": model_listing_summary.number_of_rooms,
             "source": model_listing_summary.source,
@@ -252,28 +328,36 @@ def test_create_accommodation_listing__given_valid_request__returns_listing(clie
         bytes(0 for _ in range(4 * 1024 * 1024 + 1)),
         bytes(1 for _ in range(4 * 1024 * 1024 + 1)),
     ]
-    response = client.post("/api/v1/listings/accommodation", data={
-        "title": model_listing.title,
-        "description": model_listing.description,
-        "accommodationType": model_listing.accommodation_type,
-        "numberOfRooms": str(model_listing.number_of_rooms),
-        "price": model_listing.price,
-        "address": (BytesIO(json.dumps({
-            "country": "uk",
-            "line1": address.line1,
-            "line2": address.line2,
-            "town": address.town,
-            "post_code": address.post_code,
-        }).encode()), "blob"),
-        "photos": [
-            (BytesIO(files[0]), "photo1"),
-            (BytesIO(files[1]), "photo2"),
-        ]},
-    )
+    with patch("app.auth.jwt.get_jwt") as mock_get_jwt_local, \
+            patch("flask_jwt_extended.utils.get_jwt") as mock_get_jwt_lib:
+        return_value = {
+            "sub": str(model_listing_author.id),
+            "email": model_listing_author.email
+        }
+        mock_get_jwt_local.return_value = return_value
+        mock_get_jwt_lib.return_value = return_value
+
+        response = client.post("/api/v1/listings/accommodation", data={
+            "title": model_listing.title,
+            "description": model_listing.description,
+            "accommodationType": model_listing.accommodation_type,
+            "numberOfRooms": str(model_listing.number_of_rooms),
+            "price": model_listing.price,
+            "address": (BytesIO(json.dumps({
+                "country": "uk",
+                "line1": address.line1,
+                "line2": address.line2,
+                "town": address.town,
+                "post_code": address.post_code,
+            }).encode()), "blob"),
+            "photos": [
+                (BytesIO(files[0]), "photo1"),
+                (BytesIO(files[1]), "photo2"),
+            ]},
+        )
 
     # check response
     assert response.status_code == OK
-
     assert json.loads(response.data) == model_listing_json
 
     # check photo files were read by server correctly
@@ -311,11 +395,13 @@ def test_search_accommodation_listing_given_valid_source__returns_search_result(
         "sources": [
             {
                 "name": "internal",
-                "enabled": True
+                "enabled": True,
+                "failed": False,
             },
             {
                 "name": "zoopla",
-                "enabled": False
+                "enabled": False,
+                "failed": False,
             }
         ],
         "searchResults": search_results_json
@@ -331,14 +417,39 @@ def test_search_accommodation_listing_given_required_params__returns_search_resu
         "sources": [
             {
                 "name": "internal",
-                "enabled": True
+                "enabled": True,
+                "failed": False,
             },
             {
                 "name": "zoopla",
-                "enabled": True
+                "enabled": True,
+                "failed": False,
             }
         ],
         "searchResults": search_results_json
+    }
+
+
+def test_search_accommodation_listing_given_api_failed__returns_failed_source(
+        client: FlaskClient, listings_service: MockListingService):
+    response = client.get(
+        f"/api/v1/listings/accommodation?location={listings_service.api_exception_location}&radius=10")
+
+    assert response.status_code == OK
+    assert json.loads(response.data) == {
+        "sources": [
+            {
+                "name": "internal",
+                "enabled": True,
+                "failed": False,
+            },
+            {
+                "name": "zoopla",
+                "enabled": True,
+                "failed": True,
+            }
+        ],
+        "searchResults": []
     }
 
 
@@ -351,11 +462,13 @@ def test_search_accommodation_listing_given_all_params__returns_search_result(cl
         "sources": [
             {
                 "name": "internal",
-                "enabled": True
+                "enabled": True,
+                "failed": False,
             },
             {
                 "name": "zoopla",
-                "enabled": True
+                "enabled": True,
+                "failed": False,
             }
         ],
         "searchResults": search_results_json
@@ -389,6 +502,23 @@ def test_get_accommodation_listing__listing_found__returns_listing(client: Flask
         f"/api/v1/listings/accommodation/internal_{model_listing.id}")
     assert response.status_code == OK
     assert json.loads(response.data) == model_listing_json
+
+
+def test_get_accommodation_listing__given_api_error__returns_service_unavailable(
+        client: FlaskClient, listings_service: MockListingService):
+    response = client.get(
+        f"/api/v1/listings/accommodation/zoopla_{listings_service.api_exception_listing_id}")
+
+    assert response.status_code == SERVICE_UNAVAILABLE
+    assert b'{"source":"zoopla not available"}' in response.data
+
+
+def test_get_accommodation_listing__given_zoopla_source__returns_zoopla_listing(
+        client: FlaskClient, listings_service: MockListingService):
+    response = client.get(
+        f"/api/v1/listings/accommodation/zoopla_{model_external_listing.id}")
+    assert response.status_code == OK
+    assert json.loads(response.data) == model_external_listing_json
 
 
 def test_put_accommodation_listing__given_no_form__returns_bad_request(

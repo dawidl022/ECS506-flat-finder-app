@@ -1,9 +1,10 @@
 from http.client import UNAUTHORIZED
+from uuid import UUID
 from flask import abort, make_response
 from flask_jwt_extended import get_jwt, get_jwt_identity
 
 
-def get_current_user_email():
+def get_current_user_email() -> str:
     """
     get user email from JWT token in header of request
     """
@@ -16,7 +17,7 @@ def get_current_user_email():
     return current_user_email
 
 
-def get_current_user_id():
+def get_current_user_id() -> UUID:
     """
     get user id from JWT token in header of request
     """
@@ -26,4 +27,4 @@ def get_current_user_id():
         abort(make_response(
             {'token': "invalid bearer token"}, UNAUTHORIZED))
 
-    return current_user_id
+    return UUID(current_user_id)
