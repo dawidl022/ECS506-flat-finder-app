@@ -189,8 +189,6 @@ const AccommodationForm: FC<AccommodationProps> = ({ listingId }) => {
         </select>
 
         <br />
-
-        <br />
         <button>Add</button>
       </form>
     </div>

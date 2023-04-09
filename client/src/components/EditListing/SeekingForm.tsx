@@ -79,8 +79,6 @@ const SeekingForm: FC<SeekingProps> = ({ listingId }) => {
             required
           />
           <br />
-
-          <br />
           <button>Add</button>
         </form>
       </div>
