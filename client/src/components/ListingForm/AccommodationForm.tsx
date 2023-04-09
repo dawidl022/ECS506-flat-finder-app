@@ -7,7 +7,15 @@ import {
   DefaultApi,
 } from "@/generated";
 
-const AccommodationForm: FC = ({}) => {
+interface FormProps {
+  listingId: string;
+  editExistingListing: Boolean;
+}
+
+const AccommodationForm: FC<FormProps> = ({
+  listingId,
+  editExistingListing,
+}) => {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -20,6 +28,45 @@ const AccommodationForm: FC = ({}) => {
   const [accommodationType, setAccommodationType] = useState("");
   const [numberOfRooms, setNumberOfRooms] = useState(0);
   const [price, setPrice] = useState(0);
+
+  const api = new DefaultApi(
+    new Configuration({ basePath: "http://127.0.0.1:5000" })
+  );
+
+  const baseForm = {
+    title,
+    description,
+    address: {
+      line1,
+      line2,
+      town,
+      postCode,
+      country: AccommodationAddressCountryEnum.Uk,
+    },
+    accommodationType,
+    numberOfRooms,
+    price,
+  };
+
+  if (editExistingListing) {
+    api
+      .apiV1ListingsAccommodationListingIdGet({ listingId })
+      .then(res => {
+        setTitle(res.accommodation.title);
+        setDescription(res.accommodation.description);
+        setLine1(res.accommodation.address.line1);
+        //as line2 is optional, check if there is an input
+        setLine2(res.accommodation.address.line2 ?? "");
+        setTown(res.accommodation.address.town);
+        setPostCode(res.accommodation.address.postCode);
+        setAccommodationType(res.accommodation.accommodationType);
+        setNumberOfRooms(res.accommodation.numberOfRooms);
+        setPrice(res.accommodation.price);
+      })
+      .catch(err => {
+        alert(`Could not find listing with ID:  ${listingId} \nError:  ${err}`);
+      });
+  }
 
   const preview = () => {
     router.push({
@@ -57,29 +104,32 @@ const AccommodationForm: FC = ({}) => {
 
   const handleSubmit = (e: FormEvent<HTMLElement>) => {
     e.preventDefault();
-    new DefaultApi(new Configuration({ basePath: "http://127.0.0.1:5000" }))
-      .apiV1ListingsAccommodationPost({
-        title,
-        description,
-        photos: Array<Blob>(),
-        accommodationType,
-        numberOfRooms,
-        price,
-        address: {
-          line1,
-          line2,
-          town,
-          postCode,
-          country: AccommodationAddressCountryEnum.Uk,
-        },
-      })
-      .catch(err =>
-        alert(
-          "Accommodation listing failed to be published. \nError: " +
-            err.message
+    if (!editExistingListing) {
+      api
+        .apiV1ListingsAccommodationPost({
+          ...baseForm,
+          photos: Array<Blob>(),
+        })
+        .catch(err =>
+          alert(
+            "Accommodation listing failed to be published. \nError: " +
+              err.message
+          )
         )
-      )
-      .then(res => router.push({ pathname: "/myListings" }));
+        .then(() => router.push({ pathname: "/myListings" }));
+    } else {
+      api
+        .apiV1ListingsAccommodationListingIdPut({
+          listingId,
+          accommodationFormBase: {
+            ...baseForm,
+          },
+        })
+        .then(() => router.push({ pathname: "/myListings" }))
+        .catch(err => {
+          alert("Error whilst updating listing. \nError: " + err);
+        });
+    }
   };
 
   return (
@@ -196,14 +246,19 @@ const AccommodationForm: FC = ({}) => {
           <option value={"Bungalows"}>Bungalows</option>
         </select>
         <br />
-        <label htmlFor="photos">Photos:{""}</label>
-        <input
-          type="file"
-          onChange={handleFileInput}
-          id="photos"
-          accept="image/*"
-          multiple
-        />
+
+        {!editExistingListing && (
+          <div>
+            <label htmlFor="photos">Photos:{""}</label>
+            <input
+              type="file"
+              onChange={handleFileInput}
+              id="photos"
+              accept="image/*"
+              multiple
+            />
+          </div>
+        )}
         <br />
         {/* disable the button if all required fields are not filled in */}
         <button type="button" onClick={preview} disabled={!checkInputs()}>

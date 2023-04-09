@@ -15,7 +15,7 @@ const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
   const [price, setPrice] = useState(maxPrice ? maxPrice.toString() : "");
 
   const checkIfOneSourceIsSelected = () => {
-    return Object.values(chooseSources).some(value => value);
+    return Object.values(chooseSources).some(source => source);
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -32,7 +32,7 @@ const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
           handleApply(chooseSources, parseInt(price) || null);
         }
       } else {
-        handleApply(chooseSources, parseInt(price));
+        handleApply(chooseSources, parseInt(price) || null);
       }
     }
   };

@@ -337,55 +337,6 @@ paths:
         "404":
           description: User with given ID not found.
 
-  /api/v1/users/{userId}/profile/photo:
-    get:
-      summary: Get the profile picture of a user
-      parameters:
-        - $ref: "#/components/parameters/userId"
-      responses:
-        "200":
-          description: OK
-          content:
-            image:
-              schema:
-                type: string
-                format: binary
-        "404":
-          description: User or profile photo not found.
-
-    put:
-      summary: Upload the user's profile picture
-      description:
-        Can be used to both upload for the first time as well as update the
-        profile photo of the currently logged in user.
-      parameters:
-        - $ref: "#/components/parameters/userId"
-      requestBody:
-        content:
-          image:
-            schema:
-              type: string
-              format: binary
-      responses:
-        "204":
-          description: Photo updated. No content to return.
-        "403":
-          description: Forbidden. Logged in user does not own the profile.
-        "404":
-          description: User not found.
-
-    delete:
-      summary: Delete the user's profile picture
-      parameters:
-        - $ref: "#/components/parameters/userId"
-      responses:
-        "204":
-          description: Photo deleted successfully. No content to return.
-        "403":
-          description: Forbidden. Logged in user does not own the profile.
-        "404":
-          description: User not found.
-
   /api/v1/users/{userId}/listings:
     get:
       summary: Get all listings created by a user
@@ -400,63 +351,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/userListings"
-        "404":
-          description: User not found.
-
-  /api/v1/users/{userId}/favourites:
-    get:
-      summary: Get all listings favourited by a user
-      description: >-
-        Get all accommodation and seeking listings favourited by given user.
-        Favourite lists are private to each user, so only account owner can
-        retrieve this list.
-      parameters:
-        - $ref: "#/components/parameters/userId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/userListings"
-        "403":
-          description: Forbidden. Logged in user does not own the favourites list.
-        "404":
-          description: User not found.
-
-  /api/v1/users/{userId}/favourites/{listingId}:
-    put:
-      summary: Add listing to user favourites
-      description: >-
-        Add listing with the given listingId to the user's favourites. This
-        operation is a noop if the user already has the listing in their favourites.
-        Favourite lists are private to each user, so only account owner can
-        add the favourite to the list.
-      parameters:
-        - $ref: "#/components/parameters/userId"
-        - $ref: "#/components/parameters/listingId"
-      responses:
-        "204":
-          description: Favourite added. No content to return.
-        "403":
-          description: Forbidden. Logged in user does not own the favourites list.
-        "404":
-          description: User not found.
-    delete:
-      summary: Remove listing from user favourites
-      description: >-
-        Remove listing with the given listingId from the user's favourites. This
-        operation is a noop if the user doesn't have the listing in their favourites.
-        Favourite lists are private to each user, so only account owner can
-        remove the favourite from the list.
-      parameters:
-        - $ref: "#/components/parameters/userId"
-        - $ref: "#/components/parameters/listingId"
-      responses:
-        "204":
-          description: Favourite removed. No content to return.
-        "403":
-          description: Forbidden. Logged in user does not own the favourites list.
         "404":
           description: User not found.
 
@@ -543,6 +437,9 @@ components:
             $ref: "#/components/schemas/listingSource"
           enabled:
             type: boolean
+          failed:
+            type: boolean
+            description: Set to true if search failed for the source
 
     seekingSearchResults:
       type: array
@@ -585,7 +482,6 @@ components:
         - id
         - title
         - shortDescription
-        - thumbnailUrl
         - accommodationType
         - numberOfRooms
         - source
