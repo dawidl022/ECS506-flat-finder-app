@@ -24,7 +24,8 @@ class ZooplaClient(ListingAPIClient):
     name: str = "Zoopla"
     API_KEY = os.getenv('ZOOPLA_API_KEY')
 
-    def fetch_listing(self, listing_id: str) -> ExternalAccommodationListing | None:
+    def fetch_listing(self, listing_id: str
+                      ) -> ExternalAccommodationListing | None:
         querystring = {"listing_id": listing_id}
 
         response = self.submitRequest(querystring)
