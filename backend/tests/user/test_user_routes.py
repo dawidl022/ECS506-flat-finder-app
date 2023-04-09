@@ -6,6 +6,8 @@ from app.user.user_dtos import UserProfileForm
 from app.user.user_models import ContactDetails, User
 from app.user.user_service import BaseUserService, UserNotFoundError
 
+from ..listings.test_routes import model_listing_author, search_results_json
+
 registered_user_id = uuid.uuid4()
 registered_user = User(
     id=registered_user_id,
@@ -23,9 +25,13 @@ class MockUserService(BaseUserService):
     def get_user(self, user_id) -> User | None:
         if user_id == registered_user_id:
             return registered_user
+        elif user_id == model_listing_author.id:
+            return model_listing_author
         return None
 
     def get_user_id_for_email(self, email: str) -> uuid.UUID:
+        if email == model_listing_author.email:
+            return model_listing_author.id
         return uuid.uuid4()
 
     def update_user(self, user_id: uuid.UUID, profile: UserProfileForm) -> None:
@@ -124,3 +130,29 @@ def test_put_user__given_valid_payload__updates_profile_and_returns_no_content(
             )
         )
     )
+
+
+def test_get_user_listings__given__id_not_mapped_to_user__returns_not_found(client: FlaskClient):
+    response = client.get(f"/api/v1/users/{uuid.uuid4()}/listings")
+
+    assert b'{"userId":"user not found"}' in response.data
+    assert response.status_code == NOT_FOUND
+
+
+def test_get_user_listings__given_valid_id__returns_user_listings(client: FlaskClient):
+    response = client.get(f"/api/v1/users/{model_listing_author.id}/listings")
+
+    assert response.status_code == OK
+    assert json.loads(response.data) == [
+        {
+            "type": "accommodation",
+            "listing": search_results_json[0]["accommodation"]
+        }
+    ]
+
+
+def test_get_user_listings__given_user_has_no_listings__returns_empty_list(client: FlaskClient):
+    response = client.get(f"/api/v1/users/{registered_user_id}/listings")
+
+    assert response.status_code == OK
+    assert json.loads(response.data) == []

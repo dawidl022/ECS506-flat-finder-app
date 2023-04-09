@@ -55,7 +55,7 @@ export interface UserListingsInnerListing {
      * @type {string}
      * @memberof UserListingsInnerListing
      */
-    thumbnailUrl: string;
+    thumbnailUrl?: string;
     /**
      * 
      * @type {string}
@@ -96,7 +96,6 @@ export function instanceOfUserListingsInnerListing(value: object): boolean {
     isInstance = isInstance && "id" in value;
     isInstance = isInstance && "title" in value;
     isInstance = isInstance && "shortDescription" in value;
-    isInstance = isInstance && "thumbnailUrl" in value;
     isInstance = isInstance && "accommodationType" in value;
     isInstance = isInstance && "numberOfRooms" in value;
     isInstance = isInstance && "source" in value;
@@ -119,7 +118,7 @@ export function UserListingsInnerListingFromJSONTyped(json: any, ignoreDiscrimin
         'id': json['id'],
         'title': json['title'],
         'shortDescription': json['shortDescription'],
-        'thumbnailUrl': json['thumbnailUrl'],
+        'thumbnailUrl': !exists(json, 'thumbnailUrl') ? undefined : json['thumbnailUrl'],
         'accommodationType': json['accommodationType'],
         'numberOfRooms': json['numberOfRooms'],
         'source': json['source'],
