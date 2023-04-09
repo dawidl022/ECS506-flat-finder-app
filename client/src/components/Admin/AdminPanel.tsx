@@ -11,20 +11,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
   const api = new DefaultApi(
     new Configuration({ basePath: "http://127.0.0.1:5000" })
   );
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: "0",
-      email: "john@email",
-      name: "john",
-      isAdmin: true,
-    },
-    {
-      id: "1",
-      email: "jane@email",
-      name: "jane",
-      isAdmin: false,
-    },
-  ]);
+  const [users, setUsers] = useState<User[]>([]);
   let isCurrentUserAdmin = false;
   const router = useRouter();
 
@@ -96,7 +83,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
       isCurrentUserAdmin = true;
     })
 
-  if (isCurrentUserAdmin) {
+  if (!isCurrentUserAdmin) {
     return (
       <div>
         <h3> Administrator Access Only </h3>
