@@ -7,7 +7,6 @@ import useUser from "@/hooks/useUser";
 
 const Navbar = () => {
   const { user } = useUser();
-
   return (
     <nav className={styles.wrapper}>
       <div className="container">

@@ -82,7 +82,6 @@ const UserCard = () => {
             onClick={() => {
               setIsOpen(false);
               logout();
-              router.push("/auth");
             }}
             className={styles.menuItem}
           >
