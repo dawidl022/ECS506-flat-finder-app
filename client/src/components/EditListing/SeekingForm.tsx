@@ -1,46 +1,43 @@
 import { FC, useState, FormEvent, ChangeEvent } from "react";
 import { useRouter } from "next/router";
 import { Configuration, DefaultApi } from "@/generated";
-import { handleFileInput } from "./handleFileInput";
-const SeekingForm: FC = ({}) => {
-  const router = useRouter();
-
+interface SeekingProps {
+  listingId: string;
+}
+const SeekingForm: FC<SeekingProps> = ({ listingId }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
 
-  const preview = () => {
-    router.push({
-      pathname: "/SeekingPreviewPage",
-      query: {
-        title,
-        description,
-        location,
-      },
-    });
-  };
+  const api = new DefaultApi(
+    new Configuration({ basePath: "http://127.0.0.1:5000" })
+  );
+  api.apiV1ListingsSeekingListingIdGet({ listingId }).then(res => {
+    // store the response in a state variable
+    setTitle(res.seeking.title);
+    setDescription(res.seeking.description);
+    setLocation(res.seeking.preferredLocation.name);
 
-  const checkInputs = () => {
-    if (title && description && location) {
-      return true;
-    } else {
-      return false;
-    }
-  };
+  });
 
   const handleSubmit = (e: FormEvent<HTMLElement>) => {
     e.preventDefault();
-    new DefaultApi(new Configuration({ basePath: "http://127.0.0.1:" }))
-      .apiV1ListingsSeekingPost({
-        title,
-        description,
-        photos: Array<Blob>(),
-        preferredLocation: location,
+
+    api
+      .apiV1ListingsSeekingListingIdPut({
+        listingId,
+        seekingFormBase:  {
+          title,
+          description,
+          preferredLocation: location,
+        },
       })
-      .catch(err =>
-        alert("Seeking listing failed to be published. \nError: " + err.message)
-      )
-      .then(res => (window.location.href = "/myListings"));
+      .then(res => {
+        console.log(res);
+      })
+      .catch(err => {
+        alert("Error whilst updating listing. \nError: " + err);
+      });
   };
 
   return (
@@ -79,20 +76,8 @@ const SeekingForm: FC = ({}) => {
             onChange={e => setLocation(e.target.value)}
             required
           />
+          <br />
 
-          <br />
-          <label htmlFor="photos">Photos:{""}</label>
-          <input
-            type="file"
-            id="photos"
-            onChange={handleFileInput}
-            accept="image/*"
-            multiple
-          />
-          <br />
-          <button type="button" onClick={preview} disabled={!checkInputs()}>
-            Preview
-          </button>
           <br />
           <button>Add</button>
         </form>
