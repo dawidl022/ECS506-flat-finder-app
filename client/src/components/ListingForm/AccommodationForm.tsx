@@ -7,7 +7,11 @@ import {
   DefaultApi,
 } from "@/generated";
 
-const AccommodationForm: FC = ({}) => {
+interface FormProps {
+  editable: Boolean | undefined;
+}
+
+const AccommodationForm: FC<FormProps>= ({editable}) => {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");

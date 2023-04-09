@@ -2,7 +2,12 @@ import { FC, useState, FormEvent, ChangeEvent } from "react";
 import { useRouter } from "next/router";
 import { Configuration, DefaultApi } from "@/generated";
 import { handleFileInput } from "./handleFileInput";
-const SeekingForm: FC = ({}) => {
+
+interface FormProps {
+  editable: Boolean;
+}
+
+const SeekingForm: FC<FormProps> = ({editable}) => {
   const router = useRouter();
 
   const [title, setTitle] = useState("");
