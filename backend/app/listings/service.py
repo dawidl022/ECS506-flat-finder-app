@@ -6,7 +6,7 @@ import time
 from app.listings.exceptions import ListingNotFoundError
 from app.listings.models import (
     AccommodationSearchResult, Address, Coordinates,
-    InternalAccommodationListing, Photo, Source)
+    InternalAccommodationListing, ListingSummary, Photo, Source)
 from app.listings.dtos import (
     AccommodationForm, AccommodationSearchParams)
 from app.listings.models import AccommodationListing, Location
@@ -88,6 +88,11 @@ class BaseListingsService(abc.ABC):
 
     @abc.abstractmethod
     def get_available_sources(self, location_query: str) -> list[Source]:
+        pass
+    
+    @abc.abstractmethod
+    def get_listings_authored_by(self, user_email: str
+                                 ) -> list[ListingSummary]:
         pass
 
     @abc.abstractmethod
@@ -231,6 +236,17 @@ class ListingsService(BaseListingsService):
 
     def get_available_sources(self, location_query: str) -> list[Source]:
         return [s for s in Source]
+
+    def get_listings_authored_by(self, user_email: str
+                                 ) -> list[ListingSummary]:
+        # TODO fetch user's seeking listings too and sort by latest
+        return [
+            listing.summarise()
+            for listing in
+            self.accommodation_listing_repo.get_listings_authored_by(
+                user_email
+            )
+        ]
     
     def upload_listing_photo(self, listing_id: uuid.UUID, blob: bytes) -> None:
         listing = self.accommodation_listing_repo.get_listing_by_id(listing_id)

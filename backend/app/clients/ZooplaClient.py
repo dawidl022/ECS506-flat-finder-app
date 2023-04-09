@@ -125,6 +125,7 @@ class ZooplaClient(ListingAPIClient):
         lat: float = x['latitude']
         long: float = x['longitude']
         short_desc: str = x['short_description']
+        agent_name: str = x['agent_name']
 
         postcode: str = x['outcode'] + " " + x['incode']
 
@@ -155,4 +156,6 @@ class ZooplaClient(ListingAPIClient):
             original_listing_url=listurl,
             photo_urls=photos,
             _short_description=short_desc,
-            author_phone=contact)
+            author_phone=contact,
+            author_name=agent_name,
+        )

@@ -15,8 +15,8 @@ from app.util.schema import Schemable
 from app.listings.models import (
     AccommodationSearchResult, AccommodationSummary, Country,
     ExternalAccommodationListing, ExternalAccommodationSummary,
-    InternalAccommodationListing, InternalAccommodationSummary, SortBy, Source,
-    UKAddress)
+    InternalAccommodationListing, InternalAccommodationSummary, ListingSummary,
+    ListingType, SortBy, Source, UKAddress)
 from app.util.encoding import CamelCaseDecoder
 from app.listings.models import Address, AccommodationListing
 
@@ -124,19 +124,21 @@ class AccommodationForm(Schemable):
 
 
 class AuthorDTO:
-    def __init__(self, author: User) -> None:
-        self.name = author.name
-        self.userProfile = UserDTO(author)
+    def __init__(self, author: User | None, author_name: str | None) -> None:
+        self.name = author.name if author else author_name
+        self.userProfile = UserDTO(author) if author else None
 
 
 class ContactInfoDTO:
-    def __init__(self, author: User) -> None:
-        self.email = author.email
-        self.phone_number = author.contact_details.phone_number
+    def __init__(self, author: User | None = None,
+                 phone_number: str | None = None) -> None:
+        self.email = author.email if author else None
+        self.phone_number = (
+            author.contact_details.phone_number if author else phone_number)
 
 
 class AccommodationListingDTO:
-    def __init__(self, listing: AccommodationListing, author: User):
+    def __init__(self, listing: AccommodationListing, author: User | None):
         self.id = f"{listing.source}_{listing.id}"
         self.title = listing.title
         self.description = listing.description
@@ -147,8 +149,19 @@ class AccommodationListingDTO:
         self.price = listing.price
         self.address = listing.location.address
         self.original_listing_url = self.get_original_listing_url(listing)
-        self.author = AuthorDTO(author)  # TODO conditionally set author
-        self.contact_info = ContactInfoDTO(author)
+        self.author = AuthorDTO(author, author_name=(
+            listing.author_name
+            if isinstance(listing, ExternalAccommodationListing)
+            else None
+        ))
+        self.contact_info = ContactInfoDTO(
+            author,
+            phone_number=(
+                listing.author_phone
+                if isinstance(listing, ExternalAccommodationListing)
+                else None
+            )
+        )
 
     @staticmethod
     def get_photo_urls(listing: AccommodationListing) -> list[str]:
@@ -202,6 +215,25 @@ class AccommodationSummaryDTO:
         elif isinstance(summary, ExternalAccommodationSummary):
             return summary.thumbnail_url
         return None
+
+
+@dataclass
+class SeekingSummaryDTO:
+    # TODO
+    pass
+
+
+@dataclass
+class ListingSummaryDTO:
+    type: ListingType
+    listing: AccommodationSummaryDTO | SeekingSummaryDTO
+
+    def __init__(self, summary: ListingSummary):
+        if isinstance(summary, AccommodationSummary):
+            self.type = ListingType.accommodation
+            self.listing = AccommodationSummaryDTO(summary)
+        else:
+            raise TypeError("unsupported ListingSummary subtype")
 
 
 @dataclass(frozen=True)
