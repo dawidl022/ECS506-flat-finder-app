@@ -8,7 +8,7 @@ import {
 } from "@/generated";
 
 interface FormProps {
-  listingId: string | "";
+  listingId: string;
   editExistingListing: Boolean;
 }
 

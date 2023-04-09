@@ -4,7 +4,7 @@ import { Configuration, DefaultApi } from "@/generated";
 import { handleFileInput } from "./handleFileInput";
 
 interface FormProps {
-  listingId: string | "";
+  listingId: string;
   editExistingListing: Boolean;
 }
 
@@ -122,7 +122,7 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
 
           <br />
           {!editExistingListing && (
-            <div>
+            <div> 
               <label htmlFor="photos">Photos:{""}</label>
               <input
                 type="file"
