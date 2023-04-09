@@ -4,10 +4,11 @@ import { Configuration, DefaultApi } from "@/generated";
 import { handleFileInput } from "./handleFileInput";
 
 interface FormProps {
+  listingId: string | "";
   editable: Boolean;
 }
 
-const SeekingForm: FC<FormProps> = ({editable}) => {
+const SeekingForm: FC<FormProps> = ({listingId, editable}) => {
   const router = useRouter();
 
   const [title, setTitle] = useState("");
@@ -34,18 +35,37 @@ const SeekingForm: FC<FormProps> = ({editable}) => {
   };
 
   const handleSubmit = (e: FormEvent<HTMLElement>) => {
+    const api = new DefaultApi(new Configuration({ basePath: "http://127.0.0.1:5000" }))
     e.preventDefault();
-    new DefaultApi(new Configuration({ basePath: "http://127.0.0.1:5000" }))
-      .apiV1ListingsSeekingPost({
-        title,
-        description,
-        photos: Array<Blob>(),
-        preferredLocation: location,
+    if(editable){
+     api
+        .apiV1ListingsSeekingPost({
+          title,
+          description,
+          photos: Array<Blob>(),
+          preferredLocation: location,
+        })
+        .catch(err =>
+          alert("Seeking listing failed to be published. \nError: " + err.message)
+        )
+        .then(res => (window.location.href = "/myListings"));
+    } else {
+      api
+      .apiV1ListingsSeekingListingIdPut({
+        listingId,
+        seekingFormBase: {
+          title,
+          description,
+          preferredLocation: location,
+        },
       })
-      .catch(err =>
-        alert("Seeking listing failed to be published. \nError: " + err.message)
-      )
-      .then(res => (window.location.href = "/myListings"));
+      .then(res => {
+        console.log(res);
+      })
+      .catch(err => {
+        alert("Error whilst updating listing. \nError: " + err);
+      });
+    } 
   };
 
   return (

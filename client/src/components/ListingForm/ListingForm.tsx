@@ -13,7 +13,7 @@ const ListingForm: FC = ({}) => {
       {/* "Seeking" and "Accommodation". Based on the outcome, the appropriate form should be rendered. */}
       <Tabs tabs={["Seeking", "Accommodation"]} />
 
-      {listingType === "seeking" && <SeekingForm editable={false}/>}
+      {listingType === "seeking" && <SeekingForm editable={false} listingId={""}/>}
 
       {listingType === "accommodation" && <AccommodationForm editable={false} />}
     </div>
