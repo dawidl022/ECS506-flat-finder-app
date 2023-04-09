@@ -81,7 +81,7 @@ Set the following environment variables:
 FRONTEND_URL=<frontend-url>
 GOOGLE_AUTH_CLIENT_ID=<your-auth-client-id>
 GOOGLE_AUTH_CLIENT_SECRET=<your-auth-client-secret>
-ZOOPLA_API_KEY<your-zoopla-api-key>
+ZOOPLA_API_KEY=<your-zoopla-api-key>
 ```
 
 Inside this directory, run
