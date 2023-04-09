@@ -182,7 +182,7 @@ class InternalAccommodationListing(AccommodationListing):
 
 @dataclass(frozen=True)
 class ExternalAccommodationListing(AccommodationListing):
-    original_listing_url: str  # TODO include in DTO
+    original_listing_url: str
     id: str
     author_phone: str
     photo_urls: list[str]

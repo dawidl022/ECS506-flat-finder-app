@@ -146,7 +146,8 @@ class AccommodationListingDTO:
         self.source = listing.source
         self.price = listing.price
         self.address = listing.location.address
-        self.author = AuthorDTO(author)
+        self.original_listing_url = self.get_original_listing_url(listing)
+        self.author = AuthorDTO(author)  # TODO conditionally set author
         self.contact_info = ContactInfoDTO(author)
 
     @staticmethod
@@ -160,6 +161,12 @@ class AccommodationListingDTO:
         elif isinstance(listing, ExternalAccommodationListing):
             return listing.photo_urls
         return []
+
+    @staticmethod
+    def get_original_listing_url(listing: AccommodationListing) -> str | None:
+        if isinstance(listing, ExternalAccommodationListing):
+            return listing.original_listing_url
+        return None
 
 
 @dataclass

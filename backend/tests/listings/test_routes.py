@@ -119,7 +119,8 @@ model_listing_json = {
     "contactInfo": {
         "email": "unittest@user.com",
         "phoneNumber": "+44 78912 345678",
-    }
+    },
+    "originalListingUrl": None
 }
 
 model_listing_summary = InternalAccommodationSummary(
