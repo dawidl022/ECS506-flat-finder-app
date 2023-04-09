@@ -138,7 +138,8 @@ class ListingsService(BaseListingsService):
                     page_number=0,
                     page_size=params.size * (params.page + 1),
                     maximum_price=int(
-                        params.max_price) if params.max_price is not None else None
+                        params.max_price
+                    ) if params.max_price is not None else None
                 )
             except APIException:
                 failed_sources.add(source)
