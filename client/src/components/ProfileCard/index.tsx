@@ -1,6 +1,7 @@
 import { User } from "@/generated";
 import React, { FC } from "react";
-
+import MyListings from "@/components/MyListings/MyListings"
+ 
 import styles from "./ProfileCard.module.scss";
 
 interface ProfileCardProps {
@@ -40,6 +41,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ userData }) => {
         <div className={styles.listings}>
           {/* TODO: */}
           {/* Listings card from figma */}
+          <MyListings />
         </div>
       </section>
     </div>
