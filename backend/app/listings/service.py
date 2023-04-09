@@ -49,9 +49,8 @@ class GeocodingService(BaseGeocodingService):
         """
         TODO calc distance using geopy module
         """
-        distance_in_miles = geodesic(c1, c2).miles
-        distance_in_km = geodesic(c1, c2).km
-        return 0
+        distance = geodesic(c1, c2).km
+        return distance
 
 
 class BaseListingsService(abc.ABC):
