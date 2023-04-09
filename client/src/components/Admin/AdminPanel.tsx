@@ -12,6 +12,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     new Configuration({ basePath: "http://127.0.0.1:5000" })
   );
   const [users, setUsers] = useState<User[]>([]);
+  const [error, setError] = useState(false);
   const [isCurrentUserAdmin, setIsAdmin] = useState<boolean>(false);
   const router = useRouter();
 
@@ -20,9 +21,8 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     .then((users: User[]) => {
       setUsers(users);
     })
-    .catch(err => {
-      alert(err);
-    });
+    .catch(() => setError(true));
+
 
   const removeUserFromSystem = (index: number) => {
     if (
@@ -46,10 +46,15 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
   if (!isCurrentUserAdmin) {
     return (
       <div>
-        <h3> Administrator Access Only </h3>
-        <button type="button" onClick={() => router.push("/index")}>
-          Return To Homepage
-        </button>
+        {error ? (
+        <p>Error fetching data</p>
+      ) : !users ? (
+        <p>Loading</p>
+      ) : (
+        <><p> Administrator Access Only </p><button type="button" onClick={() => router.push("/index")}>
+                Return To Homepage
+              </button></>    
+      )}
       </div>
     );
   } else {
