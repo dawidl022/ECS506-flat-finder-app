@@ -437,6 +437,9 @@ components:
             $ref: "#/components/schemas/listingSource"
           enabled:
             type: boolean
+          failed:
+            type: boolean
+            description: Set to true if search failed for the source
 
     seekingSearchResults:
       type: array

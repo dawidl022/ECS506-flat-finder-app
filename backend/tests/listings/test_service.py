@@ -6,12 +6,13 @@ from uuid import UUID
 import uuid
 
 from app.clients.ListingAPIClient import ListingAPIClient
+from app.clients.APIException import APIException
 
 from .test_routes import model_listing, model_listing_summary
 from app.listings.exceptions import ListingNotFoundError
 from app.listings.models import Address, Coordinates, ExternalAccommodationListing, InternalAccommodationListing, Location, Photo, SortBy, Source, UKAddress
 from app.listings.dtos import AccommodationForm
-from app.listings.service import BaseGeocodingService, ListingsService
+from app.listings.service import BaseGeocodingService, ListingsService, SearchResult
 from app.listings.repository import AccommodationListingRepository, ListingPhotoRepository
 from app.listings.models import AccommodationSearchResult, Address, Coordinates, Location, Photo, SortBy, UKAddress
 from app.listings.dtos import AccommodationForm, AccommodationSearchParams
@@ -96,6 +97,18 @@ class StubListingClient(ListingAPIClient):
 
     def fetch_listing(self, listing_id: str) -> 'ExternalAccommodationListing | None':
         return self.listings.get(listing_id)
+
+
+class StubExceptionListingClient(ListingAPIClient):
+
+    def search_listing(
+            self, area: str, radius: float, order_by: 'SortBy',
+            page_number: int, page_size: int, maximum_price: int | None = None
+    ) -> list['ExternalAccommodationListing']:
+        raise APIException()
+
+    def fetch_listing(self, listing_id: str) -> 'ExternalAccommodationListing | None':
+        raise APIException()
 
 
 class SpyPhotoRepo(ListingPhotoRepository):
@@ -205,13 +218,13 @@ class ListingsServiceTest(unittest.TestCase):
         )
         results = self.service.search_accommodation_listings(params)
 
-        self.assertEqual([
+        self.assertEqual(SearchResult([
             AccommodationSearchResult(
                 distance=expected_distance,
                 is_favourite=False,
                 accommodation=model_listing_summary,
             )
-        ], results)
+        ], set()), results)
 
     def test_search_accommodation_listing__given_internal_source__searches_internal_repo(self):
         params = AccommodationSearchParams(
@@ -221,13 +234,13 @@ class ListingsServiceTest(unittest.TestCase):
         )
         results = self.service.search_accommodation_listings(params)
 
-        self.assertEqual([
+        self.assertEqual(SearchResult([
             AccommodationSearchResult(
                 distance=expected_distance,
                 is_favourite=False,
                 accommodation=model_listing_summary,
-            )
-        ], results)
+            ),
+        ], set()), results)
 
     def test_search_accommodation_listing__given_external_source__uses_client_to_search(self):
         listings = generate_external_listings_with_decreasing_creation_time(2)
@@ -248,18 +261,37 @@ class ListingsServiceTest(unittest.TestCase):
             sources="zoopla"
         )
 
-        expected = [
+        expected = SearchResult([
             AccommodationSearchResult(
                 distance=10,
                 is_favourite=False,
                 accommodation=listing.summarise()
             )
             for listing in listings
-        ]
+        ], set())
 
         actual = service.search_accommodation_listings(params)
 
         self.assertEqual(expected, actual)
+
+    def test_search_accommodation_listing__given_external_source_raises_error__adds_source_to_failed(self):
+        service = ListingsService(
+            geocoder=StubGeocodingService(),
+            accommodation_listing_repo=self.spy_accommodation_listing_repo,
+            listing_photo_repo=self.spy_photo_repo,
+            external_sources={
+                Source.zoopla: StubExceptionListingClient()
+            }
+        )
+        params = AccommodationSearchParams(
+            location="London",
+            radius=10,
+            sources="zoopla"
+        )
+
+        actual = service.search_accommodation_listings(params)
+
+        self.assertEqual(SearchResult([], {Source.zoopla}), actual)
 
     def test_get_accommodation_listing__given_listing_exists_in_repo__returns_listing(self):
         actual = self.service.get_accommodation_listing(
@@ -286,6 +318,22 @@ class ListingsServiceTest(unittest.TestCase):
         actual = service.get_accommodation_listing(expected.id, Source.zoopla)
 
         self.assertEqual(expected, actual)
+
+    def test_search_accommodation_listing__given_external_raises_error__raises_error(self):
+        service = ListingsService(
+            geocoder=StubGeocodingService(),
+            accommodation_listing_repo=self.spy_accommodation_listing_repo,
+            listing_photo_repo=self.spy_photo_repo,
+            external_sources={
+                Source.zoopla: StubExceptionListingClient()
+            }
+        )
+        self.assertRaises(
+            APIException,
+            lambda: service.get_accommodation_listing(
+                uuid.uuid4(), Source.zoopla
+            )
+        )
 
     def test_update_accommodation_listing__given_listing_id__updates_listing(self):
         new_title = "My new amazing title!"
@@ -376,6 +424,12 @@ class ListingsServiceSearchTest(unittest.TestCase):
     Collection of tests to test the accumulative search algorithm
     """
 
+    def search(
+            self, service: ListingsService, params: AccommodationSearchParams,
+            page: int, size: int) -> list[AccommodationSearchResult]:
+        return service.search_accommodation_listings(
+            dataclasses.replace(params, page=page, size=size)).results
+
     def test_search__given_all_latest_listings_internal__returns_listings(self):
         external_listings = generate_external_listings_with_decreasing_creation_time(
             10, start_time=time.time()-60)
@@ -406,58 +460,47 @@ class ListingsServiceSearchTest(unittest.TestCase):
 
         self.assertEqual(
             internal_search_results[:5],
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=0, size=5))
+            self.search(service, stub_params, page=0, size=5)
         )
         self.assertEqual(
             internal_search_results,
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=0, size=10))
+            self.search(service, stub_params, page=0, size=10)
         )
         self.assertEqual(
             internal_search_results + external_search_results[:5],
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=0, size=15))
+            self.search(service, stub_params, page=0, size=15)
         )
         self.assertEqual(
             internal_search_results + external_search_results,
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=0, size=20))
+            self.search(service, stub_params, page=0, size=20)
         )
         self.assertEqual(
             internal_search_results + external_search_results,
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=0, size=21))
+            self.search(service, stub_params, page=0, size=21)
         )
         self.assertEqual(
             internal_search_results[5:],
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=1, size=5))
+            self.search(service, stub_params, page=1, size=5)
         )
         self.assertEqual(
             internal_search_results[8:] + external_search_results[:6],
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=1, size=8))
+            self.search(service, stub_params, page=1, size=8)
         )
         self.assertEqual(
             external_search_results[:2],
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=5, size=2))
+            self.search(service, stub_params, page=5, size=2)
         )
         self.assertEqual(
             external_search_results[:5],
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=2, size=5))
+            self.search(service, stub_params, page=2, size=5)
         )
         self.assertEqual(
             external_search_results[5:],
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=3, size=5))
+            self.search(service, stub_params, page=3, size=5)
         )
         self.assertEqual(
             [],
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=4, size=5))
+            self.search(service, stub_params, page=5, size=5)
         )
 
     def test_search__listings_intertwined_in_time__returns_listings(self):
@@ -496,58 +539,47 @@ class ListingsServiceSearchTest(unittest.TestCase):
 
         self.assertEqual(
             expected_results[:5],
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=0, size=5))
+            self.search(service, stub_params, page=0, size=5)
         )
         self.assertEqual(
             expected_results[:10],
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=0, size=10))
+            self.search(service, stub_params, page=0, size=10)
         )
         self.assertEqual(
             expected_results[:15],
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=0, size=15))
+            self.search(service, stub_params, page=0, size=15)
         )
         self.assertEqual(
             expected_results,
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=0, size=20))
+            self.search(service, stub_params, page=0, size=20)
         )
         self.assertEqual(
             expected_results,
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=0, size=21))
+            self.search(service, stub_params, page=0, size=21)
         )
         self.assertEqual(
             expected_results[5:10],
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=1, size=5))
+            self.search(service, stub_params, page=1, size=5)
         )
         self.assertEqual(
             expected_results[8:16],
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=1, size=8))
+            self.search(service, stub_params, page=1, size=8)
         )
         self.assertEqual(
             expected_results[10:12],
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=5, size=2))
+            self.search(service, stub_params, page=5, size=2)
         )
         self.assertEqual(
             expected_results[10:15],
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=2, size=5))
+            self.search(service, stub_params, page=2, size=5)
         )
         self.assertEqual(
             expected_results[15:],
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=3, size=5))
+            self.search(service, stub_params, page=3, size=5)
         )
         self.assertEqual(
             [],
-            service.search_accommodation_listings(
-                dataclasses.replace(stub_params, page=4, size=5))
+            self.search(service, stub_params, page=4, size=5)
         )
 
 

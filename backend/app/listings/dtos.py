@@ -208,6 +208,7 @@ class AccommodationSummaryDTO:
 class SourceDTO:
     name: str
     enabled: bool
+    failed: bool
 
 
 @dataclass
@@ -223,6 +224,6 @@ class AccommodationSearchResultDTO:
 
 
 @ dataclass(frozen=True)
-class SearchResult:
+class SearchResultDTO:
     sources: list[SourceDTO]
     search_results: list[AccommodationSearchResultDTO]

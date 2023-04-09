@@ -1,5 +1,5 @@
 from http.client import (
-    BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND)
+    BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, SERVICE_UNAVAILABLE)
 import os
 from typing import cast
 import uuid
@@ -13,6 +13,7 @@ from app.listings.exceptions import ListingNotFoundError
 from app.util.marshmallow import get_params, get_input
 from app.util.encoding import CamelCaseEncoder
 from app.util.encoding import CamelCaseDecoder
+from app.clients.APIException import APIException
 from config import Config
 from .models import AccommodationListing, Source
 from app.user.user_models import User, ContactDetails
@@ -23,7 +24,7 @@ from .dtos import (
     AccommodationListingDTO,
     AccommodationSearchParams,
     AccommodationSearchResultDTO,
-    SearchResult,
+    SearchResultDTO,
     SourceDTO
 )
 from .service import BaseListingsService
@@ -60,14 +61,18 @@ def get_accommodation_listings(listings_service: BaseListingsService
     listings = listings_service.search_accommodation_listings(params)
     sources = listings_service.get_available_sources(params.location)
 
-    result = SearchResult(
+    result = SearchResultDTO(
         sources=[
-            SourceDTO(s, enabled=params.sources is None or s in params.sources)
+            SourceDTO(
+                name=str(s),
+                enabled=params.sources is None or s in params.sources,
+                failed=s in listings.failed_sources
+            )
             for s in sources
         ],
         search_results=[
             AccommodationSearchResultDTO(listing)
-            for listing in listings
+            for listing in listings.results
         ]
     )
 
@@ -144,7 +149,12 @@ def get_accommodation_listing(
         listing_id: str, listing_service: BaseListingsService) -> Response:
     source, id = extract_listing_id_and_source(listing_id)
 
-    listing = fetch_accommodation_listing(listing_service, source, id)
+    try:
+        listing = fetch_accommodation_listing(listing_service, source, id)
+    except APIException:
+        abort(make_response(
+            {"source": f"{source} not available"}, SERVICE_UNAVAILABLE))
+
     dummy_user = make_dummy_user(get_current_user_email())
 
     dto = AccommodationListingDTO(listing, dummy_user)

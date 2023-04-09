@@ -1,5 +1,6 @@
 import abc
 import dataclasses
+from typing import NamedTuple
 import uuid
 import time
 from app.listings.exceptions import ListingNotFoundError
@@ -13,6 +14,7 @@ from app.listings.repository import (
     AccommodationListingRepository, ListingPhotoRepository,
     sort_and_page_listings)
 from app.clients.ListingAPIClient import ListingAPIClient
+from app.clients.APIException import APIException
 
 
 class BaseGeocodingService(abc.ABC):
@@ -50,10 +52,16 @@ class GeocodingService(BaseGeocodingService):
         return 0
 
 
+class SearchResult(NamedTuple):
+    results: list[AccommodationSearchResult]
+    failed_sources: set[Source]
+
+
 class BaseListingsService(abc.ABC):
     @abc.abstractmethod
-    def search_accommodation_listings(self, params: AccommodationSearchParams
-                                      ) -> list[AccommodationSearchResult]:
+    def search_accommodation_listings(
+        self, params: AccommodationSearchParams
+    ) -> SearchResult:
         pass
 
     @abc.abstractmethod
@@ -94,8 +102,9 @@ class ListingsService(BaseListingsService):
         self.listing_photo_repo = listing_photo_repo
         self.external_sources = external_sources
 
-    def search_accommodation_listings(self, params: AccommodationSearchParams
-                                      ) -> list[AccommodationSearchResult]:
+    def search_accommodation_listings(
+        self, params: AccommodationSearchParams
+    ) -> SearchResult:
         """
         Naive search algorithm, linear with regards to params.page and
         params.size, i.e. the higher the page, the longer the algorithm takes
@@ -114,6 +123,7 @@ class ListingsService(BaseListingsService):
                 size=params.size * (params.page + 1),
                 max_price=params.max_price
             )
+        failed_sources: set[Source] = set()
 
         for source in (params.sources_list or self.external_sources):
             source_client = self.external_sources.get(source)
@@ -122,26 +132,29 @@ class ListingsService(BaseListingsService):
 
             # TODO catch api exceptions, return sources that threw exception
             # so frontend can display that these were skipped
-            listings += source_client.search_listing(
-                area=params.location,
-                radius=params.radius,
-                order_by=params.sort_by,
-                page_number=0,
-                page_size=params.size * (params.page + 1),
-                maximum_price=int(
-                    params.max_price) if params.max_price is not None else None
-            )
+            try:
+                listings += source_client.search_listing(
+                    area=params.location,
+                    radius=params.radius,
+                    order_by=params.sort_by,
+                    page_number=0,
+                    page_size=params.size * (params.page + 1),
+                    maximum_price=int(
+                        params.max_price) if params.max_price is not None else None
+                )
+            except APIException:
+                failed_sources.add(source)
 
         sorted = sort_and_page_listings(
             listings, coords, params.sort_by,
             page=params.page, size=params.size
         )
 
-        return [AccommodationSearchResult(
+        return SearchResult([AccommodationSearchResult(
             distance=self.geocoder.calc_distance(coords, acc.location.coords),
             is_favourite=False,  # favourites not currently supported
             accommodation=acc.summarise()
-        ) for acc in sorted]
+        ) for acc in sorted], failed_sources)
 
     def create_accommodation_listing(
             self, form: AccommodationForm, photos: list[bytes],
