@@ -99,7 +99,6 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
   } else {
     return <p>Loading</p>;
   }
-  
 };
 
 export default AdminPanel;
