@@ -12,6 +12,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     new Configuration({ basePath: "http://127.0.0.1:5000" })
   );
   const [users, setUsers] = useState<User[]>([]);
+  const [check, setCheck] = useState(false);
   const [error, setError] = useState(false);
   const [isCurrentUserAdmin, setIsAdmin] = useState<boolean>(false);
   const router = useRouter();
@@ -37,62 +38,68 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
   };
 
   api.apiV1AdminsUserIdGet({ userId: currentUserId }).then(() => {
+    setCheck(true);
     setIsAdmin(true);
   });
 
-  if (!isCurrentUserAdmin) {
-    return (
-      <div>
-        {error ? (
-          <p>Error fetching data</p>
-        ) : !users ? (
-          <p>Loading</p>
-        ) : (
-          <>
-            <p> Administrator Access Only </p>
-            <button type="button" onClick={() => router.push("/index")}>
-              Return To Homepage
-            </button>
-          </>
-        )}
-      </div>
-    );
-  } else {
-    return (
-      <div>
-        {/* get each user and display their email */}
-        <table>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Admin </th>
-          </tr>
+  if (check) {
+    if (!isCurrentUserAdmin) {
+      return (
+        <div>
+          {error ? (
+            <p>Error fetching data</p>
+          ) : !users ? (
+            <p>Loading</p>
+          ) : (
+            <>
+              <p> Administrator Access Only </p>
+              <button type="button" onClick={() => router.push("/index")}>
+                Return To Homepage
+              </button>
+            </>
+          )}
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          {/* get each user and display their email */}
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Admin </th>
+            </tr>
 
-          {users.map((user: User, index) => {
-            return (
-              <tr key={index}>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>{user.isAdmin ? "Yes" : "No"}</td>
-                {user.id === currentUserId ? (
-                  <td></td>
-                ) : (
-                  <td>
-                    <button
-                      type="button"
-                      onClick={() => removeUserFromSystem(user)}
-                    >
-                      Remove User
-                    </button>
-                  </td>
-                )}
-              </tr>
-            );
-          })}
-        </table>
-      </div>
-    );
+            {users.map((user: User, index) => {
+              return (
+                <tr key={index}>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>{user.isAdmin ? "Yes" : "No"}</td>
+                  {user.id === currentUserId ? (
+                    <td></td>
+                  ) : (
+                    <td>
+                      <button
+                        type="button"
+                        onClick={() => removeUserFromSystem(user)}
+                      >
+                        Remove User
+                      </button>
+                    </td>
+                  )}
+                </tr>
+              );
+            })}
+          </table>
+        </div>
+      );
+    }
+  } else {
+    return <p>Loading</p>;
   }
+  
 };
 
 export default AdminPanel;
