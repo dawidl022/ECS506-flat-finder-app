@@ -1,22 +1,31 @@
 from http.client import (
-    BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, UNAUTHORIZED)
+    BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, SERVICE_UNAVAILABLE)
 import os
+from typing import cast
 import uuid
 
 from flask import Blueprint, Response, abort, jsonify, make_response, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import jwt_required
 from werkzeug.datastructures import FileStorage
+from app.auth.jwt import get_current_user_email
 from app.listings.exceptions import ListingNotFoundError
 
 from app.util.marshmallow import get_params, get_input
 from app.util.encoding import CamelCaseEncoder
 from app.util.encoding import CamelCaseDecoder
+from app.clients.APIException import APIException
 from config import Config
 from .models import AccommodationListing, Source
-from app.user.user_model import User, ContactDetails
+from app.user.user_models import User, ContactDetails
+from .models import AccommodationListing, InternalAccommodationListing, Source
+
 from .dtos import (
-    AccommodationSearchResultDTO, AccommodationForm,
-    AccommodationListingDTO, AccommodationSearchParams, SearchResult, SourceDTO
+    AccommodationForm,
+    AccommodationListingDTO,
+    AccommodationSearchParams,
+    AccommodationSearchResultDTO,
+    SearchResultDTO,
+    SourceDTO
 )
 from .service import BaseListingsService
 
@@ -52,14 +61,18 @@ def get_accommodation_listings(listings_service: BaseListingsService
     listings = listings_service.search_accommodation_listings(params)
     sources = listings_service.get_available_sources(params.location)
 
-    result = SearchResult(
+    result = SearchResultDTO(
         sources=[
-            SourceDTO(s, enabled=params.sources is None or s in params.sources)
+            SourceDTO(
+                name=str(s),
+                enabled=params.sources is None or s in params.sources,
+                failed=s in listings.failed_sources
+            )
             for s in sources
         ],
         search_results=[
             AccommodationSearchResultDTO(listing)
-            for listing in listings
+            for listing in listings.results
         ]
     )
 
@@ -84,20 +97,6 @@ def create_accommodation_listing(listing_service: BaseListingsService
     dto = AccommodationListingDTO(listing, dummy_user)
 
     return jsonify(dto)
-
-
-def get_current_user_email():
-    """
-    get user email from JWT token in header of request
-    """
-    current_user_id = get_jwt_identity()
-    current_user_email = current_user_id.get("email")
-
-    if current_user_email is None:
-        abort(make_response(
-            {'token': "invalid bearer token"}, UNAUTHORIZED))
-
-    return current_user_email
 
 
 def validate_and_get_uploaded_photos():
@@ -150,7 +149,12 @@ def get_accommodation_listing(
         listing_id: str, listing_service: BaseListingsService) -> Response:
     source, id = extract_listing_id_and_source(listing_id)
 
-    listing = fetch_accommodation_listing(listing_service, source, id)
+    try:
+        listing = fetch_accommodation_listing(listing_service, source, id)
+    except APIException:
+        abort(make_response(
+            {"source": f"{source} not available"}, SERVICE_UNAVAILABLE))
+
     dummy_user = make_dummy_user(get_current_user_email())
 
     dto = AccommodationListingDTO(listing, dummy_user)
@@ -206,14 +210,15 @@ def put_accommodation_listing(
 
 def get_accommodation_listing_authored_by_current_user(
         listing_id: str, listing_service: BaseListingsService, action: str
-) -> AccommodationListing:
+) -> InternalAccommodationListing:
     source, id = extract_listing_id_and_source(listing_id)
 
     if source != Source.internal:
         abort(make_response(
             {'listingId': f"cannot {action} external listing"}, FORBIDDEN))
 
-    listing = fetch_accommodation_listing(listing_service, source, id)
+    listing = cast(InternalAccommodationListing,
+                   fetch_accommodation_listing(listing_service, source, id))
 
     if listing.author_email != get_current_user_email():
         abort(make_response(

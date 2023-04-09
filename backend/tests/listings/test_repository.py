@@ -4,7 +4,7 @@ import unittest
 import uuid
 
 from app.listings.exceptions import ListingNotFoundError
-from app.listings.models import AccommodationListing, Source, UKAddress
+from app.listings.models import AccommodationListing, InternalAccommodationListing, Source, UKAddress
 from app.listings.repository import InMemoryAccommodationListingsRepository
 from app.listings.models import Coordinates, Location, SortBy
 
@@ -325,7 +325,7 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
 
     @staticmethod
     def accommodation_with_coords(lat: float, long: float, price: int = 10_000) -> AccommodationListing:
-        return AccommodationListing(
+        return InternalAccommodationListing(
             id=uuid.uuid4(),
             location=Location(
                 coords=Coordinates(lat=lat, long=long),
@@ -342,9 +342,9 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
             source=Source.internal
         )
 
-    @ staticmethod
+    @staticmethod
     def default_accommodation(listing_id: uuid.UUID):
-        return AccommodationListing(
+        return InternalAccommodationListing(
             id=listing_id,
             location=origin_location,
             created_at=time.time(),

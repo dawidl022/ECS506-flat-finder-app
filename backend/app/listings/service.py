@@ -1,15 +1,20 @@
 import abc
 import dataclasses
+from typing import NamedTuple
 import uuid
 import time
 from app.listings.exceptions import ListingNotFoundError
 from app.listings.models import (
-    AccommodationSearchResult, Address, Coordinates, Photo, Source)
+    AccommodationSearchResult, Address, Coordinates,
+    InternalAccommodationListing, Photo, Source)
 from app.listings.dtos import (
     AccommodationForm, AccommodationSearchParams)
 from app.listings.models import AccommodationListing, Location
 from app.listings.repository import (
-    AccommodationListingRepository, ListingPhotoRepository)
+    AccommodationListingRepository, ListingPhotoRepository,
+    sort_and_page_listings)
+from app.clients.ListingAPIClient import ListingAPIClient
+from app.clients.APIException import APIException
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 
@@ -53,10 +58,16 @@ class GeocodingService(BaseGeocodingService):
         return distance
 
 
+class SearchResult(NamedTuple):
+    results: list[AccommodationSearchResult]
+    failed_sources: set[Source]
+
+
 class BaseListingsService(abc.ABC):
     @abc.abstractmethod
-    def search_accommodation_listings(self, params: AccommodationSearchParams
-                                      ) -> list[AccommodationSearchResult]:
+    def search_accommodation_listings(
+        self, params: AccommodationSearchParams
+    ) -> SearchResult:
         pass
 
     @abc.abstractmethod
@@ -90,13 +101,21 @@ class ListingsService(BaseListingsService):
 
     def __init__(self, geocoder: BaseGeocodingService,
                  accommodation_listing_repo: AccommodationListingRepository,
-                 listing_photo_repo: ListingPhotoRepository) -> None:
+                 listing_photo_repo: ListingPhotoRepository,
+                 external_sources: dict[Source, ListingAPIClient]) -> None:
         self.geocoder = geocoder
         self.accommodation_listing_repo = accommodation_listing_repo
         self.listing_photo_repo = listing_photo_repo
+        self.external_sources = external_sources
 
-    def search_accommodation_listings(self, params: AccommodationSearchParams
-                                      ) -> list[AccommodationSearchResult]:
+    def search_accommodation_listings(
+        self, params: AccommodationSearchParams
+    ) -> SearchResult:
+        """
+        Naive search algorithm, linear with regards to params.page and
+        params.size, i.e. the higher the page, the longer the algorithm takes
+        to complete.
+        """
         coords = self.geocoder.search_coords(params.location)
         listings: list[AccommodationListing] = []
         search_all_sources = params.sources is None
@@ -106,16 +125,41 @@ class ListingsService(BaseListingsService):
                 coords=coords,
                 radius=params.radius,
                 order_by=params.sort_by,
-                page=params.page,
-                size=params.size,
+                page=0,
+                size=params.size * (params.page + 1),
                 max_price=params.max_price
             )
+        failed_sources: set[Source] = set()
 
-        return [AccommodationSearchResult(
+        for source in (params.sources_list or self.external_sources):
+            source_client = self.external_sources.get(source)
+            if source_client is None:
+                continue
+
+            try:
+                listings += source_client.search_listing(
+                    area=params.location,
+                    radius=params.radius,
+                    order_by=params.sort_by,
+                    page_number=0,
+                    page_size=params.size * (params.page + 1),
+                    maximum_price=int(
+                        params.max_price
+                    ) if params.max_price is not None else None
+                )
+            except APIException:
+                failed_sources.add(source)
+
+        sorted = sort_and_page_listings(
+            listings, coords, params.sort_by,
+            page=params.page, size=params.size
+        )
+
+        return SearchResult([AccommodationSearchResult(
             distance=self.geocoder.calc_distance(coords, acc.location.coords),
-            is_favourite=False,
+            is_favourite=False,  # favourites not currently supported
             accommodation=acc.summarise()
-        ) for acc in listings]
+        ) for acc in sorted], failed_sources)
 
     def create_accommodation_listing(
             self, form: AccommodationForm, photos: list[bytes],
@@ -125,7 +169,7 @@ class ListingsService(BaseListingsService):
         listing_photos = [Photo(id=uuid.uuid4(), blob=photo)
                           for photo in photos]
 
-        listing = AccommodationListing(
+        listing = InternalAccommodationListing(
             id=uuid.uuid4(),
             location=Location(
                 coords=self.geocoder.get_coords(form.decoded_address),
@@ -152,6 +196,8 @@ class ListingsService(BaseListingsService):
         if source == source.internal:
             id = uuid.UUID(listing_id)
             return self.accommodation_listing_repo.get_listing_by_id(id)
+        if source in self.external_sources:
+            return self.external_sources[source].fetch_listing(listing_id)
 
         raise ValueError("Unknown source for accommodation listing")
 
