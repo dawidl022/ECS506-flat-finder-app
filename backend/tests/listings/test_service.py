@@ -5,14 +5,19 @@ import unittest
 from uuid import UUID
 import uuid
 
+from app.clients.ListingAPIClient import ListingAPIClient
+from app.clients.APIException import APIException
+
 from .test_routes import model_listing, model_listing_summary
 from app.listings.exceptions import ListingNotFoundError
-from app.listings.models import AccommodationListing, Address, Coordinates, Location, Photo, SortBy, Source, UKAddress
+from app.listings.models import Address, Coordinates, ExternalAccommodationListing, InternalAccommodationListing, Location, Photo, SortBy, Source, UKAddress
 from app.listings.dtos import AccommodationForm
-from app.listings.service import BaseGeocodingService, ListingsService
+from app.listings.service import BaseGeocodingService, ListingsService, SearchResult
 from app.listings.repository import AccommodationListingRepository, ListingPhotoRepository
-from app.listings.models import AccommodationListing, AccommodationSearchResult, Address, Coordinates, Location, Photo, SortBy, UKAddress
+from app.listings.models import AccommodationSearchResult, Address, Coordinates, Location, Photo, SortBy, UKAddress
 from app.listings.dtos import AccommodationForm, AccommodationSearchParams
+
+from .test_repository import origin_location
 
 
 expected_coords = Coordinates(51.524067, -0.040374)
@@ -34,11 +39,11 @@ class StubGeocodingService(BaseGeocodingService):
 class SpyAccommodationListingRepo(AccommodationListingRepository):
 
     def __init__(self) -> None:
-        self.saved_listings: list[AccommodationListing] = []
+        self.saved_listings: list[InternalAccommodationListing] = []
         self.deleted_listing_ids: list[UUID] = []
 
     def get_listing_by_id(self, listing_id: UUID
-                          ) -> AccommodationListing | None:
+                          ) -> InternalAccommodationListing | None:
         if listing_id == model_listing.id:
             return model_listing
         return None
@@ -51,13 +56,67 @@ class SpyAccommodationListingRepo(AccommodationListingRepository):
     def search_by_location(
         self, coords: Coordinates, radius: float, order_by: SortBy, page: int,
         size: int, max_price: float | None = None
-    ) -> list[AccommodationListing]:
+    ) -> list[InternalAccommodationListing]:
         if coords == expected_search_coords and radius >= 10:
             return [model_listing]
         return []
 
-    def save_listing(self, listing: AccommodationListing) -> None:
+    def save_listing(self, listing: InternalAccommodationListing) -> None:
         self.saved_listings.append(listing)
+
+    def get_listings_authored_by(self, user_email: str) -> tuple[InternalAccommodationListing, ...]:
+        if user_email == model_listing.author_email:
+            return model_listing,
+        return ()
+
+
+class StubAccommodationListingRepo(AccommodationListingRepository):
+    def __init__(self, listings: list[InternalAccommodationListing]):
+        self.listings = {listing.id: listing for listing in listings}
+
+    def get_listing_by_id(self, listing_id: UUID) -> InternalAccommodationListing | None:
+        return self.listings.get(listing_id)
+
+    def search_by_location(
+            self, coords: Coordinates, radius: float, order_by: SortBy,
+            page: int, size: int, max_price: float | None = None
+    ) -> list[InternalAccommodationListing]:
+        return list(self.listings.values())
+
+    def save_listing(self, listing: InternalAccommodationListing) -> None:
+        raise NotImplementedError()
+
+    def delete_listing(self, listing_id: UUID) -> None:
+        raise NotImplementedError()
+
+    def get_listings_authored_by(self, user_email: str) -> tuple[InternalAccommodationListing, ...]:
+        return ()
+
+
+class StubListingClient(ListingAPIClient):
+    def __init__(self, listings: list[ExternalAccommodationListing]):
+        self.listings = {str(listing.id): listing for listing in listings}
+
+    def search_listing(
+            self, area: str, radius: float, order_by: 'SortBy',
+            page_number: int, page_size: int, maximum_price: int | None = None
+    ) -> list['ExternalAccommodationListing']:
+        return list(self.listings.values())
+
+    def fetch_listing(self, listing_id: str) -> 'ExternalAccommodationListing | None':
+        return self.listings.get(listing_id)
+
+
+class StubExceptionListingClient(ListingAPIClient):
+
+    def search_listing(
+            self, area: str, radius: float, order_by: 'SortBy',
+            page_number: int, page_size: int, maximum_price: int | None = None
+    ) -> list['ExternalAccommodationListing']:
+        raise APIException()
+
+    def fetch_listing(self, listing_id: str) -> 'ExternalAccommodationListing | None':
+        raise APIException()
 
 
 class SpyPhotoRepo(ListingPhotoRepository):
@@ -106,7 +165,8 @@ class ListingsServiceTest(unittest.TestCase):
         self.service = ListingsService(
             geocoder=StubGeocodingService(),
             accommodation_listing_repo=self.spy_accommodation_listing_repo,
-            listing_photo_repo=self.spy_photo_repo
+            listing_photo_repo=self.spy_photo_repo,
+            external_sources={}
         )
 
     def test_create_accommodation_listing__returns_listing_model(self):
@@ -166,13 +226,13 @@ class ListingsServiceTest(unittest.TestCase):
         )
         results = self.service.search_accommodation_listings(params)
 
-        self.assertEqual([
+        self.assertEqual(SearchResult([
             AccommodationSearchResult(
                 distance=expected_distance,
                 is_favourite=False,
                 accommodation=model_listing_summary,
             )
-        ], results)
+        ], set()), results)
 
     def test_search_accommodation_listing__given_internal_source__searches_internal_repo(self):
         params = AccommodationSearchParams(
@@ -182,24 +242,64 @@ class ListingsServiceTest(unittest.TestCase):
         )
         results = self.service.search_accommodation_listings(params)
 
-        self.assertEqual([
+        self.assertEqual(SearchResult([
             AccommodationSearchResult(
                 distance=expected_distance,
                 is_favourite=False,
                 accommodation=model_listing_summary,
-            )
-        ], results)
+            ),
+        ], set()), results)
 
     def test_search_accommodation_listing__given_external_source__uses_client_to_search(self):
-        # TODO in #80
+        listings = generate_external_listings_with_decreasing_creation_time(2)
+
+        service = ListingsService(
+            geocoder=StubGeocodingService(),
+            accommodation_listing_repo=self.spy_accommodation_listing_repo,
+            listing_photo_repo=self.spy_photo_repo,
+            external_sources={
+                Source.zoopla: StubListingClient(
+                    listings
+                )
+            }
+        )
         params = AccommodationSearchParams(
             location="London",
             radius=10,
             sources="zoopla"
         )
-        results = self.service.search_accommodation_listings(params)
 
-        self.assertEqual([], results)
+        expected = SearchResult([
+            AccommodationSearchResult(
+                distance=10,
+                is_favourite=False,
+                accommodation=listing.summarise()
+            )
+            for listing in listings
+        ], set())
+
+        actual = service.search_accommodation_listings(params)
+
+        self.assertEqual(expected, actual)
+
+    def test_search_accommodation_listing__given_external_source_raises_error__adds_source_to_failed(self):
+        service = ListingsService(
+            geocoder=StubGeocodingService(),
+            accommodation_listing_repo=self.spy_accommodation_listing_repo,
+            listing_photo_repo=self.spy_photo_repo,
+            external_sources={
+                Source.zoopla: StubExceptionListingClient()
+            }
+        )
+        params = AccommodationSearchParams(
+            location="London",
+            radius=10,
+            sources="zoopla"
+        )
+
+        actual = service.search_accommodation_listings(params)
+
+        self.assertEqual(SearchResult([], {Source.zoopla}), actual)
 
     def test_get_accommodation_listing__given_listing_exists_in_repo__returns_listing(self):
         actual = self.service.get_accommodation_listing(
@@ -211,9 +311,37 @@ class ListingsServiceTest(unittest.TestCase):
             str(uuid.uuid4()), Source.internal)
         self.assertIsNone(actual)
 
-    def test_get_accommodation_listing__given_zoopla_source__raises_error(self):
-        self.assertRaises(ValueError, lambda: self.service.get_accommodation_listing(
-            str(model_listing.id), Source.zoopla))
+    def test_get_accommodation_listing__given_zoopla_source__returns_listing(self):
+        listings = generate_external_listings_with_decreasing_creation_time(1)
+
+        service = ListingsService(
+            geocoder=StubGeocodingService(),
+            accommodation_listing_repo=self.spy_accommodation_listing_repo,
+            listing_photo_repo=self.spy_photo_repo,
+            external_sources={
+                Source.zoopla: StubListingClient(listings)
+            }
+        )
+        expected = listings[0]
+        actual = service.get_accommodation_listing(expected.id, Source.zoopla)
+
+        self.assertEqual(expected, actual)
+
+    def test_search_accommodation_listing__given_external_raises_error__raises_error(self):
+        service = ListingsService(
+            geocoder=StubGeocodingService(),
+            accommodation_listing_repo=self.spy_accommodation_listing_repo,
+            listing_photo_repo=self.spy_photo_repo,
+            external_sources={
+                Source.zoopla: StubExceptionListingClient()
+            }
+        )
+        self.assertRaises(
+            APIException,
+            lambda: service.get_accommodation_listing(
+                uuid.uuid4(), Source.zoopla
+            )
+        )
 
     def test_update_accommodation_listing__given_listing_id__updates_listing(self):
         new_title = "My new amazing title!"
@@ -297,3 +425,223 @@ class ListingsServiceTest(unittest.TestCase):
 
         self.assertEqual(len(expected), len(actual))
         self.assertEqual(expected, set(actual))
+
+    def test_get_listings_authored_by__returns_listings(self):
+        actual = self.service.get_listings_authored_by(
+            model_listing.author_email)
+        self.assertEqual([model_listing_summary], actual)
+
+
+class ListingsServiceSearchTest(unittest.TestCase):
+    """
+    Collection of tests to test the accumulative search algorithm
+    """
+
+    def search(
+            self, service: ListingsService, params: AccommodationSearchParams,
+            page: int, size: int) -> list[AccommodationSearchResult]:
+        return service.search_accommodation_listings(
+            dataclasses.replace(params, page=page, size=size)).results
+
+    def test_search__given_all_latest_listings_internal__returns_listings(self):
+        external_listings = generate_external_listings_with_decreasing_creation_time(
+            10, start_time=time.time()-60)
+        internal_listings = generate_internal_listings_with_decreasing_creation_time(
+            10)
+
+        service = ListingsService(
+            geocoder=StubGeocodingService(),
+            accommodation_listing_repo=StubAccommodationListingRepo(
+                internal_listings),
+            listing_photo_repo=SpyPhotoRepo(),
+            external_sources={
+                Source.zoopla: StubListingClient(external_listings)
+            }
+        )
+
+        stub_params = AccommodationSearchParams(
+            location="London",
+            radius=10
+        )
+
+        internal_search_results = [AccommodationSearchResult(
+            distance=10, is_favourite=False, accommodation=acc.summarise()
+        ) for acc in internal_listings]
+        external_search_results = [AccommodationSearchResult(
+            distance=10, is_favourite=False, accommodation=acc.summarise()
+        ) for acc in external_listings]
+
+        self.assertEqual(
+            internal_search_results[:5],
+            self.search(service, stub_params, page=0, size=5)
+        )
+        self.assertEqual(
+            internal_search_results,
+            self.search(service, stub_params, page=0, size=10)
+        )
+        self.assertEqual(
+            internal_search_results + external_search_results[:5],
+            self.search(service, stub_params, page=0, size=15)
+        )
+        self.assertEqual(
+            internal_search_results + external_search_results,
+            self.search(service, stub_params, page=0, size=20)
+        )
+        self.assertEqual(
+            internal_search_results + external_search_results,
+            self.search(service, stub_params, page=0, size=21)
+        )
+        self.assertEqual(
+            internal_search_results[5:],
+            self.search(service, stub_params, page=1, size=5)
+        )
+        self.assertEqual(
+            internal_search_results[8:] + external_search_results[:6],
+            self.search(service, stub_params, page=1, size=8)
+        )
+        self.assertEqual(
+            external_search_results[:2],
+            self.search(service, stub_params, page=5, size=2)
+        )
+        self.assertEqual(
+            external_search_results[:5],
+            self.search(service, stub_params, page=2, size=5)
+        )
+        self.assertEqual(
+            external_search_results[5:],
+            self.search(service, stub_params, page=3, size=5)
+        )
+        self.assertEqual(
+            [],
+            self.search(service, stub_params, page=5, size=5)
+        )
+
+    def test_search__listings_intertwined_in_time__returns_listings(self):
+        start_time = time.time()
+        external_listings = generate_external_listings_with_decreasing_creation_time(
+            10, start_time=start_time-1, step=2)
+        internal_listings = generate_internal_listings_with_decreasing_creation_time(
+            10, start_time=start_time, step=2)
+
+        service = ListingsService(
+            geocoder=StubGeocodingService(),
+            accommodation_listing_repo=StubAccommodationListingRepo(
+                internal_listings),
+            listing_photo_repo=SpyPhotoRepo(),
+            external_sources={
+                Source.zoopla: StubListingClient(external_listings)
+            }
+        )
+
+        stub_params = AccommodationSearchParams(
+            location="London",
+            radius=10
+        )
+
+        expected_order = [
+            internal_listings[i // 2]
+            if i % 2 == 0 else external_listings[i // 2]
+            for i in range(len(external_listings) + len(internal_listings))
+        ]
+
+        expected_results = [
+            AccommodationSearchResult(
+                distance=10, is_favourite=False, accommodation=acc.summarise()
+            ) for acc in expected_order
+        ]
+
+        self.assertEqual(
+            expected_results[:5],
+            self.search(service, stub_params, page=0, size=5)
+        )
+        self.assertEqual(
+            expected_results[:10],
+            self.search(service, stub_params, page=0, size=10)
+        )
+        self.assertEqual(
+            expected_results[:15],
+            self.search(service, stub_params, page=0, size=15)
+        )
+        self.assertEqual(
+            expected_results,
+            self.search(service, stub_params, page=0, size=20)
+        )
+        self.assertEqual(
+            expected_results,
+            self.search(service, stub_params, page=0, size=21)
+        )
+        self.assertEqual(
+            expected_results[5:10],
+            self.search(service, stub_params, page=1, size=5)
+        )
+        self.assertEqual(
+            expected_results[8:16],
+            self.search(service, stub_params, page=1, size=8)
+        )
+        self.assertEqual(
+            expected_results[10:12],
+            self.search(service, stub_params, page=5, size=2)
+        )
+        self.assertEqual(
+            expected_results[10:15],
+            self.search(service, stub_params, page=2, size=5)
+        )
+        self.assertEqual(
+            expected_results[15:],
+            self.search(service, stub_params, page=3, size=5)
+        )
+        self.assertEqual(
+            [],
+            self.search(service, stub_params, page=4, size=5)
+        )
+
+
+def generate_external_listings_with_decreasing_creation_time(
+    n: int,
+    start_time=time.time(),
+    step=1
+) -> list[ExternalAccommodationListing]:
+    return [
+        ExternalAccommodationListing(
+            id=str(uuid.uuid4()),
+            location=origin_location,
+            created_at=start_time - i * step,
+            price=700,
+            title=f"Listing {i}",
+            description="Some amazing description",
+            accommodation_type="Flat",
+            number_of_rooms=2,
+            source=Source.zoopla,
+            original_listing_url="",
+            author_phone="+44 78912 345678",
+            photo_urls=[
+                "https://fastly.picsum.photos/id/308/1200/1200"
+                ".jpg?hmac=2c1705rmBMgsQTZ1I9Uu74cRpA4Fxdl0THWV8wfV5VQ",
+            ],
+            _short_description="Good flat"
+        )
+        for i in range(n)
+    ]
+
+
+def generate_internal_listings_with_decreasing_creation_time(
+    n: int,
+    start_time=time.time(),
+    step=1
+) -> list[InternalAccommodationListing]:
+    return [
+        InternalAccommodationListing(
+            id=uuid.uuid4(),
+            location=origin_location,
+            created_at=start_time - i * step,
+            price=700,
+            title=f"Listing {i}",
+            description="Some amazing description",
+            accommodation_type="Flat",
+            number_of_rooms=2,
+            source=Source.internal,
+            author_email="unittest@example.com",
+            photo_ids=(uuid.uuid4(),),
+        )
+        for i in range(n)
+    ]

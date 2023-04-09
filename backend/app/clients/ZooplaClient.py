@@ -1,16 +1,16 @@
 import os
 import requests
 
-import uuid
 from enum import StrEnum
 from datetime import datetime
 from typing import Dict, Union
 
-from app.clients.APIClient import APIClient
+from app.clients.ListingAPIClient import ListingAPIClient
 from app.clients.APIException import *
 
-from app.listings.models import ExternalAccommodationListing, Location, \
-    Coordinates, UKAddress, Source
+from app.listings.models import (
+    Location, SortBy, ExternalAccommodationListing,
+    Coordinates, UKAddress, Source)
 
 
 class ZooplaOrderBy(StrEnum):
@@ -20,32 +20,34 @@ class ZooplaOrderBy(StrEnum):
     view_count = 'view_count'
 
 
-class ZooplaClient(APIClient):
+class ZooplaClient(ListingAPIClient):
     name: str = "Zoopla"
-    API_KEY = os.getenv('ZOOPLA_API_KEY')
 
-    @staticmethod
-    def fetchListing(listing_id: int) -> ExternalAccommodationListing | None:
+    def __init__(self, api_key: str) -> None:
+        self.API_KEY = api_key
+
+    def fetch_listing(self, listing_id: str
+                      ) -> ExternalAccommodationListing | None:
         querystring = {"listing_id": listing_id}
 
-        response = ZooplaClient.submitRequest(querystring)
+        response = self.submitRequest(querystring)
 
         if (response['result_count']) == 0:
             return None
 
-        return ZooplaClient.parseListing(response['listing'][0])
+        return self.parseListing(response['listing'][0])
 
-    @staticmethod
-    def searchListing(area: str,
-                      radius: float,
-                      order_by: ZooplaOrderBy,
-                      page_number: int,
-                      page_size: int,
-                      maximum_price: int | None = None
-                      ) -> list[ExternalAccommodationListing]:
+    def search_listing(self,
+                       area: str,
+                       radius: float,
+                       order_by: SortBy,
+                       page_number: int,
+                       page_size: int,
+                       maximum_price: int | None = None
+                       ) -> list[ExternalAccommodationListing]:
         querystring: Dict[str, Union[str, float, int]] = {
             "area": area,
-            "order_by": order_by,
+            "order_by": ZooplaClient.map_order_by(order_by),
             "ordering": "ascending",
             "radius": radius,
             "listing_status": "rent",
@@ -56,19 +58,31 @@ class ZooplaClient(APIClient):
         if maximum_price is not None:
             querystring["maximum_price"] = maximum_price
 
-        response = ZooplaClient.submitRequest(querystring)
+        response = self.submitRequest(querystring)
 
         out = []
         for x in response['listing']:
-            out.append(ZooplaClient.parseListing(x))
+            out.append(self.parseListing(x))
 
         return out
 
     @staticmethod
-    def submitRequest(querystring):
+    def map_order_by(order_by: SortBy) -> ZooplaOrderBy:
+        match order_by:
+            case SortBy.newest:
+                return ZooplaOrderBy.age
+            case SortBy.closest:
+                # Zoopla does not support sorting by distance
+                return ZooplaOrderBy.age
+            case SortBy.cheapest:
+                return ZooplaOrderBy.price
+
+        raise ValueError("unhandled SortBy enum member")
+
+    def submitRequest(self, querystring):
         url = "https://zoopla.p.rapidapi.com/properties/list"
         headers = {
-            "X-RapidAPI-Key": str(ZooplaClient.API_KEY),
+            "X-RapidAPI-Key": self.API_KEY,
             "X-RapidAPI-Host": "zoopla.p.rapidapi.com"
         }
 
@@ -112,36 +126,33 @@ class ZooplaClient(APIClient):
         long: float = x['longitude']
         short_desc: str = x['short_description']
 
-        address: UKAddress = UKAddress(
-            x['street_name'], None, x['post_town'], x['outcode']+x['incode'])
+        postcode: str = x['outcode'] + " " + x['incode']
 
         if ('property_number' in x):
             address = UKAddress(
                 x['property_number'],
                 x['street_name'],
                 x['post_town'],
-                x['outcode']+x['incode'])
+                postcode)
         else:
             address = UKAddress(
                 x['street_name'],
                 None,
                 x['post_town'],
-                x['outcode']+x['incode'])
+                postcode)
 
-        return ExternalAccommodationListing(uuid.uuid4(),
-                                            Location(Coordinates(
-                                                lat, long), address),
-                                            created,
-                                            price,
-                                            "",
-                                            title,
-                                            desc,
-                                            type,
-                                            numRooms,
-                                            tuple(),
-                                            Source.zoopla,
-                                            listurl,
-                                            listing_id,
-                                            photos,
-                                            short_desc,
-                                            contact)
+        return ExternalAccommodationListing(
+            id=str(listing_id),
+            location=Location(Coordinates(
+                lat, long), address),
+            created_at=created,
+            price=price,
+            title=title,
+            description=desc,
+            accommodation_type=type,
+            number_of_rooms=numRooms,
+            source=Source.zoopla,
+            original_listing_url=listurl,
+            photo_urls=photos,
+            _short_description=short_desc,
+            author_phone=contact)

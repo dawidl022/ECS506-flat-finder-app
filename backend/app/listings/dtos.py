@@ -8,14 +8,17 @@ from marshmallow import Schema, fields
 import marshmallow
 from marshmallow.validate import Range
 import dacite
+from app.user.user_dtos import UserDTO
+from app.user.user_models import User
 
 from app.util.schema import Schemable
 from app.listings.models import (
-    AccommodationSearchResult, AccommodationSummary, Country, SortBy, Source,
-    UKAddress)
+    AccommodationSearchResult, AccommodationSummary, Country,
+    ExternalAccommodationListing, ExternalAccommodationSummary,
+    InternalAccommodationListing, InternalAccommodationSummary, ListingSummary,
+    ListingType, SortBy, Source, UKAddress)
 from app.util.encoding import CamelCaseDecoder
 from app.listings.models import Address, AccommodationListing
-from app.user.user_model import User
 
 
 def validate_sources(sources: str) -> str:
@@ -123,7 +126,7 @@ class AccommodationForm(Schemable):
 class AuthorDTO:
     def __init__(self, author: User) -> None:
         self.name = author.name
-        self.userProfile = author
+        self.userProfile = UserDTO(author)
 
 
 class ContactInfoDTO:
@@ -133,22 +136,37 @@ class ContactInfoDTO:
 
 
 class AccommodationListingDTO:
-    def __init__(self, listing: AccommodationListing, author: User) -> None:
-        self.id = f"{listing.source}/{listing.id}"
+    def __init__(self, listing: AccommodationListing, author: User):
+        self.id = f"{listing.source}_{listing.id}"
         self.title = listing.title
         self.description = listing.description
-        self.photo_urls = [
-            url_for("listings.get_listing_photo",
-                    listing_id=listing.id, photo_id=id)
-            for id in listing.photo_ids
-        ]
+        self.photo_urls = self.get_photo_urls(listing)
         self.accommodation_type = listing.accommodation_type
         self.number_of_rooms = listing.number_of_rooms
         self.source = listing.source
         self.price = listing.price
         self.address = listing.location.address
-        self.author = AuthorDTO(author)
+        self.original_listing_url = self.get_original_listing_url(listing)
+        self.author = AuthorDTO(author)  # TODO conditionally set author
         self.contact_info = ContactInfoDTO(author)
+
+    @staticmethod
+    def get_photo_urls(listing: AccommodationListing) -> list[str]:
+        if isinstance(listing, InternalAccommodationListing):
+            return [
+                url_for("listings.get_listing_photo",
+                        listing_id=listing.id, photo_id=id)
+                for id in listing.photo_ids
+            ]
+        elif isinstance(listing, ExternalAccommodationListing):
+            return listing.photo_urls
+        return []
+
+    @staticmethod
+    def get_original_listing_url(listing: AccommodationListing) -> str | None:
+        if isinstance(listing, ExternalAccommodationListing):
+            return listing.original_listing_url
+        return None
 
 
 @dataclass
@@ -158,29 +176,58 @@ class AccommodationSummaryDTO:
     short_description: str
     accommodation_type: str
     number_of_rooms: int
-    thumbnail_url: str
+    thumbnail_url: str | None
     source: Source
     price: float
     post_code: str
 
     def __init__(self, summary: AccommodationSummary):
-        self.id = summary.id
+        self.id = f"{summary.source}_{summary.id}"
         self.title = summary.title
         self.short_description = summary.short_description
         self.accommodation_type = summary.accommodation_type
         self.number_of_rooms = summary.number_of_rooms
-        self.thumbnail_url = url_for(
-            "listings.get_listing_photo",
-            listing_id=summary.id, photo_id=summary.thumbnail_id)
+        self.thumbnail_url = self.get_thumbnail_url(summary)
         self.source = summary.source
         self.price = summary.price
         self.post_code = summary.post_code
+
+    @staticmethod
+    def get_thumbnail_url(summary: AccommodationSummary) -> str | None:
+        if isinstance(summary, InternalAccommodationSummary):
+            return url_for(
+                "listings.get_listing_photo",
+                listing_id=summary.id, photo_id=summary.thumbnail_id
+            )
+        elif isinstance(summary, ExternalAccommodationSummary):
+            return summary.thumbnail_url
+        return None
+
+
+@dataclass
+class SeekingSummaryDTO:
+    # TODO
+    pass
+
+
+@dataclass
+class ListingSummaryDTO:
+    type: ListingType
+    listing: AccommodationSummaryDTO | SeekingSummaryDTO
+
+    def __init__(self, summary: ListingSummary):
+        if isinstance(summary, AccommodationSummary):
+            self.type = ListingType.accommodation
+            self.listing = AccommodationSummaryDTO(summary)
+        else:
+            raise TypeError("unsupported ListingSummary subtype")
 
 
 @dataclass(frozen=True)
 class SourceDTO:
     name: str
     enabled: bool
+    failed: bool
 
 
 @dataclass
@@ -196,6 +243,6 @@ class AccommodationSearchResultDTO:
 
 
 @ dataclass(frozen=True)
-class SearchResult:
+class SearchResultDTO:
     sources: list[SourceDTO]
     search_results: list[AccommodationSearchResultDTO]

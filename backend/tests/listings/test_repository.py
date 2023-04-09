@@ -4,7 +4,7 @@ import unittest
 import uuid
 
 from app.listings.exceptions import ListingNotFoundError
-from app.listings.models import AccommodationListing, Source, UKAddress
+from app.listings.models import AccommodationListing, InternalAccommodationListing, Source, UKAddress
 from app.listings.repository import InMemoryAccommodationListingsRepository
 from app.listings.models import Coordinates, Location, SortBy
 
@@ -323,9 +323,33 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
         self.assertEqual(listings_within_range[1], actual_listings[0])
         self.assertEqual(listings_within_range[0], actual_listings[1])
 
+    def test_get_listings_authored_by__given_no_listings_for_given_email__returns_empty_list(self):
+        repo = InMemoryAccommodationListingsRepository()
+
+        listings = [self.default_accommodation(), self.default_accommodation()]
+        for listing in listings:
+            repo.save_listing(listing)
+
+        self.assertEqual(
+            0, len(repo.get_listings_authored_by("non-existent@example.com")))
+
+    def test_get_listings_authored_by__given_listings_exist_for_given_email__returns_empty_list(self):
+        repo = InMemoryAccommodationListingsRepository()
+
+        listings = [self.default_accommodation(), self.default_accommodation()]
+        for listing in listings:
+            repo.save_listing(listing)
+
+        actual_listings = repo.get_listings_authored_by(
+            listings[0].author_email)
+
+        self.assertEqual(
+            tuple(listings), actual_listings
+        )
+
     @staticmethod
     def accommodation_with_coords(lat: float, long: float, price: int = 10_000) -> AccommodationListing:
-        return AccommodationListing(
+        return InternalAccommodationListing(
             id=uuid.uuid4(),
             location=Location(
                 coords=Coordinates(lat=lat, long=long),
@@ -342,9 +366,9 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
             source=Source.internal
         )
 
-    @ staticmethod
-    def default_accommodation(listing_id: uuid.UUID):
-        return AccommodationListing(
+    @staticmethod
+    def default_accommodation(listing_id=uuid.uuid4()):
+        return InternalAccommodationListing(
             id=listing_id,
             location=origin_location,
             created_at=time.time(),
