@@ -33,6 +33,21 @@ const AccommodationForm: FC<FormProps> = ({
     new Configuration({ basePath: "http://127.0.0.1:5000" })
   );
 
+  const baseForm = {
+    title,
+    description,
+    address: {
+      line1,
+      line2,
+      town,
+      postCode,
+      country: AccommodationAddressCountryEnum.Uk,
+    },
+    accommodationType,
+    numberOfRooms,
+    price,
+  };
+
   if (editExistingListing) {
     api
       .apiV1ListingsAccommodationListingIdGet({ listingId })
@@ -92,19 +107,8 @@ const AccommodationForm: FC<FormProps> = ({
     if (!editExistingListing) {
       api
         .apiV1ListingsAccommodationPost({
-          title,
-          description,
+          ...baseForm,
           photos: Array<Blob>(),
-          accommodationType,
-          numberOfRooms,
-          price,
-          address: {
-            line1,
-            line2,
-            town,
-            postCode,
-            country: AccommodationAddressCountryEnum.Uk,
-          },
         })
         .catch(err =>
           alert(
@@ -118,18 +122,7 @@ const AccommodationForm: FC<FormProps> = ({
         .apiV1ListingsAccommodationListingIdPut({
           listingId,
           accommodationFormBase: {
-            title,
-            description,
-            address: {
-              line1,
-              line2,
-              town,
-              postCode,
-              country: AccommodationAddressCountryEnum.Uk,
-            },
-            accommodationType,
-            numberOfRooms,
-            price,
+            ...baseForm,
           },
         })
         .then(res => {

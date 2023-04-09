@@ -17,6 +17,12 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
     new Configuration({ basePath: "http://127.0.0.1:5000" })
   );
 
+  const baseForm = {
+    title,
+    description,
+    preferredLocation: location
+  };
+
   if (editExistingListing) {
     api
       .apiV1ListingsSeekingListingIdGet({ listingId })
@@ -34,7 +40,7 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
       pathname: "/SeekingPreviewPage",
       query: {
         title,
-        description,
+        description,   
         location,
       },
     });
@@ -53,10 +59,8 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
     if (!editExistingListing) {
       api
         .apiV1ListingsSeekingPost({
-          title,
-          description,
+          ...baseForm,
           photos: Array<Blob>(),
-          preferredLocation: location,
         })
         .catch(err =>
           alert(
@@ -69,9 +73,7 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
         .apiV1ListingsSeekingListingIdPut({
           listingId,
           seekingFormBase: {
-            title,
-            description,
-            preferredLocation: location,
+            ...baseForm,
           },
         })
         .then(res => {
