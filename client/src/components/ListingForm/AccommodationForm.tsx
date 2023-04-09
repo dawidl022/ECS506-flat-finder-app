@@ -246,14 +246,19 @@ const AccommodationForm: FC<FormProps> = ({
           <option value={"Bungalows"}>Bungalows</option>
         </select>
         <br />
-        <label htmlFor="photos">Photos:{""}</label>
-        <input
-          type="file"
-          onChange={handleFileInput}
-          id="photos"
-          accept="image/*"
-          multiple
-        />
+
+        {!editExistingListing && (
+          <div> 
+            <label htmlFor="photos">Photos:{""}</label>
+            <input
+              type="file"
+              onChange={handleFileInput}
+              id="photos"
+              accept="image/*"
+              multiple
+            />
+          </div>
+        )}
         <br />
         {/* disable the button if all required fields are not filled in */}
         <button type="button" onClick={preview} disabled={!checkInputs()}>

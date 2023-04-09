@@ -121,14 +121,18 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
           />
 
           <br />
-          <label htmlFor="photos">Photos:{""}</label>
-          <input
-            type="file"
-            id="photos"
-            onChange={handleFileInput}
-            accept="image/*"
-            multiple
-          />
+          {!editExistingListing && (
+            <div> 
+              <label htmlFor="photos">Photos:{""}</label>
+              <input
+                type="file"
+                id="photos"
+                onChange={handleFileInput}
+                accept="image/*"
+                multiple
+              />
+            </div>
+          )}
           <br />
           <button type="button" onClick={preview} disabled={!checkInputs()}>
             Preview
