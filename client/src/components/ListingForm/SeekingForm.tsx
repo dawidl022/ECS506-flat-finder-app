@@ -122,7 +122,7 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
 
           <br />
           {!editExistingListing && (
-            <div> 
+            <div>
               <label htmlFor="photos">Photos:{""}</label>
               <input
                 type="file"

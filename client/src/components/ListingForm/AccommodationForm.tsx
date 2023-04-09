@@ -248,7 +248,7 @@ const AccommodationForm: FC<FormProps> = ({
         <br />
 
         {!editExistingListing && (
-          <div> 
+          <div>
             <label htmlFor="photos">Photos:{""}</label>
             <input
               type="file"
