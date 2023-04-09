@@ -19,7 +19,7 @@ const SeekingForm: FC<SeekingProps> = ({ listingId }) => {
       setLocation(res.seeking.preferredLocation.name);
     })
     .catch(err => {
-      alert("Could not find listing. \nError: " + err);
+      alert(`Could not find listing with ID  ${listingId} \nError:  ${err}`);
     });
 
   const handleSubmit = (e: FormEvent<HTMLElement>) => {

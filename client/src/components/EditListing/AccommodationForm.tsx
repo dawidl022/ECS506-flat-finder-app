@@ -43,7 +43,7 @@ const AccommodationForm: FC<AccommodationProps> = ({ listingId }) => {
       setPrice(res.accommodation.price);
     })
     .catch(err => {
-      alert("Could not find listing. \nError: " + err);
+      alert(`Could not find listing with ID  ${listingId} \nError:  ${err}`);
     });
 
   const handleSubmit = (e: FormEvent<HTMLElement>) => {
