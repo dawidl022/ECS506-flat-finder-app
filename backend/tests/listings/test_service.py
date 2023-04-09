@@ -461,10 +461,11 @@ class ListingsServiceSearchTest(unittest.TestCase):
         )
 
     def test_search__listings_intertwined_in_time__returns_listings(self):
+        start_time = time.time()
         external_listings = generate_external_listings_with_decreasing_creation_time(
-            10, start_time=time.time()-1, step=2)
+            10, start_time=start_time-1, step=2)
         internal_listings = generate_internal_listings_with_decreasing_creation_time(
-            10, step=2)
+            10, start_time=start_time, step=2)
 
         service = ListingsService(
             geocoder=StubGeocodingService(),
