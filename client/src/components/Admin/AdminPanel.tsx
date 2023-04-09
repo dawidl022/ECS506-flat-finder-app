@@ -24,14 +24,12 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
       alert(err);
     });
 
-  const removeUserFromSystem = (index: number) => {
-    if (
-      confirm("Are you sure you want to remove " + users[index].email + "?")
-    ) {
+  const removeUserFromSystem = (user: User) => {
+    if (confirm("Are you sure you want to remove " + user.email + "?")) {
       api
-        .apiV1UsersUserIdDelete({ userId: users[index].id })
+        .apiV1UsersUserIdDelete({ userId: user.id })
         .then(() => {
-          setUsers(users.filter((user: User) => user.id !== users[index].id));
+          setUsers(users.filter((user: User) => user.id !== user.id));
         })
         .catch(err => {
           alert("User failed to be removed. \nError:" + err);
@@ -39,16 +37,12 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     }
   };
 
-  const grantAdmin = (index: number) => {
-    if (
-      confirm(
-        "Are you sure you want to grant " + users[index].email + " admin?"
-      )
-    ) {
+  const grantAdmin = (user: User) => {
+    if (confirm("Are you sure you want to grant " + user.email + " admin?")) {
       api
-        .apiV1AdminsUserIdPut({ userId: users[index].id })
+        .apiV1AdminsUserIdPut({ userId: user.id })
         .then(() => {
-          router.reload()
+          router.reload();
         })
         .catch(err => {
           alert("User failed to be granted administrator role. \nError:" + err);
@@ -56,18 +50,16 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     }
   };
 
-  const revokeAdmin = (index: number) => {
+  const revokeAdmin = (user: User) => {
     if (
       confirm(
-        "Are you sure you want to revoke " +
-          users[index].email +
-          "'s admin role?"
+        "Are you sure you want to revoke " + user.email + "'s admin role?"
       )
     ) {
       api
-        .apiV1AdminsUserIdDelete({ userId: users[index].id })
+        .apiV1AdminsUserIdDelete({ userId: user.id })
         .then(() => {
-          router.reload()
+          router.reload();
         })
         .catch(err => {
           alert(
@@ -113,7 +105,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
                   <td>
                     <button
                       type="button"
-                      onClick={() => removeUserFromSystem(index)}
+                      onClick={() => removeUserFromSystem(user)}
                     >
                       Remove User
                     </button>
@@ -125,7 +117,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
                     <button
                       type="button"
                       onClick={() => {
-                        revokeAdmin(index);
+                        revokeAdmin(user);
                       }}
                     >
                       Revoke Admin
@@ -136,7 +128,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
                     <button
                       type="button"
                       onClick={() => {
-                        grantAdmin(index);
+                        grantAdmin(user);
                       }}
                     >
                       Grant Admin
