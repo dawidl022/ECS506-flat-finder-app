@@ -43,7 +43,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     isCurrentUserAdmin = true;
   });
 
-  if (isCurrentUserAdmin) {
+  if (!isCurrentUserAdmin) {
     return (
       <div>
         <h3> Administrator Access Only </h3>
