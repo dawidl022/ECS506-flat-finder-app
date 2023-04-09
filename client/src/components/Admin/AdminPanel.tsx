@@ -39,9 +39,43 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     }
   };
 
-  api.apiV1AdminsUserIdGet({ userId: currentUserId }).then(() => {
-    isCurrentUserAdmin = true;
-  });
+  const grantAdmin = (index: number) => {
+    if (
+      confirm(
+        "Are you sure you want to grant " + users[index].email + " admin?"
+      )
+    ) {
+      api
+        .apiV1AdminsUserIdPut({ userId: users[index].id })
+        .then(() => {
+          setUsers(users.filter((user: User) => user.id !== users[index].id));
+        })
+        .catch(err => {
+          alert("User failed to be granted administrator role. \nError:" + err);
+        });
+    }
+  };
+
+  const revokeAdmin = (index: number) => {
+    if (
+      confirm(
+        "Are you sure you want to revoke " +
+          users[index].email +
+          "'s admin role?"
+      )
+    ) {
+      api
+        .apiV1AdminsUserIdDelete({ userId: users[index].id })
+        .then(() => {
+          setUsers(users.filter((user: User) => user.id !== users[index].id));
+        })
+        .catch(err => {
+          alert("User's administrator role failed to be revoked . \nError:" + err);
+        })
+    }
+  };
+
+  api.apiV1AdminsUserIdGet({ userId: currentUserId }).then(() => {});
 
   if (!isCurrentUserAdmin) {
     return (
@@ -78,6 +112,30 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
                       onClick={() => removeUserFromSystem(index)}
                     >
                       Remove User
+                    </button>
+                  </td>
+                )}
+
+                {user.isAdmin ? (
+                  <td>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        revokeAdmin(index);
+                      }}
+                    >
+                      Revoke Admin
+                    </button>
+                  </td>
+                ) : (
+                  <td>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        grantAdmin(index);
+                      }}
+                    >
+                      Grant Admin
                     </button>
                   </td>
                 )}
