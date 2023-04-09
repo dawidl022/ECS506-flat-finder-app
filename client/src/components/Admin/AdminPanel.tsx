@@ -95,9 +95,6 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     .then(res => {
       isCurrentUserAdmin = true;
     })
-    .catch(err => {
-      isCurrentUserAdmin = false;
-    });
 
   if (isCurrentUserAdmin) {
     return (
