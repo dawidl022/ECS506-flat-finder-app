@@ -12,7 +12,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     new Configuration({ basePath: "http://127.0.0.1:5000" })
   );
   const [users, setUsers] = useState<User[]>([]);
-  let isCurrentUserAdmin = false;
+  const [isCurrentUserAdmin, setIsAdmin] = useState<boolean>(false);
   const router = useRouter();
 
   api
@@ -40,7 +40,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
   };
 
   api.apiV1AdminsUserIdGet({ userId: currentUserId }).then(() => {
-    isCurrentUserAdmin = true;
+    setIsAdmin(true);
   });
 
   if (!isCurrentUserAdmin) {
