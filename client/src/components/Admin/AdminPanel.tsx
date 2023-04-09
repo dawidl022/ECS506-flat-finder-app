@@ -38,11 +38,11 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
   };
 
   api.apiV1AdminsUserIdGet({ userId: currentUserId }).then(() => {
-    setCheck(true);
+    setIsLoading(true);
     setIsAdmin(true);
   });
 
-  if (check) {
+  if (isLoading) {
     if (!isCurrentUserAdmin) {
       return (
         <div>
