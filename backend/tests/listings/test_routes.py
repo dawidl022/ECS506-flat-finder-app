@@ -9,11 +9,12 @@ import uuid
 from flask.testing import FlaskClient
 from app.listings.exceptions import ListingNotFoundError
 from app.listings.dtos import AccommodationSearchParams, AccommodationForm
-from app.listings.models import AccommodationListing, AccommodationSearchResult, AccommodationSummary, Coordinates, InternalAccommodationSummary, Location, Source, UKAddress, InternalAccommodationListing
+from app.listings.models import AccommodationListing, AccommodationSearchResult, AccommodationSummary, Coordinates, InternalAccommodationSummary, ListingSummary, Location, Source, UKAddress, InternalAccommodationListing
 
 from app.listings.service import BaseListingsService
 from app.clients.APIException import APIException
 from app.listings.service import SearchResult
+from app.user.user_models import ContactDetails, User
 
 
 class MockListingService(BaseListingsService):
@@ -71,6 +72,12 @@ class MockListingService(BaseListingsService):
 
     def get_available_sources(self, location_query: str) -> list[Source]:
         return [Source.internal, Source.zoopla]
+
+    def get_listings_authored_by(self, user_email: str
+                                 ) -> list[ListingSummary]:
+        if user_email == model_listing.author_email:
+            return [model_listing_summary]
+        return []
 
 
 model_listing = InternalAccommodationListing(
@@ -150,6 +157,12 @@ model_search_result = AccommodationSearchResult(
     distance=10,
     is_favourite=True,
     accommodation=model_listing_summary
+)
+
+model_listing_author = User(
+    id=uuid.uuid4(),
+    email=model_listing.author_email,
+    contact_details=ContactDetails(phone_number="+44 77812 713912")
 )
 
 search_results_json = [
