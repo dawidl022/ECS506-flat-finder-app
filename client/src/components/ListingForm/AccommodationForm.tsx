@@ -41,9 +41,7 @@ const AccommodationForm: FC<FormProps> = ({
         setDescription(res.accommodation.description);
         setLine1(res.accommodation.address.line1);
         //as line2 is optional, check if there is an input
-        res.accommodation.address.line2
-          ? setLine2(res.accommodation.address.line2)
-          : setLine2("");
+        setLine2(res.accommodation.address.line2 ?? "");
         setTown(res.accommodation.address.town);
         setPostCode(res.accommodation.address.postCode);
         setAccommodationType(res.accommodation.accommodationType);
