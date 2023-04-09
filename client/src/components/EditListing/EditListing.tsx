@@ -6,7 +6,7 @@ interface EditListingProps {
   listingId: string;
 }
 
-const EditListing: FC<EditListingProps> = (listingType, listingId) => {
+const EditListing: FC<EditListingProps> = ({ listingType, listingId }) => {
   return (
     <div>
       {listingType.toString() === "seeking" && (
