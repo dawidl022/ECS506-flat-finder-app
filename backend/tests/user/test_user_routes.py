@@ -30,6 +30,8 @@ class MockUserService(BaseUserService):
         return None
 
     def get_user_id_for_email(self, email: str) -> uuid.UUID:
+        if email == model_listing_author.email:
+            return model_listing_author.id
         return uuid.uuid4()
 
     def update_user(self, user_id: uuid.UUID, profile: UserProfileForm) -> None:
