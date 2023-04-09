@@ -8,13 +8,28 @@ interface FormProps {
   editable: Boolean;
 }
 
+
 const SeekingForm: FC<FormProps> = ({listingId, editable}) => {
   const router = useRouter();
-
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
+  const api = new DefaultApi(
+    new Configuration({ basePath: "http://127.0.0.1:5000" })
+  );
 
+  if(editable){
+    api
+      .apiV1ListingsSeekingListingIdGet({ listingId })
+      .then(res => {
+        setTitle(res.seeking.title);
+        setDescription(res.seeking.description);
+        setLocation(res.seeking.preferredLocation.name);
+      })
+      .catch(err => {
+        alert(`Could not find listing with ID:  ${listingId} \nError:  ${err}`);
+      });
+  }
   const preview = () => {
     router.push({
       pathname: "/SeekingPreviewPage",
@@ -35,7 +50,6 @@ const SeekingForm: FC<FormProps> = ({listingId, editable}) => {
   };
 
   const handleSubmit = (e: FormEvent<HTMLElement>) => {
-    const api = new DefaultApi(new Configuration({ basePath: "http://127.0.0.1:5000" }))
     e.preventDefault();
     if(editable){
      api
