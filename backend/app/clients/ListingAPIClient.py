@@ -12,16 +12,15 @@ class ListingAPIClient(ABC):
     name: str
 
     # returns an AccomodationListing for the given listing_id
-    @staticmethod
     @abstractmethod
-    def fetch_listing(listing_id: str
+    def fetch_listing(self, listing_id: str
                       ) -> 'ExternalAccommodationListing | None':
         pass
 
     # returns list of AccomodationListing after for a given params
-    @staticmethod
     @abstractmethod
-    def search_listing(area: str,
+    def search_listing(self,
+                       area: str,
                        radius: float,
                        order_by: 'SortBy',
                        page_number: int,

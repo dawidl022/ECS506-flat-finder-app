@@ -5,7 +5,7 @@ from enum import StrEnum
 from datetime import datetime
 from typing import Dict, Union
 
-from app.clients.APIClient import ListingAPIClient
+from app.clients.ListingAPIClient import ListingAPIClient
 from app.clients.APIException import *
 
 from app.listings.models import (
@@ -24,19 +24,18 @@ class ZooplaClient(ListingAPIClient):
     name: str = "Zoopla"
     API_KEY = os.getenv('ZOOPLA_API_KEY')
 
-    @staticmethod
-    def fetch_listing(listing_id: str) -> ExternalAccommodationListing | None:
+    def fetch_listing(self, listing_id: str) -> ExternalAccommodationListing | None:
         querystring = {"listing_id": listing_id}
 
-        response = ZooplaClient.submitRequest(querystring)
+        response = self.submitRequest(querystring)
 
         if (response['result_count']) == 0:
             return None
 
-        return ZooplaClient.parseListing(response['listing'][0])
+        return self.parseListing(response['listing'][0])
 
-    @staticmethod
-    def search_listing(area: str,
+    def search_listing(self,
+                       area: str,
                        radius: float,
                        order_by: SortBy,
                        page_number: int,
@@ -56,11 +55,11 @@ class ZooplaClient(ListingAPIClient):
         if maximum_price is not None:
             querystring["maximum_price"] = maximum_price
 
-        response = ZooplaClient.submitRequest(querystring)
+        response = self.submitRequest(querystring)
 
         out = []
         for x in response['listing']:
-            out.append(ZooplaClient.parseListing(x))
+            out.append(self.parseListing(x))
 
         return out
 
@@ -141,7 +140,7 @@ class ZooplaClient(ListingAPIClient):
                 postcode)
 
         return ExternalAccommodationListing(
-            id=listing_id,
+            id=str(listing_id),
             location=Location(Coordinates(
                 lat, long), address),
             created_at=created,
@@ -153,5 +152,5 @@ class ZooplaClient(ListingAPIClient):
             source=Source.zoopla,
             original_listing_url=listurl,
             photo_urls=photos,
-            short_description=short_desc,
+            _short_description=short_desc,
             author_phone=contact)

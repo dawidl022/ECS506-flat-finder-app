@@ -12,7 +12,7 @@ from app.listings.models import AccommodationListing, Location
 from app.listings.repository import (
     AccommodationListingRepository, ListingPhotoRepository,
     sort_and_page_listings)
-from app.clients.APIClient import ListingAPIClient
+from app.clients.ListingAPIClient import ListingAPIClient
 
 
 class BaseGeocodingService(abc.ABC):
@@ -176,6 +176,8 @@ class ListingsService(BaseListingsService):
         if source == source.internal:
             id = uuid.UUID(listing_id)
             return self.accommodation_listing_repo.get_listing_by_id(id)
+        if source in self.external_sources:
+            return self.external_sources[source].fetch_listing(listing_id)
 
         raise ValueError("Unknown source for accommodation listing")
 

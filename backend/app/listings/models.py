@@ -183,10 +183,10 @@ class InternalAccommodationListing(AccommodationListing):
 @dataclass(frozen=True)
 class ExternalAccommodationListing(AccommodationListing):
     original_listing_url: str  # TODO include in DTO
-    id: int
+    id: str
     author_phone: str
     photo_urls: list[str]
-    short_description: str
+    _short_description: str
 
     @property
     def thumbnail_url(self) -> str | None:
@@ -194,11 +194,15 @@ class ExternalAccommodationListing(AccommodationListing):
             return self.photo_urls[0]
         return None
 
+    @property
+    def short_description(self) -> str:
+        return self._short_description
+
     def summarise(self) -> AccommodationSummary:
         return ExternalAccommodationSummary(
             id=str(self.id),
             title=self.title,
-            short_description=self.short_description,
+            short_description=self._short_description,
             thumbnail_url=self.thumbnail_url,
             accommodation_type=self.accommodation_type,
             number_of_rooms=self.number_of_rooms,
