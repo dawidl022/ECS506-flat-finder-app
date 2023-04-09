@@ -12,7 +12,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     new Configuration({ basePath: "http://127.0.0.1:5000" })
   );
   const [users, setUsers] = useState<User[]>([]);
-  const [check, setCheck] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [isCurrentUserAdmin, setIsAdmin] = useState<boolean>(false);
   const router = useRouter();
