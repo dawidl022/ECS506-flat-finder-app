@@ -4,6 +4,8 @@ from flask_injector import FlaskInjector
 from flask_jwt_extended import JWTManager
 from flask_uuid import FlaskUUID
 from injector import Binder
+from app.clients.ZooplaClient import ZooplaClient
+from app.listings.models import Source
 from app.listings.service import (
     GeocodingService, ListingsService, BaseListingsService)
 from app.user.user_repository import InMemoryUserRepository
@@ -59,6 +61,9 @@ def configure_dependencies(binder: Binder) -> None:
         accommodation_listing_repo=InMemoryAccommodationListingsRepository(),
         listing_photo_repo=InMemoryPhotoRepository(),
         geocoder=GeocodingService(),
+        external_sources={
+            Source.zoopla: ZooplaClient()
+        }
     )
     user_service = UserService(
         repo=InMemoryUserRepository()

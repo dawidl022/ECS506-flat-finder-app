@@ -1,16 +1,16 @@
 import os
 import requests
 
-import uuid
 from enum import StrEnum
 from datetime import datetime
 from typing import Dict, Union
 
-from app.clients.APIClient import APIClient
+from app.clients.APIClient import ListingAPIClient
 from app.clients.APIException import *
 
-from app.listings.models import ExternalAccommodationListing, Location, \
-    Coordinates, UKAddress, Source
+from app.listings.models import (
+    Location, SortBy, ExternalAccommodationListing,
+    Coordinates, UKAddress, Source)
 
 
 class ZooplaOrderBy(StrEnum):
@@ -20,12 +20,12 @@ class ZooplaOrderBy(StrEnum):
     view_count = 'view_count'
 
 
-class ZooplaClient(APIClient):
+class ZooplaClient(ListingAPIClient):
     name: str = "Zoopla"
     API_KEY = os.getenv('ZOOPLA_API_KEY')
 
     @staticmethod
-    def fetchListing(listing_id: int) -> ExternalAccommodationListing | None:
+    def fetch_listing(listing_id: str) -> ExternalAccommodationListing | None:
         querystring = {"listing_id": listing_id}
 
         response = ZooplaClient.submitRequest(querystring)
@@ -36,16 +36,16 @@ class ZooplaClient(APIClient):
         return ZooplaClient.parseListing(response['listing'][0])
 
     @staticmethod
-    def searchListing(area: str,
-                      radius: float,
-                      order_by: ZooplaOrderBy,
-                      page_number: int,
-                      page_size: int,
-                      maximum_price: int | None = None
-                      ) -> list[ExternalAccommodationListing]:
+    def search_listing(area: str,
+                       radius: float,
+                       order_by: SortBy,
+                       page_number: int,
+                       page_size: int,
+                       maximum_price: int | None = None
+                       ) -> list[ExternalAccommodationListing]:
         querystring: Dict[str, Union[str, float, int]] = {
             "area": area,
-            "order_by": order_by,
+            "order_by": ZooplaClient.map_order_by(order_by),
             "ordering": "ascending",
             "radius": radius,
             "listing_status": "rent",
@@ -63,6 +63,19 @@ class ZooplaClient(APIClient):
             out.append(ZooplaClient.parseListing(x))
 
         return out
+
+    @staticmethod
+    def map_order_by(order_by: SortBy) -> ZooplaOrderBy:
+        match order_by:
+            case SortBy.newest:
+                return ZooplaOrderBy.age
+            case SortBy.closest:
+                # Zoopla does not support sorting by distance
+                return ZooplaOrderBy.age
+            case SortBy.cheapest:
+                return ZooplaOrderBy.price
+
+        raise ValueError("unhandled SortBy enum member")
 
     @staticmethod
     def submitRequest(querystring):

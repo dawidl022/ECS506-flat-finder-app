@@ -1,28 +1,31 @@
-from abc import ABC,  abstractmethod
-from app.listings.models import ExternalAccommodationListing
+from abc import ABC, abstractmethod
 
-from app.clients.ZooplaClient import ZooplaOrderBy
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.listings.models import ExternalAccommodationListing, SortBy
 
 
 # abstract APIClient class
-class APIClient(ABC):
+class ListingAPIClient(ABC):
     # API identifier, e.g. Zoopla
-    name: str = "None"
+    name: str
 
     # returns an AccomodationListing for the given listing_id
     @staticmethod
     @abstractmethod
-    def fetchListing(listing_id: int) -> ExternalAccommodationListing | None:
-        return None
+    def fetch_listing(listing_id: str
+                      ) -> 'ExternalAccommodationListing | None':
+        pass
 
     # returns list of AccomodationListing after for a given params
     @staticmethod
     @abstractmethod
-    def searchListing(area: str,
-                      radius: float,
-                      order_by: ZooplaOrderBy,
-                      page_number: int,
-                      page_size: int,
-                      maximum_price: int
-                      ) -> list[ExternalAccommodationListing]:
-        return []
+    def search_listing(area: str,
+                       radius: float,
+                       order_by: 'SortBy',
+                       page_number: int,
+                       page_size: int,
+                       maximum_price: int | None = None
+                       ) -> list['ExternalAccommodationListing']:
+        pass

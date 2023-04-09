@@ -13,7 +13,9 @@ from app.user.user_models import User
 
 from app.util.schema import Schemable
 from app.listings.models import (
-    AccommodationSearchResult, AccommodationSummary, Country, ExternalAccommodationListing, ExternalAccommodationSummary, InternalAccommodationListing, InternalAccommodationSummary, SortBy, Source,
+    AccommodationSearchResult, AccommodationSummary, Country,
+    ExternalAccommodationListing, ExternalAccommodationSummary,
+    InternalAccommodationListing, InternalAccommodationSummary, SortBy, Source,
     UKAddress)
 from app.util.encoding import CamelCaseDecoder
 from app.listings.models import Address, AccommodationListing

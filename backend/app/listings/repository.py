@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import time
-from typing import Callable
+from typing import Callable, TypeVar
 from uuid import UUID
 from geopy import distance
 
@@ -56,41 +56,52 @@ class InMemoryAccommodationListingsRepository(AccommodationListingRepository):
         self, coords: Coordinates, radius: float, order_by: SortBy, page: int,
         size: int, max_price: float | None = None
     ) -> list[InternalAccommodationListing]:
-        return sorted(
+        return sort_and_page_listings(
             [listing for listing in self.listings.values()
              if distance.distance(coords, listing.location.coords) <= radius
              and (max_price is None or listing.price <= max_price)
-             ],
-            key=self.sort_key(coords, order_by),
-        )[page * size:page * size + size]
+             ], coords, order_by, page, size
+        )
 
-    @staticmethod
-    def sort_key(coords: Coordinates, sort_by: SortBy
-                 ) -> Callable[[AccommodationListing], float]:
-        current_time = time.time()
 
-        match sort_by:
-            case SortBy.newest:
-                return lambda listing: current_time - listing.created_at
-            case SortBy.closest:
-                return lambda listing: distance.distance(
-                    coords, listing.location.coords)
-            case SortBy.cheapest:
-                return lambda listing: listing.price
+T = TypeVar('T', bound=AccommodationListing)
 
-        raise ValueError()
+
+def sort_and_page_listings(
+    listings: list[T], coords: Coordinates, order_by: SortBy,
+    page: int, size: int
+) -> list[T]:
+    return sorted(
+        listings, key=sort_key(coords, order_by)
+    )[page * size:page * size + size]
+
+
+def sort_key(coords: Coordinates, sort_by: SortBy
+             ) -> Callable[[AccommodationListing], float]:
+    current_time = time.time()
+
+    match sort_by:
+        case SortBy.newest:
+            return lambda listing: current_time - listing.created_at
+        case SortBy.closest:
+            return lambda listing: distance.distance(
+                coords, listing.location.coords)
+        case SortBy.cheapest:
+            return lambda listing: listing.price
+
+    raise ValueError()
 
 
 class ListingPhotoRepository(ABC):
-    @abstractmethod
+    @ abstractmethod
     def get_photo_by_id(self, photo_id: UUID) -> Photo | None:
         pass
 
-    @abstractmethod
+    @ abstractmethod
     def save_photos(self, photos: list[Photo]) -> None:
         pass
 
-    @abstractmethod
+    @ abstractmethod
     def delete_photos(self, photo_ids: list[UUID]) -> None:
         pass
 
