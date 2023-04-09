@@ -8,8 +8,7 @@ interface FormProps {
   editable: Boolean;
 }
 
-
-const SeekingForm: FC<FormProps> = ({listingId, editable}) => {
+const SeekingForm: FC<FormProps> = ({ listingId, editable }) => {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -18,7 +17,7 @@ const SeekingForm: FC<FormProps> = ({listingId, editable}) => {
     new Configuration({ basePath: "http://127.0.0.1:5000" })
   );
 
-  if(editable){
+  if (editable) {
     api
       .apiV1ListingsSeekingListingIdGet({ listingId })
       .then(res => {
@@ -51,8 +50,8 @@ const SeekingForm: FC<FormProps> = ({listingId, editable}) => {
 
   const handleSubmit = (e: FormEvent<HTMLElement>) => {
     e.preventDefault();
-    if(!editable){
-     api
+    if (!editable) {
+      api
         .apiV1ListingsSeekingPost({
           title,
           description,
@@ -60,26 +59,28 @@ const SeekingForm: FC<FormProps> = ({listingId, editable}) => {
           preferredLocation: location,
         })
         .catch(err =>
-          alert("Seeking listing failed to be published. \nError: " + err.message)
+          alert(
+            "Seeking listing failed to be published. \nError: " + err.message
+          )
         )
         .then(res => (window.location.href = "/myListings"));
     } else {
       api
-      .apiV1ListingsSeekingListingIdPut({
-        listingId,
-        seekingFormBase: {
-          title,
-          description,
-          preferredLocation: location,
-        },
-      })
-      .then(res => {
-        console.log(res);
-      })
-      .catch(err => {
-        alert("Error whilst updating listing. \nError: " + err);
-      });
-    } 
+        .apiV1ListingsSeekingListingIdPut({
+          listingId,
+          seekingFormBase: {
+            title,
+            description,
+            preferredLocation: location,
+          },
+        })
+        .then(res => {
+          console.log(res);
+        })
+        .catch(err => {
+          alert("Error whilst updating listing. \nError: " + err);
+        });
+    }
   };
 
   return (

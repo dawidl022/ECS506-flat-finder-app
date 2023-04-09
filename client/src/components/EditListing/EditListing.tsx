@@ -13,7 +13,7 @@ const EditListing: FC<EditListingProps> = (listingType, listingId) => {
         <SeekingForm listingId={listingId} editable={true} />
       )}
       {listingType.toString() === "accommodation" && (
-        <AccommodationForm listingId={listingId} editable={true}/>
+        <AccommodationForm listingId={listingId} editable={true} />
       )}
     </div>
   );

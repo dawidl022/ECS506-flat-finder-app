@@ -12,7 +12,7 @@ interface FormProps {
   editable: Boolean;
 }
 
-const AccommodationForm: FC<FormProps>= ({listingId, editable}) => {
+const AccommodationForm: FC<FormProps> = ({ listingId, editable }) => {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -30,26 +30,26 @@ const AccommodationForm: FC<FormProps>= ({listingId, editable}) => {
     new Configuration({ basePath: "http://127.0.0.1:5000" })
   );
 
-  if(editable) {
+  if (editable) {
     api
-    .apiV1ListingsAccommodationListingIdGet({ listingId })
-    .then(res => {
-      setTitle(res.accommodation.title);
-      setDescription(res.accommodation.description);
-      setLine1(res.accommodation.address.line1);
-      //as line2 is optional, check if there is an input
-      res.accommodation.address.line2
-        ? setLine2(res.accommodation.address.line2)
-        : setLine2("");
-      setTown(res.accommodation.address.town);
-      setPostCode(res.accommodation.address.postCode);
-      setAccommodationType(res.accommodation.accommodationType);
-      setNumberOfRooms(res.accommodation.numberOfRooms);
-      setPrice(res.accommodation.price);
-    })
-    .catch(err => {
-      alert(`Could not find listing with ID:  ${listingId} \nError:  ${err}`);
-    });
+      .apiV1ListingsAccommodationListingIdGet({ listingId })
+      .then(res => {
+        setTitle(res.accommodation.title);
+        setDescription(res.accommodation.description);
+        setLine1(res.accommodation.address.line1);
+        //as line2 is optional, check if there is an input
+        res.accommodation.address.line2
+          ? setLine2(res.accommodation.address.line2)
+          : setLine2("");
+        setTown(res.accommodation.address.town);
+        setPostCode(res.accommodation.address.postCode);
+        setAccommodationType(res.accommodation.accommodationType);
+        setNumberOfRooms(res.accommodation.numberOfRooms);
+        setPrice(res.accommodation.price);
+      })
+      .catch(err => {
+        alert(`Could not find listing with ID:  ${listingId} \nError:  ${err}`);
+      });
   }
 
   const preview = () => {
@@ -88,37 +88,15 @@ const AccommodationForm: FC<FormProps>= ({listingId, editable}) => {
 
   const handleSubmit = (e: FormEvent<HTMLElement>) => {
     e.preventDefault();
-    if(!editable){
-     api
-      .apiV1ListingsAccommodationPost({
-        title,
-        description,
-        photos: Array<Blob>(),
-        accommodationType,
-        numberOfRooms,
-        price,
-        address: {
-          line1,
-          line2,
-          town,
-          postCode,
-          country: AccommodationAddressCountryEnum.Uk,
-        },
-      })
-      .catch(err =>
-        alert(
-          "Accommodation listing failed to be published. \nError: " +
-            err.message
-        )
-      )
-      .then(res => router.push({ pathname: "/myListings" }));
-    } else {
+    if (!editable) {
       api
-      .apiV1ListingsAccommodationListingIdPut({
-        listingId,
-        accommodationFormBase: {
+        .apiV1ListingsAccommodationPost({
           title,
           description,
+          photos: Array<Blob>(),
+          accommodationType,
+          numberOfRooms,
+          price,
           address: {
             line1,
             line2,
@@ -126,17 +104,39 @@ const AccommodationForm: FC<FormProps>= ({listingId, editable}) => {
             postCode,
             country: AccommodationAddressCountryEnum.Uk,
           },
-          accommodationType,
-          numberOfRooms,
-          price,
-        },
-      })
-      .then(res => {
-        console.log(res);
-      })
-      .catch(err => {
-        alert("Error whilst updating listing. \nError: " + err);
-      });
+        })
+        .catch(err =>
+          alert(
+            "Accommodation listing failed to be published. \nError: " +
+              err.message
+          )
+        )
+        .then(res => router.push({ pathname: "/myListings" }));
+    } else {
+      api
+        .apiV1ListingsAccommodationListingIdPut({
+          listingId,
+          accommodationFormBase: {
+            title,
+            description,
+            address: {
+              line1,
+              line2,
+              town,
+              postCode,
+              country: AccommodationAddressCountryEnum.Uk,
+            },
+            accommodationType,
+            numberOfRooms,
+            price,
+          },
+        })
+        .then(res => {
+          console.log(res);
+        })
+        .catch(err => {
+          alert("Error whilst updating listing. \nError: " + err);
+        });
     }
   };
 
