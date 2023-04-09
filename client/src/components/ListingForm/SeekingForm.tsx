@@ -8,7 +8,7 @@ interface FormProps {
   editExistingListing: Boolean;
 }
 
-const SeekingForm: FC<FormProps> = ({ listingId, editable }) => {
+const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -17,7 +17,7 @@ const SeekingForm: FC<FormProps> = ({ listingId, editable }) => {
     new Configuration({ basePath: "http://127.0.0.1:5000" })
   );
 
-  if (editable) {
+  if (editExistingListing) {
     api
       .apiV1ListingsSeekingListingIdGet({ listingId })
       .then(res => {
@@ -50,7 +50,7 @@ const SeekingForm: FC<FormProps> = ({ listingId, editable }) => {
 
   const handleSubmit = (e: FormEvent<HTMLElement>) => {
     e.preventDefault();
-    if (!editable) {
+    if (!editExistingListing) {
       api
         .apiV1ListingsSeekingPost({
           title,

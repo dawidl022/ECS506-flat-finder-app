@@ -12,7 +12,10 @@ interface FormProps {
   editExistingListing: Boolean;
 }
 
-const AccommodationForm: FC<FormProps> = ({ listingId, editable }) => {
+const AccommodationForm: FC<FormProps> = ({
+  listingId,
+  editExistingListing,
+}) => {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -30,7 +33,7 @@ const AccommodationForm: FC<FormProps> = ({ listingId, editable }) => {
     new Configuration({ basePath: "http://127.0.0.1:5000" })
   );
 
-  if (editable) {
+  if (editExistingListing) {
     api
       .apiV1ListingsAccommodationListingIdGet({ listingId })
       .then(res => {
@@ -88,7 +91,7 @@ const AccommodationForm: FC<FormProps> = ({ listingId, editable }) => {
 
   const handleSubmit = (e: FormEvent<HTMLElement>) => {
     e.preventDefault();
-    if (!editable) {
+    if (!editExistingListing) {
       api
         .apiV1ListingsAccommodationPost({
           title,
