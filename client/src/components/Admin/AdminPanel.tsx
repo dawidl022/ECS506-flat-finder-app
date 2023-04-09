@@ -23,14 +23,16 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     })
     .catch(() => setError(true));
 
-
-  const removeUserFromSystem = (user : User) => {
-    if (confirm("Are you sure you want to remove " + users[index].email + "?")) {
-      api.apiV1UsersUserIdDelete({ userId: user.id }).then(() => {
-        setUsers(users.filter((u) => u.id !== user.id));
-      }).catch(err => {
-        alert("User failed to be removed. \nError:" + err);
-      });
+  const removeUserFromSystem = (user: User) => {
+    if (confirm("Are you sure you want to remove " + user.email + "?")) {
+      api
+        .apiV1UsersUserIdDelete({ userId: user.id })
+        .then(() => {
+          setUsers(users.filter(u => u.id !== user.id));
+        })
+        .catch(err => {
+          alert("User failed to be removed. \nError:" + err);
+        });
     }
   };
 
@@ -42,14 +44,17 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     return (
       <div>
         {error ? (
-        <p>Error fetching data</p>
-      ) : !users ? (
-        <p>Loading</p>
-      ) : (
-        <><p> Administrator Access Only </p><button type="button" onClick={() => router.push("/index")}>
-                Return To Homepage
-              </button></>    
-      )}
+          <p>Error fetching data</p>
+        ) : !users ? (
+          <p>Loading</p>
+        ) : (
+          <>
+            <p> Administrator Access Only </p>
+            <button type="button" onClick={() => router.push("/index")}>
+              Return To Homepage
+            </button>
+          </>
+        )}
       </div>
     );
   } else {
