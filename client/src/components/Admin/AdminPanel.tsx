@@ -24,18 +24,13 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     .catch(() => setError(true));
 
 
-  const removeUserFromSystem = (index: number) => {
-    if (
-      confirm("Are you sure you want to remove " + users[index].email + "?")
-    ) {
-      api
-        .apiV1UsersUserIdDelete({ userId: users[index].id })
-        .then(() => {
-          setUsers(users.filter((user: User) => user.id !== users[index].id));
-        })
-        .catch(err => {
-          alert("User failed to be removed. \nError:" + err);
-        });
+  const removeUserFromSystem = (user : User) => {
+    if (confirm("Are you sure you want to remove " + users[index].email + "?")) {
+      api.apiV1UsersUserIdDelete({ userId: user.id }).then(() => {
+        setUsers(users.filter((u) => u.id !== user.id));
+      }).catch(err => {
+        alert("User failed to be removed. \nError:" + err);
+      });
     }
   };
 
@@ -80,7 +75,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
                   <td>
                     <button
                       type="button"
-                      onClick={() => removeUserFromSystem(index)}
+                      onClick={() => removeUserFromSystem(user)}
                     >
                       Remove User
                     </button>
