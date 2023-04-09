@@ -130,8 +130,6 @@ class ListingsService(BaseListingsService):
             if source_client is None:
                 continue
 
-            # TODO catch api exceptions, return sources that threw exception
-            # so frontend can display that these were skipped
             try:
                 listings += source_client.search_listing(
                     area=params.location,
