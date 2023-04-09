@@ -8,7 +8,7 @@ from flask import Blueprint, Response, abort, jsonify, make_response, request
 from flask_jwt_extended import jwt_required
 from werkzeug.datastructures import FileStorage
 from app.auth.jwt import get_current_user_email
-from app.listings.exceptions import ListingNotFoundError
+from app.listings.exceptions import ListingNotFoundError, PhotoNotFoundError
 
 from app.util.marshmallow import get_params, get_input
 from app.util.encoding import CamelCaseEncoder
@@ -245,7 +245,39 @@ def delete_accommodation_listing(
     return make_response("", NO_CONTENT)
 
 
+@bp.post("/<listing_id>/photos")
+def upload_listing_photo(listing_id: str, blob: bytes, listing_service: BaseListingsService) -> Response:
+    listing = get_accommodation_listing_authored_by_current_user(
+        listing_id, listing_service, action="upload photo")
+
+    try:
+        listing_service.upload_listing_photo(listing.id, blob)
+    except ListingNotFoundError:
+        abort(make_response(
+            {'listingId': "listing not found"}, NOT_FOUND))
+
+    return make_response()
+
+
 @bp.get("/<listing_id>/photos/<photo_id>")
-def get_listing_photo(listing_id: str, photo_id: str):
+def get_listing_photo(listing_id: str, photo_id: str, listing_service: BaseListingsService) -> Response:
     # TODO
     pass
+
+
+@bp.delete("/<listing_id>/photos/<photo_id>")
+def delete_listing_photo(listing_id: str, photo_id: str, listing_service: BaseListingsService) -> Response:
+    listing = get_accommodation_listing_authored_by_current_user(
+        listing_id, listing_service, action="delete photo")
+
+    try:
+        pass
+        #listing_service.delete_listing_photo(listing.id, photo_id)
+    except ListingNotFoundError:
+        abort(make_response(
+            {'listingId': "listing not found"}, NOT_FOUND))
+    except PhotoNotFoundError:
+        abort(make_response(
+            {'photo_id': "photo not found"}, NOT_FOUND))
+
+    return make_response("", NO_CONTENT)

@@ -90,6 +90,18 @@ class BaseListingsService(abc.ABC):
     def get_available_sources(self, location_query: str) -> list[Source]:
         pass
 
+    @abc.abstractmethod
+    def upload_listing_photo(self, listing_id: uuid.UUID, blob: bytes) -> None:
+        pass
+
+    @abc.abstractmethod
+    def get_listing_photo(self, listing_id: uuid.UUID, photo_id: uuid.UUID) -> Photo | None:
+        pass
+
+    @abc.abstractmethod
+    def delete_listing_photo(self, listing_id: uuid.UUID, photo_id: uuid.UUID) -> None:
+        pass
+
 
 class ListingsService(BaseListingsService):
 
@@ -219,3 +231,18 @@ class ListingsService(BaseListingsService):
 
     def get_available_sources(self, location_query: str) -> list[Source]:
         return [s for s in Source]
+    
+    def upload_listing_photo(self, listing_id: uuid.UUID, blob: bytes) -> None:
+        listing = self.accommodation_listing_repo.get_listing_by_id(listing_id)
+        if listing is None:
+            raise ListingNotFoundError()
+        
+        photo = Photo(uuid.uuid4(), blob)
+        self.listing_photo_repo.save_photos([photo])
+        listing.photo_ids = tuple(list(listing.photo_ids) + [photo.id])
+
+    def get_listing_photo(self, listing_id: uuid.UUID, photo_id: uuid.UUID) -> Photo | None:
+        pass
+
+    def delete_listing_photo(self, listing_id: uuid.UUID, photo_id: uuid.UUID) -> None:
+        pass
