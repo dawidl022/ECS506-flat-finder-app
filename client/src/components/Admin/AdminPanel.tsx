@@ -70,8 +70,10 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
           setUsers(users.filter((user: User) => user.id !== users[index].id));
         })
         .catch(err => {
-          alert("User's administrator role failed to be revoked . \nError:" + err);
-        })
+          alert(
+            "User's administrator role failed to be revoked . \nError:" + err
+          );
+        });
     }
   };
 
