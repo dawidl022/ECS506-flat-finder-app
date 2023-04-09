@@ -64,6 +64,11 @@ class SpyAccommodationListingRepo(AccommodationListingRepository):
     def save_listing(self, listing: InternalAccommodationListing) -> None:
         self.saved_listings.append(listing)
 
+    def get_listings_authored_by(self, user_email: str) -> tuple[InternalAccommodationListing, ...]:
+        if user_email == model_listing.author_email:
+            return model_listing,
+        return ()
+
 
 class StubAccommodationListingRepo(AccommodationListingRepository):
     def __init__(self, listings: list[InternalAccommodationListing]):
@@ -83,6 +88,9 @@ class StubAccommodationListingRepo(AccommodationListingRepository):
 
     def delete_listing(self, listing_id: UUID) -> None:
         raise NotImplementedError()
+
+    def get_listings_authored_by(self, user_email: str) -> tuple[InternalAccommodationListing, ...]:
+        return ()
 
 
 class StubListingClient(ListingAPIClient):
@@ -417,6 +425,11 @@ class ListingsServiceTest(unittest.TestCase):
 
         self.assertEqual(len(expected), len(actual))
         self.assertEqual(expected, set(actual))
+
+    def test_get_listings_authored_by__returns_listings(self):
+        actual = self.service.get_listings_authored_by(
+            model_listing.author_email)
+        self.assertEqual([model_listing_summary], actual)
 
 
 class ListingsServiceSearchTest(unittest.TestCase):

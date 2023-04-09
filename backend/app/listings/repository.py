@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections import defaultdict
 import time
 from typing import Callable, TypeVar
 from uuid import UUID
@@ -6,8 +7,8 @@ from geopy import distance
 
 from .exceptions import ListingNotFoundError
 from .models import (
-    AccommodationListing, Coordinates, InternalAccommodationListing, Photo,
-    SortBy)
+    AccommodationListing, Coordinates, InternalAccommodationListing, Listing,
+    Photo, SortBy)
 
 
 class ListingRepository(ABC):
@@ -24,6 +25,11 @@ class ListingRepository(ABC):
     def delete_listing(self, listing_id: UUID) -> None:
         pass
 
+    @abstractmethod
+    def get_listings_authored_by(self, user_email: str
+                                 ) -> tuple[Listing, ...]:
+        pass
+
 
 class AccommodationListingRepository(ListingRepository, ABC):
     @abstractmethod
@@ -38,6 +44,8 @@ class InMemoryAccommodationListingsRepository(AccommodationListingRepository):
 
     def __init__(self) -> None:
         self.listings: dict[UUID, InternalAccommodationListing] = {}
+        self.listings_by_author: dict[str, list[InternalAccommodationListing]
+                                      ] = defaultdict(list)
 
     def get_listing_by_id(self, listing_id: UUID
                           ) -> InternalAccommodationListing | None:
@@ -45,6 +53,7 @@ class InMemoryAccommodationListingsRepository(AccommodationListingRepository):
 
     def save_listing(self, listing: InternalAccommodationListing) -> None:
         self.listings[listing.id] = listing
+        self.listings_by_author[listing.author_email].append(listing)
 
     def delete_listing(self, listing_id: UUID) -> None:
         try:
@@ -62,6 +71,10 @@ class InMemoryAccommodationListingsRepository(AccommodationListingRepository):
              and (max_price is None or listing.price <= max_price)
              ], coords, order_by, page, size
         )
+
+    def get_listings_authored_by(self, user_email: str
+                                 ) -> tuple[InternalAccommodationListing, ...]:
+        return tuple(self.listings_by_author.get(user_email, []))
 
 
 T = TypeVar('T', bound=AccommodationListing)

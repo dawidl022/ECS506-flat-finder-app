@@ -1,3 +1,4 @@
+import abc
 from dataclasses import dataclass
 from enum import StrEnum
 import json
@@ -15,8 +16,8 @@ from app.util.schema import Schemable
 from app.listings.models import (
     AccommodationSearchResult, AccommodationSummary, Country,
     ExternalAccommodationListing, ExternalAccommodationSummary,
-    InternalAccommodationListing, InternalAccommodationSummary, SortBy, Source,
-    UKAddress)
+    InternalAccommodationListing, InternalAccommodationSummary, ListingSummary,
+    ListingType, SortBy, Source, UKAddress)
 from app.util.encoding import CamelCaseDecoder
 from app.listings.models import Address, AccommodationListing
 
@@ -202,6 +203,25 @@ class AccommodationSummaryDTO:
         elif isinstance(summary, ExternalAccommodationSummary):
             return summary.thumbnail_url
         return None
+
+
+@dataclass
+class SeekingSummaryDTO:
+    # TODO
+    pass
+
+
+@dataclass
+class ListingSummaryDTO:
+    type: ListingType
+    listing: AccommodationSummaryDTO | SeekingSummaryDTO
+
+    def __init__(self, summary: ListingSummary):
+        if isinstance(summary, AccommodationSummary):
+            self.type = ListingType.accommodation
+            self.listing = AccommodationSummaryDTO(summary)
+        else:
+            raise TypeError("unsupported ListingSummary subtype")
 
 
 @dataclass(frozen=True)

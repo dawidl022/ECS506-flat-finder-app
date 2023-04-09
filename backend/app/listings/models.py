@@ -18,8 +18,22 @@ class Source(StrEnum):
     zoopla = auto()
 
 
+class ListingType(StrEnum):
+    seeking = auto()
+    accommodation = auto()
+
+
 @dataclass(frozen=True)
-class AccommodationSummary(abc.ABC):
+class ListingSummary(abc.ABC):
+
+    @classmethod
+    @abc.abstractmethod
+    def listing_type(cls) -> ListingType:
+        pass
+
+
+@dataclass(frozen=True)
+class AccommodationSummary(ListingSummary, abc.ABC):
     id: str
     title: str
     short_description: str
@@ -28,6 +42,10 @@ class AccommodationSummary(abc.ABC):
     source: Source
     price: float
     post_code: str
+
+    @classmethod
+    def listing_type(cls) -> ListingType:
+        return ListingType.accommodation
 
 
 @dataclass(frozen=True)
@@ -117,8 +135,17 @@ class Location:
 
 
 @dataclass(frozen=True)
-class AccommodationListing(abc.ABC):
-    id: UUID | str | int
+class Listing(abc.ABC):
+    id: UUID | str
+
+    @abc.abstractmethod
+    def summarise(self) -> ListingSummary:
+        pass
+
+
+@dataclass(frozen=True)
+class AccommodationListing(Listing, abc.ABC):
+    id: UUID | str
     location: Location
     created_at: float
     """Time of listing creation"""
