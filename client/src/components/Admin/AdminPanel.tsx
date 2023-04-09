@@ -44,8 +44,6 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
 
   if (isLoading) {
     return <p>Loading</p>;
-  } else if (error) {
-    return <p>Error fetching data</p>;
   } else if (!isCurrentUserAdmin) {
     return (
       <div>
@@ -55,6 +53,8 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
         </button>
       </div>
     );
+  } else if (error) {
+    return <p>Error fetching data</p>;
   } else {
     return (
       <div>
