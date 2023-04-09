@@ -11,10 +11,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
   const api = new DefaultApi(
     new Configuration({ basePath: "http://127.0.0.1:5000" })
   );
-  const [users, setUsers] = useState<User[]>([
-    { id: "1", name: "John", email: "lol@email.comm", isAdmin: true },
-    { id: "2", name: "Jane", email: "bey@email.com", isAdmin: false },
-  ]);
+  const [users, setUsers] = useState<User[]>([]);
   let isCurrentUserAdmin = false;
   const router = useRouter();
 
@@ -72,7 +69,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
                 <td>{user.name}</td>
                 <td>{user.email}</td>
                 <td>{user.isAdmin ? "Yes" : "No"}</td>
-                {user.isAdmin ? (
+                {user.id === currentUserId ? (
                   <td></td>
                 ) : (
                   <td>
