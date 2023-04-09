@@ -116,7 +116,7 @@ const AccommodationForm: FC<FormProps> = ({
               err.message
           )
         )
-        .then(res => router.push({ pathname: "/myListings" }));
+        .then(() => router.push({ pathname: "/myListings" }));
     } else {
       api
         .apiV1ListingsAccommodationListingIdPut({
@@ -125,9 +125,7 @@ const AccommodationForm: FC<FormProps> = ({
             ...baseForm,
           },
         })
-        .then(res => {
-          console.log(res);
-        })
+        .then(() => router.push({ pathname: "/myListings" }))
         .catch(err => {
           alert("Error whilst updating listing. \nError: " + err);
         });

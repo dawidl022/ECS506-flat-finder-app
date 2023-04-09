@@ -20,7 +20,7 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
   const baseForm = {
     title,
     description,
-    preferredLocation: location
+    preferredLocation: location,
   };
 
   if (editExistingListing) {
@@ -40,7 +40,7 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
       pathname: "/SeekingPreviewPage",
       query: {
         title,
-        description,   
+        description,
         location,
       },
     });
@@ -67,7 +67,7 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
             "Seeking listing failed to be published. \nError: " + err.message
           )
         )
-        .then(res => (window.location.href = "/myListings"));
+        .then(() => router.push({ pathname: "/myListings" }));
     } else {
       api
         .apiV1ListingsSeekingListingIdPut({
@@ -76,9 +76,7 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
             ...baseForm,
           },
         })
-        .then(res => {
-          console.log(res);
-        })
+        .then(() => router.push({ pathname: "/myListings" }))
         .catch(err => {
           alert("Error whilst updating listing. \nError: " + err);
         });
