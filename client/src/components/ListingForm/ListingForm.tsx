@@ -15,7 +15,7 @@ const ListingForm: FC = ({}) => {
 
       {listingType === "seeking" && <SeekingForm editable={false} listingId={""}/>}
 
-      {listingType === "accommodation" && <AccommodationForm editable={false} />}
+      {listingType === "accommodation" && <AccommodationForm editable={false} listingId={""} />}
     </div>
   );
 };

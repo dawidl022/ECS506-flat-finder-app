@@ -51,7 +51,7 @@ const SeekingForm: FC<FormProps> = ({listingId, editable}) => {
 
   const handleSubmit = (e: FormEvent<HTMLElement>) => {
     e.preventDefault();
-    if(editable){
+    if(!editable){
      api
         .apiV1ListingsSeekingPost({
           title,
