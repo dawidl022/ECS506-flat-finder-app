@@ -1,5 +1,4 @@
-import { FC, useState, FormEvent, ChangeEvent } from "react";
-import { useRouter } from "next/router";
+import { FC, useState, FormEvent } from "react";
 import { Configuration, DefaultApi } from "@/generated";
 interface SeekingProps {
   listingId: string;
@@ -12,13 +11,16 @@ const SeekingForm: FC<SeekingProps> = ({ listingId }) => {
   const api = new DefaultApi(
     new Configuration({ basePath: "http://127.0.0.1:5000" })
   );
-  api.apiV1ListingsSeekingListingIdGet({ listingId }).then(res => {
-    // store the response in a state variable
-    setTitle(res.seeking.title);
-    setDescription(res.seeking.description);
-    setLocation(res.seeking.preferredLocation.name);
-
-  });
+  api
+    .apiV1ListingsSeekingListingIdGet({ listingId })
+    .then(res => {
+      setTitle(res.seeking.title);
+      setDescription(res.seeking.description);
+      setLocation(res.seeking.preferredLocation.name);
+    })
+    .catch(err => {
+      alert("Could not find listing. \nError: " + err);
+    });
 
   const handleSubmit = (e: FormEvent<HTMLElement>) => {
     e.preventDefault();
@@ -26,7 +28,7 @@ const SeekingForm: FC<SeekingProps> = ({ listingId }) => {
     api
       .apiV1ListingsSeekingListingIdPut({
         listingId,
-        seekingFormBase:  {
+        seekingFormBase: {
           title,
           description,
           preferredLocation: location,

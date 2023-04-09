@@ -2,7 +2,7 @@ import { FC } from "react";
 import SeekingForm from "./SeekingForm";
 import AccommodationForm from "./AccommodationForm";
 interface EditListingProps {
-  listingType: boolean;
+  listingType: boolean; //true means seeking, false means accommodation
   listingId: string;
 }
 

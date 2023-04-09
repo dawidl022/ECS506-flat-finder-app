@@ -1,5 +1,4 @@
-import { FC, useState, FormEvent, ChangeEvent } from "react";
-import { useRouter } from "next/router";
+import { FC, useState, FormEvent } from "react";
 
 import {
   AccommodationAddressCountryEnum,
@@ -11,7 +10,6 @@ interface AccommodationProps {
   listingId: string;
 }
 const AccommodationForm: FC<AccommodationProps> = ({ listingId }) => {
-  const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [line1, setLine1] = useState("");
@@ -28,20 +26,25 @@ const AccommodationForm: FC<AccommodationProps> = ({ listingId }) => {
     new Configuration({ basePath: "http://127.0.0.1:5000" })
   );
 
-  api.apiV1ListingsAccommodationListingIdGet({ listingId }).then(res => {
-    setTitle(res.accommodation.title);
-    setDescription(res.accommodation.description);
-    setLine1(res.accommodation.address.line1);
-    //as line2 is optional, check if there is an input
-    res.accommodation.address.line2 ? setLine2(res.accommodation.address.line2) : setLine2("");
-    setTown(res.accommodation.address.town);
-    setPostCode(res.accommodation.address.postCode);
-    setAccommodationType(res.accommodation.accommodationType);
-    setNumberOfRooms(res.accommodation.numberOfRooms);
-    setPrice(res.accommodation.price);
-  }).catch(err => {
-    alert("Could not find listing. \nError: " + err);
-  });
+  api
+    .apiV1ListingsAccommodationListingIdGet({ listingId })
+    .then(res => {
+      setTitle(res.accommodation.title);
+      setDescription(res.accommodation.description);
+      setLine1(res.accommodation.address.line1);
+      //as line2 is optional, check if there is an input
+      res.accommodation.address.line2
+        ? setLine2(res.accommodation.address.line2)
+        : setLine2("");
+      setTown(res.accommodation.address.town);
+      setPostCode(res.accommodation.address.postCode);
+      setAccommodationType(res.accommodation.accommodationType);
+      setNumberOfRooms(res.accommodation.numberOfRooms);
+      setPrice(res.accommodation.price);
+    })
+    .catch(err => {
+      alert("Could not find listing. \nError: " + err);
+    });
 
   const handleSubmit = (e: FormEvent<HTMLElement>) => {
     e.preventDefault();
