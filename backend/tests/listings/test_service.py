@@ -614,6 +614,7 @@ def generate_external_listings_with_decreasing_creation_time(
             source=Source.zoopla,
             original_listing_url="",
             author_phone="+44 78912 345678",
+            author_name="External test user",
             photo_urls=[
                 "https://fastly.picsum.photos/id/308/1200/1200"
                 ".jpg?hmac=2c1705rmBMgsQTZ1I9Uu74cRpA4Fxdl0THWV8wfV5VQ",

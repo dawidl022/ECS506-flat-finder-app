@@ -211,6 +211,7 @@ class InternalAccommodationListing(AccommodationListing):
 class ExternalAccommodationListing(AccommodationListing):
     original_listing_url: str
     id: str
+    author_name: str
     author_phone: str
     photo_urls: list[str]
     _short_description: str
