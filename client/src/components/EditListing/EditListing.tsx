@@ -10,8 +10,12 @@ interface EditListingProps {
 const EditListing: FC<EditListingProps> = (listingType, listingId) => {
   return (
     <div>
-      {listingType.toString() === "seeking" && <SeekingForm listingId={listingId} />}
-      {listingType.toString() === "accommodation" && <AccommodationForm listingId={listingId} />}
+      {listingType.toString() === "seeking" && (
+        <SeekingForm listingId={listingId} />
+      )}
+      {listingType.toString() === "accommodation" && (
+        <AccommodationForm listingId={listingId} />
+      )}
     </div>
   );
 };
