@@ -77,11 +77,9 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     }
   };
 
-  api
-    .apiV1AdminsUserIdGet({ userId: currentUserId })
-    .then(res => {
-      isCurrentUserAdmin = true;
-    })
+  api.apiV1AdminsUserIdGet({ userId: currentUserId }).then(res => {
+    isCurrentUserAdmin = true;
+  });
 
   if (!isCurrentUserAdmin) {
     return (
