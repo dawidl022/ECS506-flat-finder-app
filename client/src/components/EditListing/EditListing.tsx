@@ -1,8 +1,10 @@
 import { FC } from "react";
 import SeekingForm from "../ListingForm/SeekingForm";
 import AccommodationForm from "../ListingForm/AccommodationForm";
+import { UserListingsInnerTypeEnum } from "@/generated";
+
 interface EditListingProps {
-  listingType: "seeking" | "accommodation";
+  listingType: UserListingsInnerTypeEnum;
   listingId: string;
 }
 
@@ -12,6 +14,7 @@ const EditListing: FC<EditListingProps> = ({ listingType, listingId }) => {
       {listingType === "seeking" && (
         <SeekingForm listingId={listingId} editExistingListing={true} />
       )}
+
       {listingType === "accommodation" && (
         <AccommodationForm listingId={listingId} editExistingListing={true} />
       )}
