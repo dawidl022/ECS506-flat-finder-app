@@ -3,9 +3,9 @@ import time
 import unittest
 import uuid
 
-from app.listings.exceptions import ListingNotFoundError
-from app.listings.models import AccommodationListing, Source, UKAddress
-from app.listings.repository import InMemoryAccommodationListingsRepository
+from app.listings.exceptions import ListingNotFoundError, PhotoNotFoundError
+from app.listings.models import AccommodationListing, InternalAccommodationListing, Source, UKAddress, Photo
+from app.listings.repository import InMemoryAccommodationListingsRepository, InMemoryPhotoRepository
 from app.listings.models import Coordinates, Location, SortBy
 
 dummy_address = UKAddress(
@@ -323,9 +323,70 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
         self.assertEqual(listings_within_range[1], actual_listings[0])
         self.assertEqual(listings_within_range[0], actual_listings[1])
 
+    def test_get_listings_authored_by__given_no_listings_for_given_email__returns_empty_list(self):
+        repo = InMemoryAccommodationListingsRepository()
+
+        listings = [self.default_accommodation(), self.default_accommodation()]
+        for listing in listings:
+            repo.save_listing(listing)
+
+        self.assertEqual(
+            0, len(repo.get_listings_authored_by("non-existent@example.com")))
+
+    def test_get_listings_authored_by__given_listings_exist_for_given_email__returns_empty_list(self):
+        repo = InMemoryAccommodationListingsRepository()
+
+        listings = [self.default_accommodation(), self.default_accommodation()]
+        for listing in listings:
+            repo.save_listing(listing)
+
+        actual_listings = repo.get_listings_authored_by(
+            listings[0].author_email)
+
+        self.assertEqual(
+            tuple(listings), actual_listings
+        )
+
+    def test_get_photos_None_then_save_and_get_saved(self):
+        repo = InMemoryPhotoRepository()
+        self.assertEqual(None, repo.get_photo_by_id(uuid.uuid4()))
+
+        photo1 = Photo(id=uuid.uuid4(),blob=bytes((2, 3, 4)))
+        photo2 = Photo(uuid.uuid4(),bytes((3, 3, 3)))
+        repo.save_photos([photo1, photo2])
+
+        self.assertNotEqual(None, repo.get_photo_by_id(photo1.id))
+
+        self.assertEqual(bytes((2, 3, 4)), repo.get_photo_by_id(photo1.id).blob)
+        self.assertEqual(bytes((3, 3, 3)), repo.get_photo_by_id(photo2.id).blob)
+
+    
+    def test_delete_photo_individual_then_multiple(self):
+        repo = InMemoryPhotoRepository()
+        photo1 = Photo(id=uuid.uuid4(),blob=bytes((2, 3, 4)))
+        photo2 = Photo(uuid.uuid4(),bytes((3, 3, 3)))
+        repo.save_photos([photo1, photo2])
+
+        self.assertNotEqual(None, repo.get_photo_by_id(photo1.id))
+        self.assertNotEqual(None, repo.get_photo_by_id(photo2.id))
+
+        repo.delete_photos([photo1.id])
+        self.assertEqual(None, repo.get_photo_by_id(photo1.id))
+        self.assertNotEqual(None, repo.get_photo_by_id(photo2.id))
+
+        repo.delete_photos([photo2.id])
+        self.assertEqual(None, repo.get_photo_by_id(photo2.id))
+        self.assertEqual({}, repo.photos)
+
+        repo.save_photos([photo1, photo2])
+        self.assertNotEqual({}, repo.photos)
+        
+        repo.delete_photos([photo1.id, photo2.id])
+        self.assertEqual({}, repo.photos)
+
     @staticmethod
     def accommodation_with_coords(lat: float, long: float, price: int = 10_000) -> AccommodationListing:
-        return AccommodationListing(
+        return InternalAccommodationListing(
             id=uuid.uuid4(),
             location=Location(
                 coords=Coordinates(lat=lat, long=long),
@@ -342,9 +403,9 @@ class InMemoryAccommodationListingsRepositoryTest(unittest.TestCase):
             source=Source.internal
         )
 
-    @ staticmethod
-    def default_accommodation(listing_id: uuid.UUID):
-        return AccommodationListing(
+    @staticmethod
+    def default_accommodation(listing_id=uuid.uuid4()):
+        return InternalAccommodationListing(
             id=listing_id,
             location=origin_location,
             created_at=time.time(),

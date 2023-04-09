@@ -31,6 +31,12 @@ export interface SearchSourcesInner {
      * @memberof SearchSourcesInner
      */
     enabled: boolean;
+    /**
+     * Set to true if search failed for the source
+     * @type {boolean}
+     * @memberof SearchSourcesInner
+     */
+    failed?: boolean;
 }
 
 /**
@@ -56,6 +62,7 @@ export function SearchSourcesInnerFromJSONTyped(json: any, ignoreDiscriminator: 
         
         'name': json['name'],
         'enabled': json['enabled'],
+        'failed': !exists(json, 'failed') ? undefined : json['failed'],
     };
 }
 
@@ -70,6 +77,7 @@ export function SearchSourcesInnerToJSON(value?: SearchSourcesInner | null): any
         
         'name': value.name,
         'enabled': value.enabled,
+        'failed': value.failed,
     };
 }
 

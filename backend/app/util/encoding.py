@@ -60,6 +60,6 @@ class CamelCaseDecoder(json.JSONDecoder):
             obj = {snake_case(k): v for k, v in obj.__dict__.items()}
 
         for key, value in obj.items():
-            if hasattr(value, "__dict__"):
+            if hasattr(value, "__dict__") or isinstance(value, dict):
                 obj[key] = CamelCaseDecoder.snake_casify(obj[key])
         return obj

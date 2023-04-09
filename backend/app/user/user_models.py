@@ -13,4 +13,5 @@ class User:
     id: UUID
     email: str
     name: str | None = None
+    is_admin: bool = False
     contact_details: ContactDetails = ContactDetails()

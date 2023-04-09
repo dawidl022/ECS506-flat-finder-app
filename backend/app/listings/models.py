@@ -4,6 +4,8 @@ from enum import StrEnum, auto
 from typing import NamedTuple
 from uuid import UUID
 
+from flask import url_for
+
 
 class SortBy(StrEnum):
     newest = auto(),
@@ -16,17 +18,44 @@ class Source(StrEnum):
     zoopla = auto()
 
 
+class ListingType(StrEnum):
+    seeking = auto()
+    accommodation = auto()
+
+
 @dataclass(frozen=True)
-class AccommodationSummary:
+class ListingSummary(abc.ABC):
+
+    @classmethod
+    @abc.abstractmethod
+    def listing_type(cls) -> ListingType:
+        pass
+
+
+@dataclass(frozen=True)
+class AccommodationSummary(ListingSummary, abc.ABC):
     id: str
     title: str
     short_description: str
-    thumbnail_id: UUID
     accommodation_type: str
     number_of_rooms: int
     source: Source
     price: float
     post_code: str
+
+    @classmethod
+    def listing_type(cls) -> ListingType:
+        return ListingType.accommodation
+
+
+@dataclass(frozen=True)
+class InternalAccommodationSummary(AccommodationSummary):
+    thumbnail_id: UUID
+
+
+@dataclass(frozen=True)
+class ExternalAccommodationSummary(AccommodationSummary):
+    thumbnail_url: str | None
 
 
 @dataclass(frozen=True)
@@ -70,6 +99,14 @@ class Address(abc.ABC):
     def get_post_code(self) -> str:
         pass
 
+    @property
+    def full_address(self) -> str:
+        """
+        Get the full, human-readable address including the country. Can be used
+        to search for the location in e.g. Google Maps.
+        """
+        return f"{self.address}, {self.country_name}"
+
 
 @dataclass(frozen=True)
 class UKAddress(Address):
@@ -98,28 +135,103 @@ class Location:
 
 
 @dataclass(frozen=True)
-class AccommodationListing:
-    id: UUID
+class Listing(abc.ABC):
+    id: UUID | str
+
+    @abc.abstractmethod
+    def summarise(self) -> ListingSummary:
+        pass
+
+
+@dataclass(frozen=True)
+class AccommodationListing(Listing, abc.ABC):
+    id: UUID | str
     location: Location
     created_at: float
     """Time of listing creation"""
     price: int
-    author_email: str
 
     title: str
     description: str
     accommodation_type: str
     number_of_rooms: int
 
-    photo_ids: tuple[UUID, ...]
     source: Source
 
+    @property
+    @abc.abstractmethod
+    def thumbnail_url(self) -> str | None:
+        pass
+
+    @property
+    @abc.abstractmethod
+    def short_description(self) -> str:
+        pass
+
+    @abc.abstractmethod
     def summarise(self) -> AccommodationSummary:
-        return AccommodationSummary(
+        pass
+
+
+@dataclass(frozen=True)
+class InternalAccommodationListing(AccommodationListing):
+    id: UUID
+    author_email: str
+
+    photo_ids: tuple[UUID, ...]
+
+    @property
+    def thumbnail_url(self) -> str | None:
+        if len(self.photo_ids) > 0:
+            return url_for(
+                "listings.get_listing_photo",
+                listing_id=self.id, photo_id=self.photo_ids[0]
+            )
+        return None
+
+    @property
+    def short_description(self) -> str:
+        return self.description
+
+    def summarise(self) -> AccommodationSummary:
+        return InternalAccommodationSummary(
             id=str(self.id),
             title=self.title,
-            short_description=self.description,
+            short_description=self.short_description,
             thumbnail_id=self.photo_ids[0],
+            accommodation_type=self.accommodation_type,
+            number_of_rooms=self.number_of_rooms,
+            source=self.source,
+            post_code=self.location.address.get_post_code(),
+            price=self.price
+        )
+
+
+@dataclass(frozen=True)
+class ExternalAccommodationListing(AccommodationListing):
+    original_listing_url: str
+    id: str
+    author_name: str
+    author_phone: str
+    photo_urls: list[str]
+    _short_description: str
+
+    @property
+    def thumbnail_url(self) -> str | None:
+        if len(self.photo_urls) > 0:
+            return self.photo_urls[0]
+        return None
+
+    @property
+    def short_description(self) -> str:
+        return self._short_description
+
+    def summarise(self) -> AccommodationSummary:
+        return ExternalAccommodationSummary(
+            id=str(self.id),
+            title=self.title,
+            short_description=self._short_description,
+            thumbnail_url=self.thumbnail_url,
             accommodation_type=self.accommodation_type,
             number_of_rooms=self.number_of_rooms,
             source=self.source,
