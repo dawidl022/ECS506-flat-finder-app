@@ -114,7 +114,7 @@ const AccommodationForm: FC = ({}) => {
           <input
             id="line1"
             type="text"
-            placeholder="Accommodation Line 1 REQUIRED"
+            placeholder="Line 1 REQUIRED"
             value={line1}
             onChange={e => setLine1(e.target.value)}
             required

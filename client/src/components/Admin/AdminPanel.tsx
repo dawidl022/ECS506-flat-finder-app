@@ -48,7 +48,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
       api
         .apiV1AdminsUserIdPut({ userId: users[index].id })
         .then(() => {
-          setUsers(users.filter((user: User) => user.id !== users[index].id));
+          router.reload()
         })
         .catch(err => {
           alert("User failed to be granted administrator role. \nError:" + err);
@@ -67,7 +67,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
       api
         .apiV1AdminsUserIdDelete({ userId: users[index].id })
         .then(() => {
-          setUsers(users.filter((user: User) => user.id !== users[index].id));
+          router.reload()
         })
         .catch(err => {
           alert(
