@@ -14,11 +14,11 @@ const ListingForm: FC = ({}) => {
       <Tabs tabs={["Seeking", "Accommodation"]} />
 
       {listingType === "seeking" && (
-        <SeekingForm editable={false} listingId={""} />
+        <SeekingForm listingId={""} editExistingListing={false}/>
       )}
 
       {listingType === "accommodation" && (
-        <AccommodationForm editable={false} listingId={""} />
+        <AccommodationForm listingId={""} editExistingListing={false}/>
       )}
     </div>
   );

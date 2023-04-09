@@ -9,7 +9,7 @@ import {
 
 interface FormProps {
   listingId: string | "";
-  editable: Boolean;
+  editExistingListing: Boolean;
 }
 
 const AccommodationForm: FC<FormProps> = ({ listingId, editable }) => {

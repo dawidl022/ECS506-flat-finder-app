@@ -5,7 +5,7 @@ import { handleFileInput } from "./handleFileInput";
 
 interface FormProps {
   listingId: string | "";
-  editable: Boolean;
+  editExistingListing: Boolean;
 }
 
 const SeekingForm: FC<FormProps> = ({ listingId, editable }) => {

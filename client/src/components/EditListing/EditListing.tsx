@@ -10,10 +10,10 @@ const EditListing: FC<EditListingProps> = (listingType, listingId) => {
   return (
     <div>
       {listingType.toString() === "seeking" && (
-        <SeekingForm listingId={listingId} editable={true} />
+        <SeekingForm listingId={listingId} editExistingListing={true} />
       )}
       {listingType.toString() === "accommodation" && (
-        <AccommodationForm listingId={listingId} editable={true} />
+        <AccommodationForm listingId={listingId} editExistingListing={true} />
       )}
     </div>
   );
