@@ -112,36 +112,33 @@ class ZooplaClient(APIClient):
         long: float = x['longitude']
         short_desc: str = x['short_description']
 
-        address: UKAddress = UKAddress(
-            x['street_name'], None, x['post_town'], x['outcode']+x['incode'])
+        postcode: str = x['outcode'] + " " + x['incode']
 
         if ('property_number' in x):
             address = UKAddress(
                 x['property_number'],
                 x['street_name'],
                 x['post_town'],
-                x['outcode']+x['incode'])
+                postcode)
         else:
             address = UKAddress(
                 x['street_name'],
                 None,
                 x['post_town'],
-                x['outcode']+x['incode'])
+                postcode)
 
-        return ExternalAccommodationListing(uuid.uuid4(),
-                                            Location(Coordinates(
-                                                lat, long), address),
-                                            created,
-                                            price,
-                                            "",
-                                            title,
-                                            desc,
-                                            type,
-                                            numRooms,
-                                            tuple(),
-                                            Source.zoopla,
-                                            listurl,
-                                            listing_id,
-                                            photos,
-                                            short_desc,
-                                            contact)
+        return ExternalAccommodationListing(
+            id=listing_id,
+            location=Location(Coordinates(
+                lat, long), address),
+            created_at=created,
+            price=price,
+            title=title,
+            description=desc,
+            accommodation_type=type,
+            number_of_rooms=numRooms,
+            source=Source.zoopla,
+            original_listing_url=listurl,
+            photo_urls=photos,
+            short_description=short_desc,
+            author_phone=contact)

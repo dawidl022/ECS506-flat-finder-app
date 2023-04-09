@@ -7,7 +7,7 @@ import uuid
 
 from .test_routes import model_listing, model_listing_summary
 from app.listings.exceptions import ListingNotFoundError
-from app.listings.models import AccommodationListing, Address, Coordinates, Location, Photo, SortBy, Source, UKAddress
+from app.listings.models import AccommodationListing, Address, Coordinates, InternalAccommodationListing, Location, Photo, SortBy, Source, UKAddress
 from app.listings.dtos import AccommodationForm
 from app.listings.service import BaseGeocodingService, ListingsService
 from app.listings.repository import AccommodationListingRepository, ListingPhotoRepository
@@ -34,11 +34,11 @@ class StubGeocodingService(BaseGeocodingService):
 class SpyAccommodationListingRepo(AccommodationListingRepository):
 
     def __init__(self) -> None:
-        self.saved_listings: list[AccommodationListing] = []
+        self.saved_listings: list[InternalAccommodationListing] = []
         self.deleted_listing_ids: list[UUID] = []
 
     def get_listing_by_id(self, listing_id: UUID
-                          ) -> AccommodationListing | None:
+                          ) -> InternalAccommodationListing | None:
         if listing_id == model_listing.id:
             return model_listing
         return None
@@ -51,12 +51,12 @@ class SpyAccommodationListingRepo(AccommodationListingRepository):
     def search_by_location(
         self, coords: Coordinates, radius: float, order_by: SortBy, page: int,
         size: int, max_price: float | None = None
-    ) -> list[AccommodationListing]:
+    ) -> list[InternalAccommodationListing]:
         if coords == expected_search_coords and radius >= 10:
             return [model_listing]
         return []
 
-    def save_listing(self, listing: AccommodationListing) -> None:
+    def save_listing(self, listing: InternalAccommodationListing) -> None:
         self.saved_listings.append(listing)
 
 

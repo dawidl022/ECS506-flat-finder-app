@@ -1,6 +1,6 @@
 import dataclasses
 from http.client import BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, OK
-from io import SEEK_SET, BytesIO
+from io import BytesIO
 import json
 import time
 from typing import cast
@@ -9,7 +9,7 @@ import uuid
 from flask.testing import FlaskClient
 from app.listings.exceptions import ListingNotFoundError
 from app.listings.dtos import AccommodationSearchParams, AccommodationForm
-from app.listings.models import AccommodationListing, AccommodationSearchResult, AccommodationSummary, Coordinates, Location, Source, UKAddress
+from app.listings.models import AccommodationListing, AccommodationSearchResult, AccommodationSummary, Coordinates, InternalAccommodationSummary, Location, Source, UKAddress, InternalAccommodationListing
 
 from app.listings.service import BaseListingsService
 
@@ -62,7 +62,7 @@ class MockListingService(BaseListingsService):
         return [Source.internal, Source.zoopla]
 
 
-model_listing = AccommodationListing(
+model_listing = InternalAccommodationListing(
     id=uuid.uuid4(),
     location=Location(
         coords=Coordinates(51.524067, -0.040374),
@@ -122,7 +122,7 @@ model_listing_json = {
     }
 }
 
-model_listing_summary = AccommodationSummary(
+model_listing_summary = InternalAccommodationSummary(
     id=str(model_listing.id),
     title=model_listing.title,
     short_description=model_listing.description,
@@ -148,7 +148,7 @@ search_results_json = [
             "id": model_listing_summary.id,
             "title": model_listing_summary.title,
             "shortDescription": model_listing_summary.short_description,
-            "thumbnailUrl": f"/api/v1/listings/{model_listing_summary.id}/photos/{model_listing_summary.thumbnail_id}",
+            "thumbnailUrl": f"/api/v1/listings/{model_listing_summary.id}/photos/{model_listing.photo_ids[0]}",
             "accommodationType": model_listing_summary.accommodation_type,
             "numberOfRooms": model_listing_summary.number_of_rooms,
             "source": model_listing_summary.source,

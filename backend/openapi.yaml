@@ -479,7 +479,6 @@ components:
         - id
         - title
         - shortDescription
-        - thumbnailUrl
         - accommodationType
         - numberOfRooms
         - source

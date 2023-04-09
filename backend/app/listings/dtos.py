@@ -13,7 +13,7 @@ from app.user.user_models import User
 
 from app.util.schema import Schemable
 from app.listings.models import (
-    AccommodationSearchResult, AccommodationSummary, Country, SortBy, Source,
+    AccommodationSearchResult, AccommodationSummary, Country, ExternalAccommodationListing, ExternalAccommodationSummary, InternalAccommodationListing, InternalAccommodationSummary, SortBy, Source,
     UKAddress)
 from app.util.encoding import CamelCaseDecoder
 from app.listings.models import Address, AccommodationListing
@@ -134,15 +134,11 @@ class ContactInfoDTO:
 
 
 class AccommodationListingDTO:
-    def __init__(self, listing: AccommodationListing, author: User) -> None:
+    def __init__(self, listing: AccommodationListing, author: User):
         self.id = f"{listing.source}/{listing.id}"
         self.title = listing.title
         self.description = listing.description
-        self.photo_urls = [
-            url_for("listings.get_listing_photo",
-                    listing_id=listing.id, photo_id=id)
-            for id in listing.photo_ids
-        ]
+        self.photo_urls = self.get_photo_urls(listing)
         self.accommodation_type = listing.accommodation_type
         self.number_of_rooms = listing.number_of_rooms
         self.source = listing.source
@@ -150,6 +146,18 @@ class AccommodationListingDTO:
         self.address = listing.location.address
         self.author = AuthorDTO(author)
         self.contact_info = ContactInfoDTO(author)
+
+    @staticmethod
+    def get_photo_urls(listing: AccommodationListing) -> list[str]:
+        if isinstance(listing, InternalAccommodationListing):
+            return [
+                url_for("listings.get_listing_photo",
+                        listing_id=listing.id, photo_id=id)
+                for id in listing.photo_ids
+            ]
+        elif isinstance(listing, ExternalAccommodationListing):
+            return listing.photo_urls
+        return []
 
 
 @dataclass
@@ -159,7 +167,7 @@ class AccommodationSummaryDTO:
     short_description: str
     accommodation_type: str
     number_of_rooms: int
-    thumbnail_url: str
+    thumbnail_url: str | None
     source: Source
     price: float
     post_code: str
@@ -170,12 +178,21 @@ class AccommodationSummaryDTO:
         self.short_description = summary.short_description
         self.accommodation_type = summary.accommodation_type
         self.number_of_rooms = summary.number_of_rooms
-        self.thumbnail_url = url_for(
-            "listings.get_listing_photo",
-            listing_id=summary.id, photo_id=summary.thumbnail_id)
+        self.thumbnail_url = self.get_thumbnail_url(summary)
         self.source = summary.source
         self.price = summary.price
         self.post_code = summary.post_code
+
+    @staticmethod
+    def get_thumbnail_url(summary: AccommodationSummary) -> str | None:
+        if isinstance(summary, InternalAccommodationSummary):
+            return url_for(
+                "listings.get_listing_photo",
+                listing_id=summary.id, photo_id=summary.thumbnail_id
+            )
+        elif isinstance(summary, ExternalAccommodationSummary):
+            return summary.thumbnail_url
+        return None
 
 
 @dataclass(frozen=True)

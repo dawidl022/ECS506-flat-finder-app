@@ -5,17 +5,19 @@ from uuid import UUID
 from geopy import distance
 
 from .exceptions import ListingNotFoundError
-from .models import AccommodationListing, Coordinates, Photo, SortBy
+from .models import (
+    AccommodationListing, Coordinates, InternalAccommodationListing, Photo,
+    SortBy)
 
 
 class ListingRepository(ABC):
     @abstractmethod
     def get_listing_by_id(self, listing_id: UUID
-                          ) -> AccommodationListing | None:
+                          ) -> InternalAccommodationListing | None:
         pass
 
     @abstractmethod
-    def save_listing(self, listing: AccommodationListing) -> None:
+    def save_listing(self, listing: InternalAccommodationListing) -> None:
         pass
 
     @abstractmethod
@@ -28,20 +30,20 @@ class AccommodationListingRepository(ListingRepository, ABC):
     def search_by_location(
         self, coords: Coordinates, radius: float, order_by: SortBy,
         page: int, size: int, max_price: float | None = None
-    ) -> list[AccommodationListing]:
+    ) -> list[InternalAccommodationListing]:
         pass
 
 
 class InMemoryAccommodationListingsRepository(AccommodationListingRepository):
 
     def __init__(self) -> None:
-        self.listings: dict[UUID, AccommodationListing] = {}
+        self.listings: dict[UUID, InternalAccommodationListing] = {}
 
     def get_listing_by_id(self, listing_id: UUID
-                          ) -> AccommodationListing | None:
+                          ) -> InternalAccommodationListing | None:
         return self.listings.get(listing_id)
 
-    def save_listing(self, listing: AccommodationListing) -> None:
+    def save_listing(self, listing: InternalAccommodationListing) -> None:
         self.listings[listing.id] = listing
 
     def delete_listing(self, listing_id: UUID) -> None:
@@ -53,7 +55,7 @@ class InMemoryAccommodationListingsRepository(AccommodationListingRepository):
     def search_by_location(
         self, coords: Coordinates, radius: float, order_by: SortBy, page: int,
         size: int, max_price: float | None = None
-    ) -> list[AccommodationListing]:
+    ) -> list[InternalAccommodationListing]:
         return sorted(
             [listing for listing in self.listings.values()
              if distance.distance(coords, listing.location.coords) <= radius

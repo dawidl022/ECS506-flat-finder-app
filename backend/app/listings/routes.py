@@ -1,6 +1,7 @@
 from http.client import (
     BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND)
 import os
+from typing import cast
 import uuid
 
 from flask import Blueprint, Response, abort, jsonify, make_response, request
@@ -15,9 +16,15 @@ from app.util.encoding import CamelCaseDecoder
 from config import Config
 from .models import AccommodationListing, Source
 from app.user.user_models import User, ContactDetails
+from .models import AccommodationListing, InternalAccommodationListing, Source
+
 from .dtos import (
-    AccommodationSearchResultDTO, AccommodationForm,
-    AccommodationListingDTO, AccommodationSearchParams, SearchResult, SourceDTO
+    AccommodationForm,
+    AccommodationListingDTO,
+    AccommodationSearchParams,
+    AccommodationSearchResultDTO,
+    SearchResult,
+    SourceDTO
 )
 from .service import BaseListingsService
 
@@ -193,14 +200,15 @@ def put_accommodation_listing(
 
 def get_accommodation_listing_authored_by_current_user(
         listing_id: str, listing_service: BaseListingsService, action: str
-) -> AccommodationListing:
+) -> InternalAccommodationListing:
     source, id = extract_listing_id_and_source(listing_id)
 
     if source != Source.internal:
         abort(make_response(
             {'listingId': f"cannot {action} external listing"}, FORBIDDEN))
 
-    listing = fetch_accommodation_listing(listing_service, source, id)
+    listing = cast(InternalAccommodationListing,
+                   fetch_accommodation_listing(listing_service, source, id))
 
     if listing.author_email != get_current_user_email():
         abort(make_response(

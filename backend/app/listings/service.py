@@ -4,7 +4,8 @@ import uuid
 import time
 from app.listings.exceptions import ListingNotFoundError
 from app.listings.models import (
-    AccommodationSearchResult, Address, Coordinates, Photo, Source)
+    AccommodationSearchResult, Address, Coordinates,
+    InternalAccommodationListing, Photo, Source)
 from app.listings.dtos import (
     AccommodationForm, AccommodationSearchParams)
 from app.listings.models import AccommodationListing, Location
@@ -119,7 +120,7 @@ class ListingsService(BaseListingsService):
         listing_photos = [Photo(id=uuid.uuid4(), blob=photo)
                           for photo in photos]
 
-        listing = AccommodationListing(
+        listing = InternalAccommodationListing(
             id=uuid.uuid4(),
             location=Location(
                 coords=self.geocoder.get_coords(form.decoded_address),
