@@ -137,7 +137,7 @@ class ContactInfoDTO:
 
 class AccommodationListingDTO:
     def __init__(self, listing: AccommodationListing, author: User):
-        self.id = f"{listing.source}/{listing.id}"
+        self.id = f"{listing.source}_{listing.id}"
         self.title = listing.title
         self.description = listing.description
         self.photo_urls = self.get_photo_urls(listing)
@@ -182,7 +182,7 @@ class AccommodationSummaryDTO:
     post_code: str
 
     def __init__(self, summary: AccommodationSummary):
-        self.id = summary.id
+        self.id = f"{summary.source}_{summary.id}"
         self.title = summary.title
         self.short_description = summary.short_description
         self.accommodation_type = summary.accommodation_type

@@ -22,7 +22,9 @@ class ZooplaOrderBy(StrEnum):
 
 class ZooplaClient(ListingAPIClient):
     name: str = "Zoopla"
-    API_KEY = os.getenv('ZOOPLA_API_KEY')
+
+    def __init__(self, api_key: str) -> None:
+        self.API_KEY = api_key
 
     def fetch_listing(self, listing_id: str
                       ) -> ExternalAccommodationListing | None:
@@ -77,11 +79,10 @@ class ZooplaClient(ListingAPIClient):
 
         raise ValueError("unhandled SortBy enum member")
 
-    @staticmethod
-    def submitRequest(querystring):
+    def submitRequest(self, querystring):
         url = "https://zoopla.p.rapidapi.com/properties/list"
         headers = {
-            "X-RapidAPI-Key": str(ZooplaClient.API_KEY),
+            "X-RapidAPI-Key": self.API_KEY,
             "X-RapidAPI-Host": "zoopla.p.rapidapi.com"
         }
 

@@ -120,12 +120,14 @@ class ListingsService(BaseListingsService):
             if source_client is None:
                 continue
 
+            # TODO catch api exceptions, return sources that threw exception
+            # so frontend can display that these were skipped
             listings += source_client.search_listing(
                 area=params.location,
                 radius=params.radius,
                 order_by=params.sort_by,
                 page_number=0,
-                page_size=params.size,
+                page_size=params.size * (params.page + 1),
                 maximum_price=int(
                     params.max_price) if params.max_price is not None else None
             )

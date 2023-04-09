@@ -87,7 +87,7 @@ address = cast(UKAddress, model_listing.location.address)
 
 
 model_listing_json = {
-    "id": "internal/" + str(model_listing.id),
+    "id": "internal_" + str(model_listing.id),
     "title": model_listing.title,
     "description": model_listing.description,
     "photoUrls": [
@@ -146,7 +146,7 @@ search_results_json = [
         "distance": model_search_result.distance,
         "isFavourite": model_search_result.is_favourite,
         "accommodation": {
-            "id": model_listing_summary.id,
+            "id": "internal_" + model_listing_summary.id,
             "title": model_listing_summary.title,
             "shortDescription": model_listing_summary.short_description,
             "thumbnailUrl": f"/api/v1/listings/{model_listing_summary.id}/photos/{model_listing.photo_ids[0]}",

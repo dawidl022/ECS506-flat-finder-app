@@ -62,7 +62,7 @@ def configure_dependencies(binder: Binder) -> None:
         listing_photo_repo=InMemoryPhotoRepository(),
         geocoder=GeocodingService(),
         external_sources={
-            Source.zoopla: ZooplaClient()
+            Source.zoopla: ZooplaClient(Config().ZOOPLA_API_KEY)
         }
     )
     user_service = UserService(

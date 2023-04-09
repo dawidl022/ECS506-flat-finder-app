@@ -21,6 +21,12 @@ export default function Home() {
         <div className="container">
           <h2>Hello</h2>
           <ListingForm />
+          <form
+            action="http://127.0.0.1:5000/api/v1/login/google"
+            method="POST"
+          >
+            <button>Login with Google</button>
+          </form>
         </div>
       </main>
     </>
