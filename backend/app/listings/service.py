@@ -42,7 +42,7 @@ class GeocodingService(BaseGeocodingService):
         """
         geolocator = Nominatim(user_agent="flatfinder-app")
         location = geolocator.geocode(addr.full_address)
-        return Coordinates(location.lat,location.long)
+        return Coordinates(location.lat, location.long)
 
     def search_coords(self, location_query: str) -> Coordinates:
         """
@@ -50,7 +50,7 @@ class GeocodingService(BaseGeocodingService):
         """
         geolocator = Nominatim(user_agent="flatfinder-app")
         location = geolocator.geocode(location_query)
-        return Coordinates(location.lat,location.long)
+        return Coordinates(location.lat, location.long)
 
     def calc_distance(self, c1: Coordinates, c2: Coordinates) -> float:
         """
