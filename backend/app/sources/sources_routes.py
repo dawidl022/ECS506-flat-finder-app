@@ -4,7 +4,7 @@ from config import Config
 from app.listings.service import BaseListingsService
 from app.util.encoding import CamelCaseDecoder, CamelCaseEncoder
 
-bp = Blueprint("sources", __name__, url_prefix=f"{Config.ROOT}/listings")
+bp = Blueprint("sources", __name__, url_prefix=f"{Config.ROOT}/sources")
 bp.json_encoder = CamelCaseEncoder
 bp.json_decoder = CamelCaseDecoder
 
