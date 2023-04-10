@@ -248,6 +248,7 @@ def delete_accommodation_listing(
 
 
 @bp.post("/<listing_id>/photos")
+@jwt_required()
 def upload_listing_photo(listing_id: str, blob: bytes, listing_service: BaseListingsService) -> Response:
     listing = get_accommodation_listing_authored_by_current_user(
         listing_id, listing_service, action="upload photo")
@@ -262,19 +263,21 @@ def upload_listing_photo(listing_id: str, blob: bytes, listing_service: BaseList
 
 
 @bp.get("/<listing_id>/photos/<photo_id>")
+@jwt_required()
 def get_listing_photo(listing_id: str, photo_id: str, listing_service: BaseListingsService) -> Response:
-    # TODO
-    pass
+    # check if user is authenticated
+    # get photo and return
+    return make_response("", NO_CONTENT)
 
 
 @bp.delete("/<listing_id>/photos/<photo_id>")
+@jwt_required()
 def delete_listing_photo(listing_id: str, photo_id: str, listing_service: BaseListingsService) -> Response:
     listing = get_accommodation_listing_authored_by_current_user(
         listing_id, listing_service, action="delete photo")
 
     try:
-        pass
-        #listing_service.delete_listing_photo(listing.id, photo_id)
+        listing_service.delete_listing_photo(listing.id, uuid.UUID(photo_id))
     except ListingNotFoundError:
         abort(make_response(
             {'listingId': "listing not found"}, NOT_FOUND))
