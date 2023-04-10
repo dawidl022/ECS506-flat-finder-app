@@ -21,15 +21,19 @@ const UserProfile: NextPage<UserProfileProps> = ({ userData }) => {
 
   useEffect(() => {
     const query = router.query.success;
-    if (query === "true") { setSuccess(true) };
-    if (query === "false") { setError(true) };
+    if (query === "true") {
+      setSuccess(true);
+    }
+    if (query === "false") {
+      setError(true);
+    }
   }, [router.query]);
-  
+
   return (
     <div className="container">
       {success && <p>Successfully deleted listing</p>}
       {error && <p>Error: could not delete listing</p>}
-      
+
       {userData.id ? (
         <ProfileCard isMe={isMe} userData={userData} />
       ) : (

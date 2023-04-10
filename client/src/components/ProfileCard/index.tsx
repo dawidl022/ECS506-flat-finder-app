@@ -1,7 +1,7 @@
 import { UserProfile } from "@/generated";
 import React, { FC, useState } from "react";
-import MyListings from "@/components/MyListings/MyListings"
- 
+import MyListings from "@/components/MyListings/MyListings";
+
 import styles from "./ProfileCard.module.scss";
 import AvatarPlaceholder from "../AvatarPlaceholder";
 import EditingButton from "./EditingButtonComponent";
