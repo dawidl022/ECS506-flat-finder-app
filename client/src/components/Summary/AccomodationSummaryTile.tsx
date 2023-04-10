@@ -2,6 +2,8 @@ import { FC } from "react";
 import Link from "next/link";
 import { AccommodationSummary } from "@/generated/models/AccommodationSummary";
 
+import styles from "./Tile.module.scss";
+
 interface AccommodationSummaryProps {
   accommodation: AccommodationSummary;
 }
@@ -10,7 +12,7 @@ const AccommodationSummaryTile: FC<AccommodationSummaryProps> = ({
   accommodation,
 }) => {
   return (
-    <div>
+    <div className={styles.wrapper}>
       <Link href={`/listings/accommodation/${accommodation.id}`}>
         <img
           src={accommodation.thumbnailUrl}
@@ -20,7 +22,7 @@ const AccommodationSummaryTile: FC<AccommodationSummaryProps> = ({
         />
         <p> {accommodation.title} </p>
         <p> {`£${accommodation.price}`} </p>
-        <p> {accommodation.shortDescription} </p>
+        {/* <p> {accommodation.shortDescription} </p> */}
         <p> {accommodation.accommodationType} </p>
         <p> {accommodation.numberOfRooms} </p>
         <p> {accommodation.postCode} </p>

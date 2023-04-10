@@ -5,6 +5,8 @@ import styles from "@/styles/Home.module.scss";
 import Tabs from "@/components/Tabs";
 import Filter from "@/components/Filter/Filter";
 import InfiniteListings from "@/components/InfiniteListings";
+import Pagination from "@/components/Pagination";
+import MainListings from "@/components/MainListing";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
@@ -23,7 +25,9 @@ export default function Home() {
           <Tabs tabs={["1", "2"]} />
           {/* <Filter /> */}
           <div>
-            <InfiniteListings location="london" radius={10000000} />
+            {/* <InfiniteListings location="london" radius={10000000} /> */}
+            {/* <Pagination /> */}
+            <MainListings />
           </div>
         </div>
       </main>
