@@ -2,7 +2,7 @@ import ProfileCard from "@/components/ProfileCard";
 import { GetServerSideProps, GetServerSidePropsContext, NextPage } from "next";
 
 import React from "react";
-import { UserProfile } from "@/generated";
+import { Configuration, DefaultApi, UserProfile } from "@/generated";
 import useApi from "@/hooks/useApi";
 
 import * as cookie from "cookie";
@@ -32,13 +32,18 @@ export default UserProfile;
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
+  // hooks dont work in getServerSideProps
   const { userId }: any = context.params;
-  const token = cookie.parse(context.req.headers.cookie as string).token;
 
-  const { apiManager } = useApi(token);
+  const token = cookie.parse(context.req.headers.cookie as string).token;
+  const basePath = "http://127.0.0.1:5000";
+  const config = new Configuration({ basePath, accessToken: token });
+
+  const api = new DefaultApi(config);
+
   let result;
   try {
-    const res = await apiManager.apiV1UsersUserIdProfileGet({ userId });
+    const res = await api.apiV1UsersUserIdProfileGet({ userId });
     result = res;
   } catch (error) {}
 
