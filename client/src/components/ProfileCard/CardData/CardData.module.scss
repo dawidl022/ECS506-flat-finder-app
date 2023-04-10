@@ -1,0 +1,76 @@
+.name {
+  margin-top: 10px;
+  font-size: 20px;
+  font-weight: bold;
+}
+.detailsCon {
+  margin-top: 24px;
+  width: 100%;
+  .detailsRow {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 16px;
+
+    .title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .value {
+      font-size: 14px;
+      color: #1d1d1d;
+    }
+  }
+}
+
+.nameInput {
+  margin-top: 10px;
+  // border-color: gray;
+  border: 1px solid gray;
+  padding: 4px 8px;
+  border-radius: 4px;
+  outline: none;
+}
+
+.valueInput {
+  border: 1px solid gray;
+  padding: 4px 8px;
+  border-radius: 4px;
+  outline: none;
+}
+
+.btnRow {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  display: flex;
+  gap: 12px;
+  button {
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #fff;
+  }
+  .saveBtn {
+    background-color: #4285f4;
+    transition: background-color 0.1s ease-in-out;
+
+    &:hover {
+      background-color: lighten(#4285f4, 5%);
+    }
+    &:active {
+      transform: translateY(2px);
+    }
+  }
+  .cancelBtn {
+    background-color: #fa5252;
+    transition: background-color 0.1s ease-in-out;
+
+    &:hover {
+      background-color: lighten(#fa5252, 5%);
+    }
+    &:active {
+      transform: translateY(2px);
+    }
+  }
+}

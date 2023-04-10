@@ -3,11 +3,10 @@ import React from "react";
 import styles from "./Navbar.module.scss";
 import UserCard from "./UserCard";
 import Link from "next/link";
+import useUser from "@/hooks/useUser";
 
 const Navbar = () => {
-  // TODO: create user context (for now just boolean)
-  const user = true;
-
+  const { user } = useUser();
   return (
     <nav className={styles.wrapper}>
       <div className="container">
@@ -18,8 +17,8 @@ const Navbar = () => {
           {user ? (
             <UserCard />
           ) : (
-            <Link href="/signup">
-              <p className={styles.loginBtn}>Sign up</p>
+            <Link href="/login">
+              <p className={styles.loginBtn}>Log in</p>
             </Link>
           )}
         </div>
