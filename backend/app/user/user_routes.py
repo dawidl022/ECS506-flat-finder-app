@@ -5,7 +5,7 @@ from flask_jwt_extended import jwt_required
 from app.auth.jwt import get_current_user_id
 from app.listings.dtos import ListingSummaryDTO
 from app.listings.service import BaseListingsService
-from app.user.user_dtos import UserDTO, UserProfileForm
+from app.user.user_dtos import UserDTO, UserProfileForm, UserSummaryDTO
 from app.user.user_models import User
 from app.user.user_service import BaseUserService, UserNotFoundError
 from app.util.encoding import CamelCaseDecoder, CamelCaseEncoder
@@ -16,6 +16,24 @@ from config import Config
 bp = Blueprint("users", __name__, url_prefix=f"{Config.ROOT}/users")
 bp.json_encoder = CamelCaseEncoder
 bp.json_decoder = CamelCaseDecoder
+
+
+@bp.get("/")
+@jwt_required()
+def get_users(user_service: BaseUserService):
+    check_logged_in_user_is_admin(user_service)
+
+    return jsonify([
+        UserSummaryDTO(user)
+        for user in user_service.get_all_users()
+    ])
+
+
+def check_logged_in_user_is_admin(user_service) -> None:
+    user = get_user(user_service, get_current_user_id())
+
+    if not user.is_admin:
+        abort(make_response({"user": "user not authorised"}, FORBIDDEN))
 
 
 @bp.get("/<uuid:user_id>/profile")

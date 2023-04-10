@@ -35,3 +35,17 @@ class UserDTO:
         self.email = user.email
         self.name = user.name
         self.contact_details = user.contact_details
+
+
+@dataclass
+class UserSummaryDTO:
+    id: UUID
+    email: str
+    name: str | None
+    is_admin: bool
+
+    def __init__(self, user: User) -> None:
+        self.id = user.id
+        self.email = user.email
+        self.name = user.name
+        self.is_admin = user.is_admin

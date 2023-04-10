@@ -1,5 +1,7 @@
+import dataclasses
 from http.client import BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, OK
 import json
+from unittest.mock import patch
 import uuid
 from flask.testing import FlaskClient
 from app.user.user_dtos import UserProfileForm
@@ -21,13 +23,19 @@ class MockUserService(BaseUserService):
     def __init__(self) -> None:
         self.deleted_user_ids: list[uuid.UUID] = []
         self.updated_users: list[tuple[uuid.UUID, UserProfileForm]] = []
+        self.admin_id: uuid.UUID | None = None
 
     def get_user(self, user_id) -> User | None:
         if user_id == registered_user_id:
             return registered_user
         elif user_id == model_listing_author.id:
             return model_listing_author
+        elif self.admin_id is not None and user_id == self.admin_id:
+            return self._get_admin()
         return None
+
+    def _get_admin(self):
+        return dataclasses.replace(registered_user, id=self.admin_id, is_admin=True)
 
     def get_user_id_for_email(self, email: str) -> uuid.UUID:
         if email == model_listing_author.email:
@@ -42,6 +50,65 @@ class MockUserService(BaseUserService):
 
     def delete_user(self, user_id: uuid.UUID) -> None:
         self.deleted_user_ids.append(user_id)
+
+    def get_all_users(self) -> list[User]:
+        return [registered_user, model_listing_author, self._get_admin()]
+
+
+def test_get_all_users__given_user_not_found__returns_not_found(client: FlaskClient):
+    response = client.get(
+        f"/api/v1/users/")
+
+    assert b'{"userId":"user not found"}' in response.data
+    assert response.status_code == NOT_FOUND
+
+
+def test_get_all_users__given_user_not_admin__returns_forbidden(client: FlaskClient):
+    with patch("app.auth.jwt.get_jwt") as mock_get_jwt_local, \
+            patch("flask_jwt_extended.utils.get_jwt") as mock_get_jwt_lib:
+        return_value = {
+            "sub": str(model_listing_author.id),
+            "email": model_listing_author.email
+        }
+        mock_get_jwt_local.return_value = return_value
+        mock_get_jwt_lib.return_value = return_value
+
+        response = client.get(f"/api/v1/users/")
+
+        assert b'{"user":"user not authorised"}' in response.data
+        assert response.status_code == FORBIDDEN
+
+
+def test_get_all_users__given_user_is_admin__returns_all_users(
+        client: FlaskClient,
+        user_service: MockUserService,
+        currently_logged_in_user_id: uuid.UUID):
+    user_service.admin_id = currently_logged_in_user_id
+
+    response = client.get(
+        f"/api/v1/users/")
+
+    assert response.status_code == OK
+    assert json.loads(response.data) == [
+        {
+            "id": str(registered_user.id),
+            "name": registered_user.name,
+            "email": registered_user.email,
+            "isAdmin": False
+        },
+        {
+            "id": str(model_listing_author.id),
+            "name": model_listing_author.name,
+            "email": model_listing_author.email,
+            "isAdmin": False
+        },
+        {
+            "id": str(currently_logged_in_user_id),
+            "name": registered_user.name,
+            "email": registered_user.email,
+            "isAdmin": True
+        }
+    ]
 
 
 def test_get_user__given_id_not_mapped_to_user__returns_not_found(client: FlaskClient):

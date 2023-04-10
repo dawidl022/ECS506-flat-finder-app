@@ -26,6 +26,10 @@ class BaseUserService(ABC):
     def update_user(self, user_id: UUID, profile: UserProfileForm) -> None:
         pass
 
+    @abstractmethod
+    def get_all_users(self) -> list[User]:
+        pass
+
 
 class UserService(BaseUserService):
 
@@ -56,6 +60,9 @@ class UserService(BaseUserService):
         updated_user = dataclasses.replace(prev_user, **vars(profile))
 
         self.repo.save_user(updated_user)
+
+    def get_all_users(self) -> list[User]:
+        return self.repo.get_all_users()
 
 
 class UserNotFoundError(Exception):

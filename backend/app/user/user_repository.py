@@ -17,6 +17,10 @@ class UserRepository(ABC):
     def save_user(self, user: User) -> None:
         pass
 
+    @abstractmethod
+    def get_all_users(self) -> list[User]:
+        pass
+
 
 class InMemoryUserRepository(UserRepository):
 
@@ -33,3 +37,6 @@ class InMemoryUserRepository(UserRepository):
     def save_user(self, user: User) -> None:
         self.users_by_email[user.email] = user
         self.users_by_id[user.id] = user
+
+    def get_all_users(self) -> list[User]:
+        return list(self.users_by_id.values())
