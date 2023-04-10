@@ -11,7 +11,7 @@ interface AccommodationDetailsProps {
   location: string;
   radius: number;
   maxPrice?: number;
-  sources?: Array<string>;
+  sources?: string[];
   sortBy?: ApiV1ListingsAccommodationGetSortByEnum;
   page?: number;
   size?: number;
@@ -26,8 +26,9 @@ const InfiniteListings: FC<AccommodationDetailsProps> = ({
   page = 0,
   size = 6,
 }) => {
-  const [data, setData] = useState(Array<AccommodationSearchResultsInner>);
+  const [data, setData] = useState<Array<AccommodationSearchResultsInner>>([]);
   const [error, setError] = useState(false);
+  var pointer = 0;
 
   const getMoreAccommodation = async () => {
     await new DefaultApi()
@@ -41,11 +42,16 @@ const InfiniteListings: FC<AccommodationDetailsProps> = ({
         size,
       })
       .then(res => {
-        setData(data.concat(res.searchResults));
+        setData(res.searchResults);
       })
       .catch(() => setError(true));
     page = page + 1;
+    pointer = pointer + size;
   };
+
+  useEffect(() => {
+    getMoreAccommodation();
+  })
 
   return (
     <div>
@@ -55,7 +61,7 @@ const InfiniteListings: FC<AccommodationDetailsProps> = ({
         <InfiniteScroll
           dataLength={data.length}
           next={getMoreAccommodation}
-          hasMore={data.length !== 10}
+          hasMore={pointer <= data.length}
           loader={<h4>Loading...</h4>}
           endMessage={
             <p style={{ textAlign: "center" }}>
