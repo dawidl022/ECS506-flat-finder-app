@@ -37,14 +37,17 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     }
   };
 
-  api.apiV1AdminsUserIdGet({ userId: currentUserId }).then(() => {
-    setIsAdmin(true);
-  }).catch((err) => {
-    console.log(err);
-  }).finally(() => {
-    setIsLoading(false);
-  });
-
+  api
+    .apiV1AdminsUserIdGet({ userId: currentUserId })
+    .then(() => {
+      setIsAdmin(true);
+    })
+    .catch(err => {
+      console.log(err);
+    })
+    .finally(() => {
+      setIsLoading(false);
+    });
 
   if (isLoading) {
     return <p>Loading</p>;
@@ -72,7 +75,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
 
           {!users ? (
             <tr>
-              <td>Loading</td> 
+              <td>Loading</td>
             </tr>
           ) : (
             users.map((user: User, index) => {
