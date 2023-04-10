@@ -1,5 +1,5 @@
 from http.client import (
-    BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, SERVICE_UNAVAILABLE)
+    BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, SERVICE_UNAVAILABLE, CREATED)
 import os
 from typing import cast
 import uuid
@@ -397,7 +397,7 @@ def upload_listing_photo(listing_id: str, blob: bytes, listing_service: BaseList
         abort(make_response(
             {'listingId': "listing not found"}, NOT_FOUND))
 
-    return make_response("", NO_CONTENT)
+    return make_response("", CREATED)
 
 
 @bp.get("/<listing_id>/photos/<photo_id>")
@@ -406,11 +406,12 @@ def get_listing_photo(listing_id: str, photo_id: str, listing_service: BaseListi
     try:
         photo = listing_service.get_listing_photo(
             uuid.UUID(listing_id), uuid.UUID(photo_id))
-        
+
         return jsonify(id=photo.id, blob=photo.blob)
+
     except ValueError:
         abort(make_response(
-            {'msg': "invalid ids given"}, NOT_FOUND))
+            {'msg': "invalid ids given"}, BAD_REQUEST))
     except ListingNotFoundError:
         abort(make_response(
             {'listingId': "listing not found"}, NOT_FOUND))
