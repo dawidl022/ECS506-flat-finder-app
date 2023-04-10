@@ -32,16 +32,16 @@ const InfiniteListings: FC<AccommodationDetailsProps> = ({
   const getMoreAccommodation = async () => {
     await new DefaultApi()
       .apiV1ListingsAccommodationGet({
-        location: location,
-        radius: radius,
-        maxPrice: maxPrice,
-        sources: sources,
-        sortBy: sortBy,
-        page: page,
-        size: size,
+        location,
+        radius,
+        maxPrice,
+        sources,
+        sortBy,
+        page,
+        size,
       })
       .then(res => {
-        setData(data.concat(res));
+        setData(data.concat(res.searchResults));
       })
       .catch(() => setError(true));
     page = page + 1;
