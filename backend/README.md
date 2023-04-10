@@ -75,16 +75,27 @@ when you run the application.
 
 ### Running the server
 
+Set the following environment variables:
+
+```env
+FRONTEND_URL=<frontend-url>
+GOOGLE_AUTH_CLIENT_ID=<your-auth-client-id>
+GOOGLE_AUTH_CLIENT_SECRET=<your-auth-client-secret>
+ZOOPLA_API_KEY=<your-zoopla-api-key>
+```
+
 Inside this directory, run
 
 ```bash
-FRONTEND_URL=<frontend-url>  GOOGLE_AUTH_CLIENT_ID=<your-auth-client-id> GOOGLE_AUTH_CLIENT_SECRET=<your-auth-client-secret> python3 -m flask run
+python3 -m flask run
 ```
 
 Where frontend URL is the URL to the frontend application. If running locally,
 set, use `127.0.0.1` instead of `localhost` to get parity between domains and
 hence share cookies without extra configuration. This URL will be used to
 redirect the user back to the frontend after SSO authentication.
+
+[Instructions to obtain the Zoopla API key](../docs/API-details/APIdetails.md#getting-api-key)
 
 You should see output similar to the following:
 

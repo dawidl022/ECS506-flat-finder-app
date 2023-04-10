@@ -42,7 +42,7 @@ export interface AccommodationSummary {
      * @type {string}
      * @memberof AccommodationSummary
      */
-    thumbnailUrl: string;
+    thumbnailUrl?: string;
     /**
      * 
      * @type {string}
@@ -83,7 +83,6 @@ export function instanceOfAccommodationSummary(value: object): boolean {
     isInstance = isInstance && "id" in value;
     isInstance = isInstance && "title" in value;
     isInstance = isInstance && "shortDescription" in value;
-    isInstance = isInstance && "thumbnailUrl" in value;
     isInstance = isInstance && "accommodationType" in value;
     isInstance = isInstance && "numberOfRooms" in value;
     isInstance = isInstance && "source" in value;
@@ -106,7 +105,7 @@ export function AccommodationSummaryFromJSONTyped(json: any, ignoreDiscriminator
         'id': json['id'],
         'title': json['title'],
         'shortDescription': json['shortDescription'],
-        'thumbnailUrl': json['thumbnailUrl'],
+        'thumbnailUrl': !exists(json, 'thumbnailUrl') ? undefined : json['thumbnailUrl'],
         'accommodationType': json['accommodationType'],
         'numberOfRooms': json['numberOfRooms'],
         'source': json['source'],
