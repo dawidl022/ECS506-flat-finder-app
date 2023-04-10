@@ -37,10 +37,8 @@ const ProfileCard: FC<ProfileCardProps> = ({ userData }) => {
 
       {/* If user has listings */}
       <section className={styles.listingsCon}>
-        <h2 className={styles.title}>Listings:</h2>
+        {/* <h2 className={styles.title}>Listings:</h2> */}
         <div className={styles.listings}>
-          {/* TODO: */}
-          {/* Listings card from figma */}
           <MyListings />
         </div>
       </section>
