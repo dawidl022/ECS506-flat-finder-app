@@ -28,7 +28,7 @@ const InfiniteListings: FC<AccommodationDetailsProps> = ({
 }) => {
   const [data, setData] = useState<Array<AccommodationSearchResultsInner>>([]);
   const [error, setError] = useState(false);
-  var pointer = 0;
+  var pointer = size;
 
   const getMoreAccommodation = async () => {
     await new DefaultApi()
@@ -48,10 +48,6 @@ const InfiniteListings: FC<AccommodationDetailsProps> = ({
     page = page + 1;
     pointer = pointer + size;
   };
-
-  useEffect(() => {
-    getMoreAccommodation();
-  })
 
   return (
     <div>
