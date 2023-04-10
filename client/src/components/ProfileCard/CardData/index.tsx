@@ -76,9 +76,12 @@ const CardData: React.FC<CardDataProps> = ({
           )} */}
         </div>
         <div className={styles.detailsRow}>
-          <p className={styles.title}>Phone:</p>
+          <label htmlFor="phone" className={styles.title}>
+            Phone:
+          </label>
           {isEditing ? (
             <input
+              id="phone"
               className={styles.valueInput}
               placeholder={userData.contactDetails.phoneNumber}
               value={newUserData.contactDetails.phoneNumber}

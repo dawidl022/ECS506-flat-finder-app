@@ -26,6 +26,7 @@ const Input: React.FC<InputProps> = ({
         id={`input-${label}`}
         placeholder={placeholder}
         value={value}
+        required={isRequired}
         onChange={e => setValue && setValue(e.target.value)}
       />
     </div>
