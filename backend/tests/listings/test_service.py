@@ -64,6 +64,11 @@ class SpyAccommodationListingRepo(AccommodationListingRepository):
     def save_listing(self, listing: InternalAccommodationListing) -> None:
         self.saved_listings.append(listing)
 
+    def get_listings_authored_by(self, user_email: str) -> tuple[InternalAccommodationListing, ...]:
+        if user_email == model_listing.author_email:
+            return model_listing,
+        return ()
+
 
 class StubAccommodationListingRepo(AccommodationListingRepository):
     def __init__(self, listings: list[InternalAccommodationListing]):
@@ -83,6 +88,9 @@ class StubAccommodationListingRepo(AccommodationListingRepository):
 
     def delete_listing(self, listing_id: UUID) -> None:
         raise NotImplementedError()
+
+    def get_listings_authored_by(self, user_email: str) -> tuple[InternalAccommodationListing, ...]:
+        return ()
 
 
 class StubListingClient(ListingAPIClient):
@@ -418,6 +426,11 @@ class ListingsServiceTest(unittest.TestCase):
         self.assertEqual(len(expected), len(actual))
         self.assertEqual(expected, set(actual))
 
+    def test_get_listings_authored_by__returns_listings(self):
+        actual = self.service.get_listings_authored_by(
+            model_listing.author_email)
+        self.assertEqual([model_listing_summary], actual)
+
 
 class ListingsServiceSearchTest(unittest.TestCase):
     """
@@ -601,6 +614,7 @@ def generate_external_listings_with_decreasing_creation_time(
             source=Source.zoopla,
             original_listing_url="",
             author_phone="+44 78912 345678",
+            author_name="External test user",
             photo_urls=[
                 "https://fastly.picsum.photos/id/308/1200/1200"
                 ".jpg?hmac=2c1705rmBMgsQTZ1I9Uu74cRpA4Fxdl0THWV8wfV5VQ",
