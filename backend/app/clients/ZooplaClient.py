@@ -47,8 +47,8 @@ class ZooplaClient(ListingAPIClient):
                        ) -> list[ExternalAccommodationListing]:
         querystring: Dict[str, Union[str, float, int]] = {
             "area": area,
-            "order_by": ZooplaClient.map_order_by(order_by),
-            "ordering": "ascending",
+            "order_by": self.map_order_by(order_by),
+            "ordering": self.map_ordering(order_by),
             "radius": radius,
             "listing_status": "rent",
             "page_number": page_number,
@@ -76,6 +76,19 @@ class ZooplaClient(ListingAPIClient):
                 return ZooplaOrderBy.age
             case SortBy.cheapest:
                 return ZooplaOrderBy.price
+
+        raise ValueError("unhandled SortBy enum member")
+
+    @staticmethod
+    def map_ordering(order_by: SortBy) -> str:
+        match order_by:
+            case SortBy.newest:
+                return "descending"
+            case SortBy.closest:
+                # Zoopla does not support sorting by distance
+                return "descending"
+            case SortBy.cheapest:
+                return "ascending"
 
         raise ValueError("unhandled SortBy enum member")
 

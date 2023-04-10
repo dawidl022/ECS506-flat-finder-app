@@ -4,6 +4,7 @@ import { Inter } from "@next/font/google";
 import styles from "@/styles/Home.module.scss";
 import Tabs from "@/components/Tabs";
 import Filter from "@/components/Filter/Filter";
+import InfiniteListings from "@/components/InfiniteListings";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
@@ -21,7 +22,9 @@ export default function Home() {
           <h2>Hello</h2>
           <Tabs tabs={["1", "2"]} />
           {/* <Filter /> */}
-          <div>{/* Infinite scroll */}</div>
+          <div>
+            <InfiniteListings location="london" radius={10000000} />
+          </div>
         </div>
       </main>
     </>
