@@ -1,5 +1,6 @@
 import { UserProfile } from "@/generated";
 import React, { FC, useState } from "react";
+import MyListings from "@/components/MyListings/MyListings";
 
 import styles from "./ProfileCard.module.scss";
 import AvatarPlaceholder from "../AvatarPlaceholder";
@@ -46,10 +47,9 @@ const ProfileCard: FC<ProfileCardProps> = ({ userData, isMe = false }) => {
 
       {/* If user has listings */}
       <section className={styles.listingsCon}>
-        <h2 className={styles.title}>Listings:</h2>
+        {/* <h2 className={styles.title}>Listings:</h2> */}
         <div className={styles.listings}>
-          {/* TODO: */}
-          {/* Listings card from figma */}
+          <MyListings />
         </div>
       </section>
     </div>

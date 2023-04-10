@@ -1,7 +1,7 @@
 import ProfileCard from "@/components/ProfileCard";
 import { GetServerSideProps, GetServerSidePropsContext, NextPage } from "next";
-
-import React from "react";
+import { useRouter } from "next/router";
+import { useState, useEffect } from "react";
 import { Configuration, DefaultApi, UserProfile } from "@/generated";
 import useApi from "@/hooks/useApi";
 
@@ -15,8 +15,25 @@ interface UserProfileProps {
 const UserProfile: NextPage<UserProfileProps> = ({ userData }) => {
   const { user } = useUser();
   const isMe = user?.id === userData.id;
+  const router = useRouter();
+  const [success, setSuccess] = useState<boolean | undefined>(false);
+  const [error, setError] = useState<boolean | undefined>(false);
+
+  useEffect(() => {
+    const query = router.query.success;
+    if (query === "true") {
+      setSuccess(true);
+    }
+    if (query === "false") {
+      setError(true);
+    }
+  }, [router.query]);
+
   return (
     <div className="container">
+      {success && <p>Successfully deleted listing</p>}
+      {error && <p>Error: could not delete listing</p>}
+
       {userData.id ? (
         <ProfileCard isMe={isMe} userData={userData} />
       ) : (
