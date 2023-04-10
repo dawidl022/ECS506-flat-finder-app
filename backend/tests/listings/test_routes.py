@@ -8,12 +8,12 @@ from unittest.mock import patch
 import uuid
 from flask.testing import FlaskClient
 from app.listings.exceptions import ListingNotFoundError
-from app.listings.dtos import AccommodationSearchParams, AccommodationForm
-from app.listings.models import AccommodationListing, AccommodationSearchResult, AccommodationSummary, Coordinates, ExternalAccommodationListing, InternalAccommodationSummary, ListingSummary, Location, Source, UKAddress, InternalAccommodationListing
+from app.listings.dtos import AccommodationSearchParams, AccommodationForm, SeekingForm, SeekingSearchParams
+from app.listings.models import AccommodationListing, AccommodationSearchResult, AccommodationSummary, Coordinates, ExternalAccommodationListing, InternalAccommodationSummary, ListingSummary, Location, SeekingListing, SeekingSearchResult, Source, UKAddress, InternalAccommodationListing
 
-from app.listings.service import BaseListingsService
+from app.listings.service import BaseListingsService, SearchResult
 from app.clients.APIException import APIException
-from app.listings.service import SearchResult
+from app.listings.service import AccommodationSearchResult
 from app.user.user_models import ContactDetails, User
 
 
@@ -77,6 +77,21 @@ class MockListingService(BaseListingsService):
         if user_email == model_listing.author_email:
             return [model_listing_summary]
         return []
+
+    def get_seeking_listing(self, listing_id: uuid.UUID) -> SeekingListing | None:
+        raise NotImplementedError()
+
+    def create_seeking_listing(self, form: SeekingForm, photos: list[bytes], author_email: str) -> SeekingListing:
+        raise NotImplementedError()
+
+    def update_seeking_listing(self, listing_id: uuid.UUID, form: SeekingForm) -> SeekingListing:
+        raise NotImplementedError()
+
+    def delete_seeking_listing(self, listing_id: uuid.UUID) -> None:
+        raise NotImplementedError()
+
+    def search_seeking_listings(self, params: SeekingSearchParams) -> list[SeekingSearchResult]:
+        raise NotImplementedError()
 
 
 model_listing = InternalAccommodationListing(

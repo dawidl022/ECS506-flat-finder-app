@@ -60,6 +60,23 @@ class AccommodationSearchParams(Schemable):
         ] if self.sources else []
 
 
+class SeekingSearchParamsSchema(Schema):
+    location = fields.Str(required=True)
+    radius = fields.Float(required=True, validate=Range(min=0))
+    page = fields.Int(validate=Range(min=0))
+    size = fields.Int(validate=Range(min=1, max=100))
+
+
+@dataclass(frozen=True)
+class SeekingSearchParams(Schemable):
+    schema = SeekingSearchParamsSchema()
+
+    location: str
+    radius: float
+    page: int = 0
+    size: int = 10
+
+
 def validate_address(addr: str) -> dict[str, str]:
     address = cast(
         dict[str, str], CamelCaseDecoder.snake_casify(json.loads(addr)))
@@ -121,6 +138,21 @@ class AccommodationForm(Schemable):
         d = vars(self).copy()
         del d["address"]
         return d
+
+
+class SeekingFormSchema(Schema):
+    title = fields.Str(required=True)
+    description = fields.Str(required=True)
+    preferred_location = fields.Str(required=True)
+
+
+@dataclass(frozen=True)
+class SeekingForm(Schemable):
+    schema = SeekingFormSchema()
+
+    title: str
+    description: str
+    preferred_location: str
 
 
 class AuthorDTO:

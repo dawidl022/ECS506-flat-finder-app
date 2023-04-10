@@ -49,6 +49,18 @@ class AccommodationSummary(ListingSummary, abc.ABC):
 
 
 @dataclass(frozen=True)
+class SeekingSummary(ListingSummary):
+    id: UUID
+    title: str
+    short_description: str
+    thumbnail_id: UUID | None
+
+    @classmethod
+    def listing_type(cls) -> ListingType:
+        return ListingType.seeking
+
+
+@dataclass(frozen=True)
 class InternalAccommodationSummary(AccommodationSummary):
     thumbnail_id: UUID
 
@@ -63,6 +75,13 @@ class AccommodationSearchResult:
     distance: float
     is_favourite: bool
     accommodation: AccommodationSummary
+
+
+@dataclass(frozen=True)
+class SeekingSearchResult:
+    distance: float
+    is_favourite: bool
+    seeking: SeekingSummary
 
 
 class Coordinates(NamedTuple):
@@ -132,6 +151,12 @@ class UKAddress(Address):
 class Location:
     coords: Coordinates
     address: Address
+
+
+@dataclass(frozen=True)
+class AddressFreeLocation:
+    coords: Coordinates
+    name: str
 
 
 @dataclass(frozen=True)
@@ -244,3 +269,24 @@ class ExternalAccommodationListing(AccommodationListing):
 class Photo:
     id: UUID
     blob: bytes
+
+
+@dataclass(frozen=True)
+class SeekingListing(Listing):
+    id: UUID
+    author_email: str
+    location: AddressFreeLocation
+    created_at: float
+
+    title: str
+    description: str
+    photo_ids: tuple[UUID, ...]
+
+    def summarise(self) -> SeekingSummary:
+        return SeekingSummary(
+            id=self.id,
+            title=self.title,
+            short_description=self.description,
+            thumbnail_id=(self.photo_ids[0] if len(
+                self.photo_ids) > 0 else None)
+        )

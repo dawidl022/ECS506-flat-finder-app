@@ -10,9 +10,9 @@ from app.listings.service import (
     GeocodingService, ListingsService, BaseListingsService)
 from app.user.user_repository import InMemoryUserRepository
 from app.user.user_service import BaseUserService, UserService
-from app.util.encoding import CamelCaseEncoder
 from app.listings.repository import (
-    InMemoryAccommodationListingsRepository, InMemoryPhotoRepository)
+    InMemoryAccommodationListingsRepository, InMemoryPhotoRepository,
+    InMemorySeekingListingsRepository)
 from config import Config
 
 
@@ -59,6 +59,7 @@ def create_app(config_class: type = Config) -> Flask:
 def configure_dependencies(binder: Binder) -> None:
     listing_service = ListingsService(
         accommodation_listing_repo=InMemoryAccommodationListingsRepository(),
+        seeking_listing_repo=InMemorySeekingListingsRepository(),
         listing_photo_repo=InMemoryPhotoRepository(),
         geocoder=GeocodingService(),
         external_sources={
