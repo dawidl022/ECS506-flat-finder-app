@@ -7,6 +7,7 @@ from app.user.user_exceptions import UserNotFoundError
 from app.user.user_models import User
 
 from app.user.user_repository import UserRepository
+from config import Config
 
 
 class BaseUserService(ABC):
@@ -59,11 +60,14 @@ class UserService(BaseUserService, AdminService):
 
     def get_user_id_for_email(self, email: str) -> UUID:
         user = self.repo.get_user_by_email(email)
+        su_email = Config().SUPERUSER_EMAIL
+        is_admin = su_email is not None and email == su_email
 
         if user is None:
             user = User(
                 id=uuid4(),
                 email=email,
+                is_admin=is_admin
             )
             self.repo.save_user(user)
 

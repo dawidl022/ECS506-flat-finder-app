@@ -1,32 +1,35 @@
 import { FC, useState } from "react";
 import { useRouter } from "next/router";
-import { Configuration, DefaultApi } from "@/generated";
+
+import React from "react";
+import useApi from "@/hooks/useApi";
 
 import { User } from "@/generated";
+import useUser from "@/hooks/useUser";
 
-interface AdminPanelProps {
-  currentUserId: string;
-}
-const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
-  const api = new DefaultApi(
-    new Configuration({ basePath: "http://127.0.0.1:5000" })
-  );
+const AdminPanel: FC = () => {
+  const { apiManager } = useApi();
+  const { user: currentUser } = useUser();
+  // const currentUserId = user?.id;
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [isCurrentUserAdmin, setIsAdmin] = useState<boolean>(false);
   const router = useRouter();
 
-  api
-    .apiV1UsersGet()
-    .then((users: User[]) => {
-      setUsers(users);
-    })
-    .catch(() => setError(true));
+  React.useEffect(() => {
+    // get users
+    apiManager
+      .apiV1UsersGet()
+      .then((users: User[]) => {
+        setUsers(users);
+      })
+      .catch(() => setError(true));
+  }, []);
 
   const removeUserFromSystem = (user: User) => {
     if (confirm("Are you sure you want to remove " + user.email + "?")) {
-      api
+      apiManager
         .apiV1UsersUserIdDelete({ userId: user.id })
         .then(() => {
           setUsers(users.filter(u => u.id !== user.id));
@@ -39,7 +42,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
 
   const grantAdmin = (user: User) => {
     if (confirm("Are you sure you want to grant " + user.email + " admin?")) {
-      api
+      apiManager
         .apiV1AdminsUserIdPut({ userId: user.id })
         .then(() => {
           router.reload();
@@ -56,7 +59,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
         "Are you sure you want to revoke " + user.email + "'s admin role?"
       )
     ) {
-      api
+      apiManager
         .apiV1AdminsUserIdDelete({ userId: user.id })
         .then(() => {
           router.reload();
@@ -69,17 +72,21 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     }
   };
 
-  api
-    .apiV1AdminsUserIdGet({ userId: currentUserId })
-    .then(() => {
-      setIsAdmin(true);
-    })
-    .catch(err => {
-      console.log(err);
-    })
-    .finally(() => {
-      setIsLoading(false);
-    });
+  React.useEffect(() => {
+    if (currentUser?.id) {
+      apiManager
+        .apiV1AdminsUserIdGet({ userId: currentUser.id })
+        .then(() => {
+          setIsAdmin(true);
+        })
+        .catch(err => {
+          console.log(err);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [currentUser]);
 
   if (isLoading) {
     return <p>Loading</p>;
@@ -87,7 +94,9 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     return (
       <div>
         <p> Administrator Access Only </p>
-        <button type="button" onClick={() => (window.location.href = "/")}>
+        {/* TODO: */}
+        {/* <button type="button" onClick={() => (window.location.href = "/")}> */}
+        <button type="button" onClick={() => router.push("/")}>
           Return To Homepage
         </button>
       </div>
@@ -116,7 +125,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
                   <td>{user.name}</td>
                   <td>{user.email}</td>
                   <td>{user.isAdmin ? "Yes" : "No"}</td>
-                  {user.id === currentUserId ? (
+                  {user.id === currentUser?.id ? (
                     <td></td>
                   ) : (
                     <td>
@@ -130,7 +139,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
                   )}
                   {user.isAdmin ? (
                     <>
-                      {user.id === currentUserId ? (
+                      {user.id === currentUser?.id ? (
                         <td></td>
                       ) : (
                         <td>

@@ -18,7 +18,7 @@ bp.json_encoder = CamelCaseEncoder
 bp.json_decoder = CamelCaseDecoder
 
 
-@bp.get("/")
+@bp.get("")
 @jwt_required()
 def get_users(user_service: BaseUserService) -> Response:
     check_logged_in_user_is_admin(user_service)

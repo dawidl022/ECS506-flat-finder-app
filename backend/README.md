@@ -82,6 +82,7 @@ FRONTEND_URL=<frontend-url>
 GOOGLE_AUTH_CLIENT_ID=<your-auth-client-id>
 GOOGLE_AUTH_CLIENT_SECRET=<your-auth-client-secret>
 ZOOPLA_API_KEY=<your-zoopla-api-key>
+SUPERUSER_EMAIL=<test-admin-email>
 ```
 
 Inside this directory, run
