@@ -254,11 +254,11 @@ class ListingsService(BaseListingsService):
         if listing is None:
             raise ListingNotFoundError()
 
-        # create photo object and save to repo
+        # create photo object and save to photo repo
         photo = Photo(uuid.uuid4(), blob)
         self.listing_photo_repo.save_photos([photo])
 
-        # add photo to listing
+        # update listing by adding the photo to it
         updated_listing = dataclasses.replace(
             listing,
             photo_ids=tuple(list(listing.photo_ids) + [photo.id])
@@ -272,7 +272,11 @@ class ListingsService(BaseListingsService):
         if listing is None:
             raise ListingNotFoundError()
 
-        # get photo if exists
+        # check if photo is part of this listing
+        if photo_id not in listing.photo_ids:
+            raise PhotoNotFoundError()
+        
+        # get photo from photo repo
         photo = self.listing_photo_repo.get_photo_by_id(photo_id)
         if photo is None:
             raise PhotoNotFoundError()
@@ -284,6 +288,17 @@ class ListingsService(BaseListingsService):
         listing = self.accommodation_listing_repo.get_listing_by_id(listing_id)
         if listing is None:
             raise ListingNotFoundError()
-        
-        # delete photo if exists (raises PhotoNotFound if non-existent for id)
+
+        # check if photo is part of this listing
+        if photo_id not in listing.photo_ids:
+            raise PhotoNotFoundError()
+
+        # delete photo if exists for that listing
         self.listing_photo_repo.delete_photos([photo_id])
+
+        # then update the listing by removing the photo from photo_ids
+        updated_listing = dataclasses.replace(
+            listing,
+            photo_ids=tuple(list(listing.photo_ids).remove(photo_id))
+        )
+        self.accommodation_listing_repo.save_listing(updated_listing)

@@ -254,20 +254,32 @@ def upload_listing_photo(listing_id: str, blob: bytes, listing_service: BaseList
         listing_id, listing_service, action="upload photo")
 
     try:
+        # upload photo then update listing photo_ids to have the id of the new photo
         listing_service.upload_listing_photo(listing.id, blob)
     except ListingNotFoundError:
         abort(make_response(
             {'listingId': "listing not found"}, NOT_FOUND))
 
-    return make_response()
+    return make_response("", NO_CONTENT)
 
 
 @bp.get("/<listing_id>/photos/<photo_id>")
 @jwt_required()
 def get_listing_photo(listing_id: str, photo_id: str, listing_service: BaseListingsService) -> Response:
-    # check if user is authenticated
-    # get photo and return
-    return make_response("", NO_CONTENT)
+    try:
+        photo = listing_service.get_listing_photo(
+            uuid.UUID(listing_id), uuid.UUID(photo_id))
+    except ValueError:
+        abort(make_response(
+            {'msg': "invalid ids given"}, NOT_FOUND))
+    except ListingNotFoundError:
+        abort(make_response(
+            {'listingId': "listing not found"}, NOT_FOUND))
+    except PhotoNotFoundError:
+        abort(make_response(
+            {'photoId': "photo not found"}, NOT_FOUND))
+
+    return jsonify(id=photo.id, blob=photo.blob)
 
 
 @bp.delete("/<listing_id>/photos/<photo_id>")
@@ -283,6 +295,6 @@ def delete_listing_photo(listing_id: str, photo_id: str, listing_service: BaseLi
             {'listingId': "listing not found"}, NOT_FOUND))
     except PhotoNotFoundError:
         abort(make_response(
-            {'photo_id': "photo not found"}, NOT_FOUND))
+            {'photoId': "photo not found"}, NOT_FOUND))
 
     return make_response("", NO_CONTENT)

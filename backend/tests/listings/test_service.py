@@ -595,9 +595,6 @@ class ListingsServiceSearchTest(unittest.TestCase):
             self.search(service, stub_params, page=4, size=5)
         )
 
-    def test_get_listing_photo(self):
-        pass
-
 
 def generate_external_listings_with_decreasing_creation_time(
     n: int,
