@@ -132,15 +132,21 @@ class BaseListingsService(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def upload_listing_photo(self, listing_id: uuid.UUID, blob: bytes) -> Photo:
+    def upload_listing_photo(self, listing_id: uuid.UUID,
+                             blob: bytes
+                             ) -> Photo:
         pass
 
     @abc.abstractmethod
-    def get_listing_photo(self, listing_id: uuid.UUID, photo_id: uuid.UUID) -> Photo:
+    def get_listing_photo(self, listing_id: uuid.UUID,
+                          photo_id: uuid.UUID
+                          ) -> Photo:
         pass
 
     @abc.abstractmethod
-    def delete_listing_photo(self, listing_id: uuid.UUID, photo_id: uuid.UUID) -> None:
+    def delete_listing_photo(self, listing_id: uuid.UUID,
+                             photo_id: uuid.UUID
+                             ) -> None:
         pass
 
 
@@ -390,7 +396,9 @@ class ListingsService(BaseListingsService, ListingsCleanupService):
             except ListingNotFoundError:
                 pass
 
-    def upload_listing_photo(self, listing_id: uuid.UUID, blob: bytes) -> Photo:
+    def upload_listing_photo(self, listing_id: uuid.UUID,
+                             blob: bytes
+                             ) -> Photo:
         # get listing if exists
         listing = self.accommodation_listing_repo.get_listing_by_id(listing_id)
         if listing is None:
@@ -408,7 +416,9 @@ class ListingsService(BaseListingsService, ListingsCleanupService):
         self.accommodation_listing_repo.save_listing(updated_listing)
         return photo
 
-    def get_listing_photo(self, listing_id: uuid.UUID, photo_id: uuid.UUID) -> Photo:
+    def get_listing_photo(self, listing_id: uuid.UUID,
+                          photo_id: uuid.UUID
+                          ) -> Photo:
         # get listing if exists
         listing = self.accommodation_listing_repo.get_listing_by_id(listing_id)
         if listing is None:
@@ -425,7 +435,9 @@ class ListingsService(BaseListingsService, ListingsCleanupService):
 
         return photo
 
-    def delete_listing_photo(self, listing_id: uuid.UUID, photo_id: uuid.UUID) -> None:
+    def delete_listing_photo(self, listing_id: uuid.UUID,
+                             photo_id: uuid.UUID
+                             ) -> None:
         # get listing if exists
         listing = self.accommodation_listing_repo.get_listing_by_id(listing_id)
         if listing is None:

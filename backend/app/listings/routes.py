@@ -1,5 +1,6 @@
 from http.client import (
-    BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, SERVICE_UNAVAILABLE, CREATED)
+    BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, SERVICE_UNAVAILABLE,
+    CREATED)
 import os
 from typing import cast
 import uuid
@@ -386,12 +387,15 @@ def delete_seeking_listing(
 
 @bp.post("/<listing_id>/photos")
 @jwt_required()
-def upload_listing_photo(listing_id: str, blob: bytes, listing_service: BaseListingsService) -> Response:
+def upload_listing_photo(listing_id: str,
+                         blob: bytes,
+                         listing_service: BaseListingsService
+                         ) -> Response:
     listing = get_accommodation_listing_authored_by_current_user(
         listing_id, listing_service, action="upload photo")
 
     try:
-        # upload photo then update listing photo_ids to have the id of the new photo
+        # upload photo then update listing photo_ids to have the new photo
         listing_service.upload_listing_photo(listing.id, blob)
     except ListingNotFoundError:
         abort(make_response(
@@ -402,7 +406,10 @@ def upload_listing_photo(listing_id: str, blob: bytes, listing_service: BaseList
 
 @bp.get("/<listing_id>/photos/<photo_id>")
 @jwt_required()
-def get_listing_photo(listing_id: str, photo_id: str, listing_service: BaseListingsService) -> Response:
+def get_listing_photo(listing_id: str,
+                      photo_id: str,
+                      listing_service: BaseListingsService
+                      ) -> Response:
     try:
         photo = listing_service.get_listing_photo(
             uuid.UUID(listing_id), uuid.UUID(photo_id))
@@ -422,7 +429,10 @@ def get_listing_photo(listing_id: str, photo_id: str, listing_service: BaseListi
 
 @bp.delete("/<listing_id>/photos/<photo_id>")
 @jwt_required()
-def delete_listing_photo(listing_id: str, photo_id: str, listing_service: BaseListingsService) -> Response:
+def delete_listing_photo(listing_id: str,
+                         photo_id: str,
+                         listing_service: BaseListingsService
+                         ) -> Response:
     listing = get_accommodation_listing_authored_by_current_user(
         listing_id, listing_service, action="delete photo")
 
