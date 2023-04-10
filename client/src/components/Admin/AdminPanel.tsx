@@ -129,16 +129,22 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
                     </td>
                   )}
                   {user.isAdmin ? (
-                    <td>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          revokeAdmin(user);
-                        }}
-                      >
-                        Revoke Admin
-                      </button>
-                    </td>
+                    <>
+                      {user.id === currentUserId ? (
+                        <td></td>
+                      ) : (
+                        <td>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              revokeAdmin(user);
+                            }}
+                          >
+                            Revoke Admin
+                          </button>
+                        </td>
+                      )}
+                    </>
                   ) : (
                     <td>
                       <button
