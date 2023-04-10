@@ -24,6 +24,7 @@ interface UserContextProps {
   user: UserProfile | null;
   setUser: Dispatch<SetStateAction<UserProfile | null>>;
   logout: () => void;
+  refetchUser: () => void;
 }
 
 interface UserContextProviderProps {
@@ -34,6 +35,7 @@ const UserContext = createContext<UserContextProps>({
   user: null,
   setUser: () => null,
   logout: () => null,
+  refetchUser: () => null,
 });
 
 const UserContextProvider = ({ children }: UserContextProviderProps) => {
@@ -52,6 +54,10 @@ const UserContextProvider = ({ children }: UserContextProviderProps) => {
   };
 
   useEffect(() => {
+    refetchUser();
+  }, []);
+
+  const refetchUser = (): void => {
     setIsLoading(true);
     if (!token) return setIsLoading(false);
     const payload = jwtDecode(token) as JwtPayload;
@@ -62,13 +68,13 @@ const UserContextProvider = ({ children }: UserContextProviderProps) => {
         router.push("/finish-auth");
       }
     });
-  }, []);
+  };
 
   // Redirect if user not signed in or didnt finish regestration
   useEffect(() => {
     if (!isLoading) {
       if (!user) {
-        router.push("/auth");
+        router.push("/login");
       } else {
         if (!user.name) {
           router.push("/finish-auth");
@@ -78,7 +84,7 @@ const UserContextProvider = ({ children }: UserContextProviderProps) => {
   }, [router.asPath, isLoading]);
 
   return (
-    <UserContext.Provider value={{ user, setUser, logout }}>
+    <UserContext.Provider value={{ user, setUser, logout, refetchUser }}>
       {children}
     </UserContext.Provider>
   );

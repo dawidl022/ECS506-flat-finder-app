@@ -20,7 +20,7 @@ const FinishAuth = () => {
     phone: "",
   });
 
-  const { user } = useUser();
+  const { user, refetchUser } = useUser();
 
   const { apiManager } = useApi();
 
@@ -41,9 +41,10 @@ const FinishAuth = () => {
         },
       })
       .then(res => {
+        refetchUser();
         router.push("/");
       })
-      .catch(err => alert(err));
+      .catch(err => console.log(err));
   };
 
   return (
