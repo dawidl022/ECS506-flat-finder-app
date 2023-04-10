@@ -23,6 +23,7 @@ class MockUserService(BaseUserService):
     def __init__(self) -> None:
         self.deleted_user_ids: list[uuid.UUID] = []
         self.updated_users: list[tuple[uuid.UUID, UserProfileForm]] = []
+        self.deregistered_user_ids: list[uuid.UUID] = []
         self.admin_id: uuid.UUID | None = None
 
     def get_user(self, user_id) -> User | None:
@@ -53,6 +54,11 @@ class MockUserService(BaseUserService):
 
     def get_all_users(self) -> list[User]:
         return [registered_user, model_listing_author, self._get_admin()]
+
+    def deregister_user(self, user_id: uuid.UUID) -> None:
+        self.deregistered_user_ids.append(user_id)
+        if user_id != registered_user_id:
+            raise UserNotFoundError()
 
 
 def test_get_all_users__given_user_not_found__returns_not_found(client: FlaskClient):
@@ -109,6 +115,41 @@ def test_get_all_users__given_user_is_admin__returns_all_users(
             "isAdmin": True
         }
     ]
+
+
+def test_delete_all_users__given_user_not_admin__returns_forbidden(
+        client: FlaskClient, user_service: MockUserService):
+    with patch("app.auth.jwt.get_jwt") as mock_get_jwt_local, \
+            patch("flask_jwt_extended.utils.get_jwt") as mock_get_jwt_lib:
+        return_value = {
+            "sub": str(model_listing_author.id),
+            "email": model_listing_author.email
+        }
+        mock_get_jwt_local.return_value = return_value
+        mock_get_jwt_lib.return_value = return_value
+
+        response = client.delete(f"/api/v1/users/{registered_user_id}")
+
+        assert b'{"user":"user not authorised"}' in response.data
+        assert response.status_code == FORBIDDEN
+        assert len(user_service.deregistered_user_ids) == 0
+
+
+def test_delete_all_users__given_user_not_found__returns_not_found(client: FlaskClient):
+    response = client.delete(f"/api/v1/users/{uuid.uuid4()}")
+
+    assert b'{"userId":"user not found"}' in response.data
+    assert response.status_code == NOT_FOUND
+
+
+def test_delete_all_users__given_user_found__returns_no_content(
+        client: FlaskClient, user_service: MockUserService, currently_logged_in_user_id: uuid.UUID):
+    user_service.admin_id = currently_logged_in_user_id
+    response = client.delete(f"/api/v1/users/{registered_user_id}")
+
+    assert response.status_code == NO_CONTENT
+    assert len(user_service.deregistered_user_ids) == 1
+    assert user_service.deregistered_user_ids[0] == registered_user_id
 
 
 def test_get_user__given_id_not_mapped_to_user__returns_not_found(client: FlaskClient):

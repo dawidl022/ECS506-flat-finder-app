@@ -302,6 +302,8 @@ paths:
           description: User deleted successfully. No content to return.
         "403":
           description: Forbidden. Logged in user is not an admin.
+        "404":
+          description: User with given ID not found.
 
   /api/v1/users/{userId}/profile:
     get:

@@ -66,7 +66,8 @@ def configure_dependencies(binder: Binder) -> None:
         }
     )
     user_service = UserService(
-        repo=InMemoryUserRepository()
+        repo=InMemoryUserRepository(),
+        listings_service=listing_service,
     )
 
     binder.bind(

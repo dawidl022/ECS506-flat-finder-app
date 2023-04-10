@@ -20,13 +20,27 @@ bp.json_decoder = CamelCaseDecoder
 
 @bp.get("/")
 @jwt_required()
-def get_users(user_service: BaseUserService):
+def get_users(user_service: BaseUserService) -> Response:
     check_logged_in_user_is_admin(user_service)
 
     return jsonify([
         UserSummaryDTO(user)
         for user in user_service.get_all_users()
     ])
+
+
+@bp.delete("/<uuid:user_id>")
+@jwt_required()
+def delete_user(user_id: UUID, user_service: BaseUserService) -> Response:
+    check_logged_in_user_is_admin(user_service)
+
+    try:
+        user_service.deregister_user(user_id)
+    except UserNotFoundError:
+        abort(make_response(
+            {"userId": "user not found"}, NOT_FOUND))
+
+    return make_response("", NO_CONTENT)
 
 
 def check_logged_in_user_is_admin(user_service) -> None:

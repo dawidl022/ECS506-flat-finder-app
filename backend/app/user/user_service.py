@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 import dataclasses
 from uuid import UUID, uuid4
+from app.listings.service import ListingsCleanupService, BaseListingsService
 from app.user.user_dtos import UserProfileForm
-from app.user.user_models import ContactDetails, User
+from app.user.user_exceptions import UserNotFoundError
+from app.user.user_models import User
 
 from app.user.user_repository import UserRepository
 
@@ -30,11 +32,19 @@ class BaseUserService(ABC):
     def get_all_users(self) -> list[User]:
         pass
 
+    @abstractmethod
+    def deregister_user(self, user_id: UUID) -> None:
+        pass
+
 
 class UserService(BaseUserService):
 
-    def __init__(self, repo: UserRepository) -> None:
+    def __init__(
+        self, repo: UserRepository,
+        listings_service: ListingsCleanupService
+    ) -> None:
         self.repo = repo
+        self.listings_service = listings_service
 
     def get_user_id_for_email(self, email: str) -> UUID:
         user = self.repo.get_user_by_email(email)
@@ -64,6 +74,10 @@ class UserService(BaseUserService):
     def get_all_users(self) -> list[User]:
         return self.repo.get_all_users()
 
+    def deregister_user(self, user_id: UUID) -> None:
+        user = self.get_user(user_id)
+        if user is None:
+            raise UserNotFoundError()
 
-class UserNotFoundError(Exception):
-    pass
+        self.listings_service.delete_listings_authored_by(user.email)
+        self.repo.delete_user(user_id)
