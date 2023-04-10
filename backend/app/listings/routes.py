@@ -229,8 +229,10 @@ def extract_listing_id_and_source(external_listing_id: str
     return source, id
 
 
-def fetch_accommodation_listing(listing_service: BaseListingsService, source, id
-                                ) -> AccommodationListing:
+def fetch_accommodation_listing(
+    listing_service: BaseListingsService, source,
+    id: str
+) -> AccommodationListing:
     listing = listing_service.get_accommodation_listing(id, source)
     if listing is None:
         abort(make_response(
@@ -252,7 +254,8 @@ def fetch_seeking_listing(listing_service: BaseListingsService, id: str
 def get_author(user_service, source, listing):
     if source == Source.internal:
         author_email = cast(
-            SeekingListing | InternalAccommodationListing, listing).author_email
+            SeekingListing | InternalAccommodationListing, listing
+        ).author_email
         author_id = user_service.get_user_id_for_email(author_email)
         author = user_service.get_user(author_id)
     else:

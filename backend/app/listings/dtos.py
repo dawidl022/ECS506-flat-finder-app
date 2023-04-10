@@ -16,7 +16,8 @@ from app.listings.models import (
     AccommodationSearchResult, AccommodationSummary, Country,
     ExternalAccommodationListing, ExternalAccommodationSummary,
     InternalAccommodationListing, InternalAccommodationSummary, ListingSummary,
-    ListingType, SeekingListing, SeekingSearchResult, SeekingSummary, SortBy, Source, UKAddress)
+    ListingType, SeekingListing, SeekingSearchResult, SeekingSummary, SortBy,
+    Source, UKAddress)
 from app.util.encoding import CamelCaseDecoder
 from app.listings.models import Address, AccommodationListing
 
@@ -156,7 +157,8 @@ class SeekingForm(Schemable):
 
 
 class AuthorDTO:
-    def __init__(self, author: User | None, author_name: str | None = None) -> None:
+    def __init__(self, author: User | None, author_name: str | None = None
+                 ) -> None:
         self.name = author.name if author else author_name
         self.userProfile = UserDTO(author) if author else None
 

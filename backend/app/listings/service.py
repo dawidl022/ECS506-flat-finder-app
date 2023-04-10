@@ -126,7 +126,19 @@ class BaseListingsService(abc.ABC):
         pass
 
 
-class ListingsService(BaseListingsService):
+class ListingsCleanupService(abc.ABC):
+    """
+    Interface Segregation Principle in action: UserService only depends on one
+    method of the ListingsService, so it should not depend on any other method
+    implemented by ListingsService
+    """
+
+    @abc.abstractmethod
+    def delete_listings_authored_by(self, user_email: str):
+        pass
+
+
+class ListingsService(BaseListingsService, ListingsCleanupService):
 
     def __init__(self, geocoder: BaseGeocodingService,
                  accommodation_listing_repo: AccommodationListingRepository,
@@ -347,3 +359,15 @@ class ListingsService(BaseListingsService):
 
     def delete_seeking_listing(self, listing_id: uuid.UUID) -> None:
         self.seeking_listing_repo.delete_listing(listing_id)
+
+    def delete_listings_authored_by(self, user_email: str) -> None:
+        user_listings = self.get_listings_authored_by(user_email)
+
+        for listing in user_listings:
+            try:
+                if isinstance(listing, InternalAccommodationListing):
+                    self.delete_accommodation_listing(listing.id)
+
+                # TODO clean up seeking listings too
+            except ListingNotFoundError:
+                pass

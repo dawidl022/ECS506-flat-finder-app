@@ -9,7 +9,7 @@ from app.listings.models import Source
 from app.listings.service import (
     GeocodingService, ListingsService, BaseListingsService)
 from app.user.user_repository import InMemoryUserRepository
-from app.user.user_service import BaseUserService, UserService
+from app.user.user_service import BaseUserService, UserService, AdminService
 from app.listings.repository import (
     InMemoryAccommodationListingsRepository, InMemoryPhotoRepository,
     InMemorySeekingListingsRepository)
@@ -25,6 +25,9 @@ def register_common_blueprints(app: Flask) -> None:
 
     from app.user import users_bp
     app.register_blueprint(users_bp)
+
+    from app.admins import admins_bp
+    app.register_blueprint(admins_bp)
 
 
 def initialise_common_extensions(app: Flask) -> None:
@@ -67,7 +70,8 @@ def configure_dependencies(binder: Binder) -> None:
         }
     )
     user_service = UserService(
-        repo=InMemoryUserRepository()
+        repo=InMemoryUserRepository(),
+        listings_service=listing_service,
     )
 
     binder.bind(
@@ -75,4 +79,7 @@ def configure_dependencies(binder: Binder) -> None:
     )
     binder.bind(
         BaseUserService, to=user_service  # type: ignore[type-abstract]
+    )
+    binder.bind(
+        AdminService, to=user_service  # type: ignore[type-abstract]
     )
