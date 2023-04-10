@@ -1,5 +1,5 @@
 .wrapper {
-  padding-top: 200px;
+  padding-top: 100px;
   .card {
     width: 100%;
     background-color: #fff;
@@ -15,6 +15,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
 
     .avaCon {
       height: 110px;
@@ -28,37 +29,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-
-      .ava {
-        height: 94px;
-        width: 94px;
-        border-radius: 100%;
-        background-color: gray;
-      }
-    }
-    .name {
-      margin-top: 10px;
-      font-size: 20px;
-      font-weight: bold;
-    }
-    .detailsCon {
-      margin-top: 24px;
-      width: 100%;
-      .detailsRow {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        margin-bottom: 16px;
-
-        .title {
-          font-size: 16px;
-          font-weight: 700;
-        }
-        .value {
-          font-size: 14px;
-          color: #1d1d1d;
-        }
-      }
     }
   }
 

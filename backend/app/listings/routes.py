@@ -10,12 +10,12 @@ from werkzeug.datastructures import FileStorage
 from app.auth.jwt import get_current_user_email, get_current_user_id
 from app.listings.exceptions import ListingNotFoundError, PhotoNotFoundError
 
-from app.util.marshmallow import get_params, get_input
+from app.util.marshmallow import get_form, get_params, get_input
 from app.util.encoding import CamelCaseEncoder
 from app.util.encoding import CamelCaseDecoder
 from app.clients.APIException import APIException
 from config import Config
-from .models import AccommodationListing, Source
+from .models import AccommodationListing, SeekingListing, Source
 from app.user.user_models import User, ContactDetails
 from app.user.user_service import BaseUserService
 from .models import AccommodationListing, InternalAccommodationListing, Source
@@ -26,6 +26,10 @@ from .dtos import (
     AccommodationSearchParams,
     AccommodationSearchResultDTO,
     SearchResultDTO,
+    SeekingForm,
+    SeekingListingDTO,
+    SeekingSearchParams,
+    SeekingSearchResultDTO,
     SourceDTO
 )
 from .service import BaseListingsService
@@ -64,6 +68,22 @@ def get_accommodation_listings(listings_service: BaseListingsService
     return jsonify(result)
 
 
+@bp.get("/seeking")
+@jwt_required()
+def get_seeking_listings(listings_service: BaseListingsService
+                         ) -> Response:
+    params = get_params(SeekingSearchParams)
+
+    listings = listings_service.search_seeking_listings(params)
+
+    result = [
+        SeekingSearchResultDTO(listing)
+        for listing in listings
+    ]
+
+    return jsonify(result)
+
+
 @bp.post("/accommodation")
 @jwt_required()
 def create_accommodation_listing(
@@ -85,14 +105,35 @@ def create_accommodation_listing(
     return jsonify(dto)
 
 
-def validate_and_get_uploaded_photos():
+@bp.post("/seeking")
+@jwt_required()
+def create_seeking_listing(
+    listing_service: BaseListingsService,
+    user_service: BaseUserService,
+) -> Response:
+    form = get_form(SeekingForm)
+    photos = validate_and_get_uploaded_photos(min_photos=0)
+
+    user = user_service.get_user(get_current_user_id())
+    if user is None:
+        abort(make_response({"user": "user no longer registered"}, FORBIDDEN))
+
+    listing = listing_service.create_seeking_listing(
+        form, photos, user.email)
+
+    dto = SeekingListingDTO(listing, user)
+
+    return jsonify(dto)
+
+
+def validate_and_get_uploaded_photos(min_photos=1):
     """
     get uploaded photos and ensure they don't exceed the max file size and
     that a correct number of them have been uploaded
     """
     photo_files = request.files.getlist("photos")
 
-    if not 1 <= len(photo_files) <= 15:
+    if not min_photos <= len(photo_files) <= 15:
         abort(make_response(
             {'photos': "expected between 1 and 15 photos"}, BAD_REQUEST))
 
@@ -150,6 +191,28 @@ def get_accommodation_listing(
     return jsonify(dto)
 
 
+@bp.get("/seeking/<listing_id>")
+@jwt_required()
+def get_seeking_listing(
+        listing_id: str,
+        listing_service: BaseListingsService,
+        user_service: BaseUserService
+) -> Response:
+    source, id = extract_listing_id_and_source(listing_id)
+
+    if source != source.internal:
+        abort(make_response(
+            {"source": f"seeking listings not available for {source}"},
+            NOT_FOUND))
+
+    listing = fetch_seeking_listing(listing_service, id)
+
+    author = get_author(user_service, source, listing)
+
+    dto = SeekingListingDTO(listing, author)
+    return jsonify(dto)
+
+
 def extract_listing_id_and_source(external_listing_id: str
                                   ) -> tuple[Source, str]:
     parts = external_listing_id.split('_')
@@ -166,9 +229,21 @@ def extract_listing_id_and_source(external_listing_id: str
     return source, id
 
 
-def fetch_accommodation_listing(listing_service, source, id
-                                ) -> AccommodationListing:
+def fetch_accommodation_listing(
+    listing_service: BaseListingsService, source,
+    id: str
+) -> AccommodationListing:
     listing = listing_service.get_accommodation_listing(id, source)
+    if listing is None:
+        abort(make_response(
+            {'listingId': "listing not found"}, NOT_FOUND))
+
+    return listing
+
+
+def fetch_seeking_listing(listing_service: BaseListingsService, id: str
+                          ) -> SeekingListing:
+    listing = listing_service.get_seeking_listing(uuid.UUID(id))
     if listing is None:
         abort(make_response(
             {'listingId': "listing not found"}, NOT_FOUND))
@@ -178,7 +253,9 @@ def fetch_accommodation_listing(listing_service, source, id
 
 def get_author(user_service, source, listing):
     if source == Source.internal:
-        author_email = cast(InternalAccommodationListing, listing).author_email
+        author_email = cast(
+            SeekingListing | InternalAccommodationListing, listing
+        ).author_email
         author_id = user_service.get_user_id_for_email(author_email)
         author = user_service.get_user(author_id)
     else:
@@ -210,6 +287,30 @@ def put_accommodation_listing(
     return jsonify(AccommodationListingDTO(updated_listing, author))
 
 
+@bp.put("/seeking/<listing_id>")
+@jwt_required()
+def put_seeking_listing(
+        listing_id: str,
+        listing_service: BaseListingsService,
+        user_service: BaseUserService
+) -> Response:
+    form = get_form(SeekingForm)
+
+    listing = get_seeking_listing_authored_by_current_user(
+        listing_id, listing_service, action="update")
+
+    try:
+        updated_listing = listing_service.update_seeking_listing(
+            listing.id, form)
+    except ListingNotFoundError:
+        abort(make_response(
+            {'listingId': "listing not found"}, NOT_FOUND))
+
+    author = get_author(user_service, Source.internal, listing)
+
+    return jsonify(SeekingListingDTO(updated_listing, author))
+
+
 def get_accommodation_listing_authored_by_current_user(
         listing_id: str, listing_service: BaseListingsService, action: str
 ) -> InternalAccommodationListing:
@@ -231,6 +332,26 @@ def get_accommodation_listing_authored_by_current_user(
     return listing
 
 
+def get_seeking_listing_authored_by_current_user(
+        listing_id: str, listing_service: BaseListingsService, action: str
+) -> SeekingListing:
+    source, id = extract_listing_id_and_source(listing_id)
+
+    if source != Source.internal:
+        abort(make_response(
+            {'listingId': f"cannot {action} external listing"}, FORBIDDEN))
+
+    listing = fetch_seeking_listing(listing_service, id)
+
+    if listing.author_email != get_current_user_email():
+        abort(make_response(
+            {'listingId':
+              "currently logged in user is not the author of this listing"},
+            FORBIDDEN))
+
+    return listing
+
+
 @bp.delete("/accommodation/<listing_id>")
 @jwt_required()
 def delete_accommodation_listing(
@@ -240,6 +361,22 @@ def delete_accommodation_listing(
 
     try:
         listing_service.delete_accommodation_listing(listing.id)
+    except ListingNotFoundError:
+        abort(make_response(
+            {'listingId': "listing not found"}, NOT_FOUND))
+
+    return make_response("", NO_CONTENT)
+
+
+@bp.delete("/seeking/<listing_id>")
+@jwt_required()
+def delete_seeking_listing(
+        listing_id: str, listing_service: BaseListingsService) -> Response:
+    listing = get_seeking_listing_authored_by_current_user(
+        listing_id, listing_service, action="delete")
+
+    try:
+        listing_service.delete_seeking_listing(listing.id)
     except ListingNotFoundError:
         abort(make_response(
             {'listingId': "listing not found"}, NOT_FOUND))
@@ -269,6 +406,8 @@ def get_listing_photo(listing_id: str, photo_id: str, listing_service: BaseListi
     try:
         photo = listing_service.get_listing_photo(
             uuid.UUID(listing_id), uuid.UUID(photo_id))
+        
+        return jsonify(id=photo.id, blob=photo.blob)
     except ValueError:
         abort(make_response(
             {'msg': "invalid ids given"}, NOT_FOUND))
@@ -278,8 +417,6 @@ def get_listing_photo(listing_id: str, photo_id: str, listing_service: BaseListi
     except PhotoNotFoundError:
         abort(make_response(
             {'photoId': "photo not found"}, NOT_FOUND))
-
-    return jsonify(id=photo.id, blob=photo.blob)
 
 
 @bp.delete("/<listing_id>/photos/<photo_id>")
