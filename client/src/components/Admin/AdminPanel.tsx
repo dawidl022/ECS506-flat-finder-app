@@ -69,7 +69,6 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     }
   };
 
-
   api
     .apiV1AdminsUserIdGet({ userId: currentUserId })
     .then(() => {
@@ -88,7 +87,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     return (
       <div>
         <p> Administrator Access Only </p>
-        <button type="button" onClick={() => router.push("/index")}>
+        <button type="button" onClick={() => (window.location.href = "/")}>
           Return To Homepage
         </button>
       </div>
@@ -129,29 +128,29 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
                       </button>
                     </td>
                   )}
-               {user.isAdmin ? (
-                  <td>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        revokeAdmin(user);
-                      }}
-                    >
-                      Revoke Admin
-                    </button>
-                  </td>
-                ) : (
-                  <td>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        grantAdmin(user);
-                      }}
-                    >
-                      Grant Admin
-                    </button>
-                  </td>
-                )}
+                  {user.isAdmin ? (
+                    <td>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          revokeAdmin(user);
+                        }}
+                      >
+                        Revoke Admin
+                      </button>
+                    </td>
+                  ) : (
+                    <td>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          grantAdmin(user);
+                        }}
+                      >
+                        Grant Admin
+                      </button>
+                    </td>
+                  )}
                 </tr>
               );
             })
