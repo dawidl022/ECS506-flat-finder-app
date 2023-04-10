@@ -43,6 +43,12 @@ export interface SeekingSummary {
      * @memberof SeekingSummary
      */
     thumbnailUrl?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SeekingSummary
+     */
+    locationName: string;
 }
 
 /**
@@ -53,6 +59,7 @@ export function instanceOfSeekingSummary(value: object): boolean {
     isInstance = isInstance && "id" in value;
     isInstance = isInstance && "title" in value;
     isInstance = isInstance && "shortDescription" in value;
+    isInstance = isInstance && "locationName" in value;
 
     return isInstance;
 }
@@ -71,6 +78,7 @@ export function SeekingSummaryFromJSONTyped(json: any, ignoreDiscriminator: bool
         'title': json['title'],
         'shortDescription': json['shortDescription'],
         'thumbnailUrl': !exists(json, 'thumbnailUrl') ? undefined : json['thumbnailUrl'],
+        'locationName': json['locationName'],
     };
 }
 
@@ -87,6 +95,7 @@ export function SeekingSummaryToJSON(value?: SeekingSummary | null): any {
         'title': value.title,
         'shortDescription': value.shortDescription,
         'thumbnailUrl': value.thumbnailUrl,
+        'locationName': value.locationName,
     };
 }
 
