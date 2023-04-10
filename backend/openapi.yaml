@@ -302,6 +302,8 @@ paths:
           description: User deleted successfully. No content to return.
         "403":
           description: Forbidden. Logged in user is not an admin.
+        "404":
+          description: User with given ID not found.
 
   /api/v1/users/{userId}/profile:
     get:
@@ -384,6 +386,9 @@ paths:
             User granted admin privileges successfully. No content to return.
         "403":
           description: Forbidden. Logged in user is not an admin.
+        "404":
+          description: >-
+            User with given ID does not exist.
 
     delete:
       summary: Revoke admin privileges from user
@@ -395,6 +400,9 @@ paths:
             User revoked admin privileges successfully. No content to return.
         "403":
           description: Forbidden. Logged in user is not an admin.
+        "404":
+          description: >-
+            User with given ID does not exist.
 
 components:
   schemas:
@@ -454,7 +462,7 @@ components:
             $ref: "#/components/schemas/distance"
           isFavourite:
             $ref: "#/components/schemas/isFavourite"
-          accommodation:
+          seeking:
             $ref: "#/components/schemas/seekingSummary"
 
     accommodationDetails:
@@ -602,6 +610,7 @@ components:
         - id
         - title
         - shortDescription
+        - locationName
       properties:
         id:
           $ref: "#/components/schemas/listingId"
@@ -611,6 +620,8 @@ components:
           $ref: "#/components/schemas/listingShortDescription"
         thumbnailUrl:
           $ref: "#/components/schemas/listingThumbnailUrl"
+        locationName:
+          type: string
 
     seekingDetails:
       type: object

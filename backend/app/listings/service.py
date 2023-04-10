@@ -5,14 +5,16 @@ import uuid
 import time
 from app.listings.exceptions import ListingNotFoundError
 from app.listings.models import (
-    AccommodationSearchResult, Address, Coordinates,
-    InternalAccommodationListing, Photo, Source)
+    AccommodationSearchResult, Address, AddressFreeLocation, Coordinates,
+    InternalAccommodationListing, ListingSummary, Photo, SeekingListing,
+    SeekingSearchResult, Source)
 from app.listings.dtos import (
-    AccommodationForm, AccommodationSearchParams)
+    AccommodationForm, AccommodationSearchParams, SeekingForm,
+    SeekingSearchParams)
 from app.listings.models import AccommodationListing, Location
 from app.listings.repository import (
     AccommodationListingRepository, ListingPhotoRepository,
-    sort_and_page_listings)
+    SeekingListingRepository, sort_and_page_listings)
 from app.clients.ListingAPIClient import ListingAPIClient
 from app.clients.APIException import APIException
 from geopy.geocoders import Nominatim
@@ -96,15 +98,62 @@ class BaseListingsService(abc.ABC):
     def get_available_sources(self, location_query: str) -> list[Source]:
         pass
 
+    @abc.abstractmethod
+    def get_listings_authored_by(self, user_email: str
+                                 ) -> list[ListingSummary]:
+        pass
 
-class ListingsService(BaseListingsService):
+    @abc.abstractmethod
+    def search_seeking_listings(
+        self, params: SeekingSearchParams
+    ) -> list[SeekingSearchResult]:
+        pass
+
+    @abc.abstractmethod
+    def create_seeking_listing(
+        self, form: SeekingForm, photos: list[bytes],
+        author_email: str
+    ) -> SeekingListing:
+        pass
+
+    @abc.abstractmethod
+    def get_seeking_listing(self, listing_id: uuid.UUID
+                            ) -> SeekingListing | None:
+        pass
+
+    @abc.abstractmethod
+    def update_seeking_listing(
+        self, listing_id: uuid.UUID, form: SeekingForm
+    ) -> SeekingListing:
+        pass
+
+    @abc.abstractmethod
+    def delete_seeking_listing(self, listing_id: uuid.UUID) -> None:
+        pass
+
+
+class ListingsCleanupService(abc.ABC):
+    """
+    Interface Segregation Principle in action: UserService only depends on one
+    method of the ListingsService, so it should not depend on any other method
+    implemented by ListingsService
+    """
+
+    @abc.abstractmethod
+    def delete_listings_authored_by(self, user_email: str):
+        pass
+
+
+class ListingsService(BaseListingsService, ListingsCleanupService):
 
     def __init__(self, geocoder: BaseGeocodingService,
                  accommodation_listing_repo: AccommodationListingRepository,
+                 seeking_listing_repo: SeekingListingRepository,
                  listing_photo_repo: ListingPhotoRepository,
                  external_sources: dict[Source, ListingAPIClient]) -> None:
         self.geocoder = geocoder
         self.accommodation_listing_repo = accommodation_listing_repo
+        self.seeking_listing_repo = seeking_listing_repo
         self.listing_photo_repo = listing_photo_repo
         self.external_sources = external_sources
 
@@ -212,8 +261,10 @@ class ListingsService(BaseListingsService):
         updated_listing = dataclasses.replace(
             listing,
             **form.to_dict(),
-            location=dataclasses.replace(
-                listing.location, address=form.decoded_address)
+            location=Location(
+                coords=self.geocoder.get_coords(form.decoded_address),
+                address=form.decoded_address
+            )
         )
 
         self.accommodation_listing_repo.save_listing(updated_listing)
@@ -225,3 +276,104 @@ class ListingsService(BaseListingsService):
 
     def get_available_sources(self, location_query: str) -> list[Source]:
         return [s for s in Source]
+
+    def get_listings_authored_by(self, user_email: str
+                                 ) -> list[ListingSummary]:
+        # TODO fetch user's seeking listings too and sort by latest
+        return [
+            listing.summarise()
+            for listing in
+            self.accommodation_listing_repo.get_listings_authored_by(
+                user_email
+            )
+        ]
+
+    def search_seeking_listings(
+        self, params: SeekingSearchParams
+    ) -> list[SeekingSearchResult]:
+        coords = self.geocoder.search_coords(params.location)
+        listings = self.seeking_listing_repo.search_by_location(
+            coords=coords,
+            radius=params.radius,
+            page=params.page,
+            size=params.size
+        )
+
+        return [SeekingSearchResult(
+            distance=self.geocoder.calc_distance(
+                coords, seeking.location.coords),
+            is_favourite=False,  # favourites not currently supported
+            seeking=seeking.summarise()
+        ) for seeking in listings]
+
+    def create_seeking_listing(
+        self, form: SeekingForm, photos: list[bytes],
+        author_email: str
+    ) -> SeekingListing:
+        listing_photos = [Photo(id=uuid.uuid4(), blob=photo)
+                          for photo in photos]
+
+        # TODO what happens when this fails due to garbage input?
+        coords = self.geocoder.search_coords(form.preferred_location)
+
+        listing = SeekingListing(
+            id=uuid.uuid4(),
+            location=AddressFreeLocation(
+                coords=coords,
+                name=form.preferred_location
+            ),
+            created_at=time.time(),
+            author_email=author_email,
+            title=form.title,
+            description=form.description,
+            photo_ids=tuple(photo.id for photo in listing_photos),
+        )
+
+        self.listing_photo_repo.save_photos(listing_photos)
+        self.seeking_listing_repo.save_listing(listing)
+
+        return listing
+
+    def get_seeking_listing(self, listing_id: uuid.UUID
+                            ) -> SeekingListing | None:
+        return self.seeking_listing_repo.get_listing_by_id(listing_id)
+
+    def update_seeking_listing(
+        self, listing_id: uuid.UUID, form: SeekingForm
+    ) -> SeekingListing:
+        listing = self.seeking_listing_repo.get_listing_by_id(listing_id)
+
+        if listing is None:
+            raise ListingNotFoundError()
+
+        # TODO what happens when this fails due to garbage input?
+        coords = self.geocoder.search_coords(form.preferred_location)
+
+        updated_listing = dataclasses.replace(
+            listing,
+            title=form.title,
+            description=form.description,
+            location=AddressFreeLocation(
+                coords=coords,
+                name=form.preferred_location,
+            )
+        )
+
+        self.seeking_listing_repo.save_listing(updated_listing)
+
+        return updated_listing
+
+    def delete_seeking_listing(self, listing_id: uuid.UUID) -> None:
+        self.seeking_listing_repo.delete_listing(listing_id)
+
+    def delete_listings_authored_by(self, user_email: str) -> None:
+        user_listings = self.get_listings_authored_by(user_email)
+
+        for listing in user_listings:
+            try:
+                if isinstance(listing, InternalAccommodationListing):
+                    self.delete_accommodation_listing(listing.id)
+
+                # TODO clean up seeking listings too
+            except ListingNotFoundError:
+                pass

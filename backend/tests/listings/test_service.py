@@ -10,10 +10,10 @@ from app.clients.APIException import APIException
 
 from .test_routes import model_listing, model_listing_summary
 from app.listings.exceptions import ListingNotFoundError
-from app.listings.models import Address, Coordinates, ExternalAccommodationListing, InternalAccommodationListing, Location, Photo, SortBy, Source, UKAddress
+from app.listings.models import Address, Coordinates, ExternalAccommodationListing, InternalAccommodationListing, Location, Photo, SeekingListing, SortBy, Source, UKAddress
 from app.listings.dtos import AccommodationForm
-from app.listings.service import BaseGeocodingService, ListingsService, SearchResult
-from app.listings.repository import AccommodationListingRepository, ListingPhotoRepository
+from app.listings.service import BaseGeocodingService, ListingsService, AccommodationSearchResult, SearchResult
+from app.listings.repository import AccommodationListingRepository, ListingPhotoRepository, SeekingListingRepository
 from app.listings.models import AccommodationSearchResult, Address, Coordinates, Location, Photo, SortBy, UKAddress
 from app.listings.dtos import AccommodationForm, AccommodationSearchParams
 
@@ -64,6 +64,11 @@ class SpyAccommodationListingRepo(AccommodationListingRepository):
     def save_listing(self, listing: InternalAccommodationListing) -> None:
         self.saved_listings.append(listing)
 
+    def get_listings_authored_by(self, user_email: str) -> tuple[InternalAccommodationListing, ...]:
+        if user_email == model_listing.author_email:
+            return model_listing,
+        return ()
+
 
 class StubAccommodationListingRepo(AccommodationListingRepository):
     def __init__(self, listings: list[InternalAccommodationListing]):
@@ -83,6 +88,32 @@ class StubAccommodationListingRepo(AccommodationListingRepository):
 
     def delete_listing(self, listing_id: UUID) -> None:
         raise NotImplementedError()
+
+    def get_listings_authored_by(self, user_email: str) -> tuple[InternalAccommodationListing, ...]:
+        return ()
+
+
+class StubSeekingListingRepo(SeekingListingRepository):
+    def __init__(self, listings: list[SeekingListing]):
+        self.listings = {listing.id: listing for listing in listings}
+
+    def get_listing_by_id(self, listing_id: UUID) -> SeekingListing | None:
+        return self.listings.get(listing_id)
+
+    def search_by_location(
+            self, coords: Coordinates, radius: float,
+            page: int, size: int
+    ) -> list[SeekingListing]:
+        return list(self.listings.values())
+
+    def save_listing(self, listing: SeekingListing) -> None:
+        raise NotImplementedError()
+
+    def delete_listing(self, listing_id: UUID) -> None:
+        raise NotImplementedError()
+
+    def get_listings_authored_by(self, user_email: str) -> tuple[SeekingListing, ...]:
+        return ()
 
 
 class StubListingClient(ListingAPIClient):
@@ -157,6 +188,7 @@ class ListingsServiceTest(unittest.TestCase):
         self.service = ListingsService(
             geocoder=StubGeocodingService(),
             accommodation_listing_repo=self.spy_accommodation_listing_repo,
+            seeking_listing_repo=StubSeekingListingRepo([]),
             listing_photo_repo=self.spy_photo_repo,
             external_sources={}
         )
@@ -248,6 +280,7 @@ class ListingsServiceTest(unittest.TestCase):
         service = ListingsService(
             geocoder=StubGeocodingService(),
             accommodation_listing_repo=self.spy_accommodation_listing_repo,
+            seeking_listing_repo=StubSeekingListingRepo([]),
             listing_photo_repo=self.spy_photo_repo,
             external_sources={
                 Source.zoopla: StubListingClient(
@@ -278,6 +311,7 @@ class ListingsServiceTest(unittest.TestCase):
         service = ListingsService(
             geocoder=StubGeocodingService(),
             accommodation_listing_repo=self.spy_accommodation_listing_repo,
+            seeking_listing_repo=StubSeekingListingRepo([]),
             listing_photo_repo=self.spy_photo_repo,
             external_sources={
                 Source.zoopla: StubExceptionListingClient()
@@ -291,7 +325,8 @@ class ListingsServiceTest(unittest.TestCase):
 
         actual = service.search_accommodation_listings(params)
 
-        self.assertEqual(SearchResult([], {Source.zoopla}), actual)
+        self.assertEqual(SearchResult(
+            [], {Source.zoopla}), actual)
 
     def test_get_accommodation_listing__given_listing_exists_in_repo__returns_listing(self):
         actual = self.service.get_accommodation_listing(
@@ -309,6 +344,7 @@ class ListingsServiceTest(unittest.TestCase):
         service = ListingsService(
             geocoder=StubGeocodingService(),
             accommodation_listing_repo=self.spy_accommodation_listing_repo,
+            seeking_listing_repo=StubSeekingListingRepo([]),
             listing_photo_repo=self.spy_photo_repo,
             external_sources={
                 Source.zoopla: StubListingClient(listings)
@@ -323,6 +359,7 @@ class ListingsServiceTest(unittest.TestCase):
         service = ListingsService(
             geocoder=StubGeocodingService(),
             accommodation_listing_repo=self.spy_accommodation_listing_repo,
+            seeking_listing_repo=StubSeekingListingRepo([]),
             listing_photo_repo=self.spy_photo_repo,
             external_sources={
                 Source.zoopla: StubExceptionListingClient()
@@ -418,6 +455,11 @@ class ListingsServiceTest(unittest.TestCase):
         self.assertEqual(len(expected), len(actual))
         self.assertEqual(expected, set(actual))
 
+    def test_get_listings_authored_by__returns_listings(self):
+        actual = self.service.get_listings_authored_by(
+            model_listing.author_email)
+        self.assertEqual([model_listing_summary], actual)
+
 
 class ListingsServiceSearchTest(unittest.TestCase):
     """
@@ -440,6 +482,7 @@ class ListingsServiceSearchTest(unittest.TestCase):
             geocoder=StubGeocodingService(),
             accommodation_listing_repo=StubAccommodationListingRepo(
                 internal_listings),
+            seeking_listing_repo=StubSeekingListingRepo([]),
             listing_photo_repo=SpyPhotoRepo(),
             external_sources={
                 Source.zoopla: StubListingClient(external_listings)
@@ -514,6 +557,7 @@ class ListingsServiceSearchTest(unittest.TestCase):
             geocoder=StubGeocodingService(),
             accommodation_listing_repo=StubAccommodationListingRepo(
                 internal_listings),
+            seeking_listing_repo=StubSeekingListingRepo([]),
             listing_photo_repo=SpyPhotoRepo(),
             external_sources={
                 Source.zoopla: StubListingClient(external_listings)
@@ -601,6 +645,7 @@ def generate_external_listings_with_decreasing_creation_time(
             source=Source.zoopla,
             original_listing_url="",
             author_phone="+44 78912 345678",
+            author_name="External test user",
             photo_urls=[
                 "https://fastly.picsum.photos/id/308/1200/1200"
                 ".jpg?hmac=2c1705rmBMgsQTZ1I9Uu74cRpA4Fxdl0THWV8wfV5VQ",

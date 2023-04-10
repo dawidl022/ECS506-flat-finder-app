@@ -9,10 +9,10 @@ from app.listings.models import Source
 from app.listings.service import (
     GeocodingService, ListingsService, BaseListingsService)
 from app.user.user_repository import InMemoryUserRepository
-from app.user.user_service import BaseUserService, UserService
-from app.util.encoding import CamelCaseEncoder
+from app.user.user_service import BaseUserService, UserService, AdminService
 from app.listings.repository import (
-    InMemoryAccommodationListingsRepository, InMemoryPhotoRepository)
+    InMemoryAccommodationListingsRepository, InMemoryPhotoRepository,
+    InMemorySeekingListingsRepository)
 from config import Config
 
 
@@ -23,8 +23,14 @@ def register_common_blueprints(app: Flask) -> None:
     from app.listings import listings_bp
     app.register_blueprint(listings_bp)
 
+    from app.sources import sources_bp
+    app.register_blueprint(sources_bp)
+
     from app.user import users_bp
     app.register_blueprint(users_bp)
+
+    from app.admins import admins_bp
+    app.register_blueprint(admins_bp)
 
 
 def initialise_common_extensions(app: Flask) -> None:
@@ -59,6 +65,7 @@ def create_app(config_class: type = Config) -> Flask:
 def configure_dependencies(binder: Binder) -> None:
     listing_service = ListingsService(
         accommodation_listing_repo=InMemoryAccommodationListingsRepository(),
+        seeking_listing_repo=InMemorySeekingListingsRepository(),
         listing_photo_repo=InMemoryPhotoRepository(),
         geocoder=GeocodingService(),
         external_sources={
@@ -66,7 +73,8 @@ def configure_dependencies(binder: Binder) -> None:
         }
     )
     user_service = UserService(
-        repo=InMemoryUserRepository()
+        repo=InMemoryUserRepository(),
+        listings_service=listing_service,
     )
 
     binder.bind(
@@ -74,4 +82,7 @@ def configure_dependencies(binder: Binder) -> None:
     )
     binder.bind(
         BaseUserService, to=user_service  # type: ignore[type-abstract]
+    )
+    binder.bind(
+        AdminService, to=user_service  # type: ignore[type-abstract]
     )

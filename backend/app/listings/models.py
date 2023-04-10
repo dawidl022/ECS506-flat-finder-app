@@ -18,8 +18,22 @@ class Source(StrEnum):
     zoopla = auto()
 
 
+class ListingType(StrEnum):
+    seeking = auto()
+    accommodation = auto()
+
+
 @dataclass(frozen=True)
-class AccommodationSummary(abc.ABC):
+class ListingSummary(abc.ABC):
+
+    @classmethod
+    @abc.abstractmethod
+    def listing_type(cls) -> ListingType:
+        pass
+
+
+@dataclass(frozen=True)
+class AccommodationSummary(ListingSummary, abc.ABC):
     id: str
     title: str
     short_description: str
@@ -28,6 +42,23 @@ class AccommodationSummary(abc.ABC):
     source: Source
     price: float
     post_code: str
+
+    @classmethod
+    def listing_type(cls) -> ListingType:
+        return ListingType.accommodation
+
+
+@dataclass(frozen=True)
+class SeekingSummary(ListingSummary):
+    id: UUID
+    title: str
+    short_description: str
+    thumbnail_id: UUID | None
+    location_name: str
+
+    @classmethod
+    def listing_type(cls) -> ListingType:
+        return ListingType.seeking
 
 
 @dataclass(frozen=True)
@@ -45,6 +76,13 @@ class AccommodationSearchResult:
     distance: float
     is_favourite: bool
     accommodation: AccommodationSummary
+
+
+@dataclass(frozen=True)
+class SeekingSearchResult:
+    distance: float
+    is_favourite: bool
+    seeking: SeekingSummary
 
 
 class Coordinates(NamedTuple):
@@ -117,8 +155,23 @@ class Location:
 
 
 @dataclass(frozen=True)
-class AccommodationListing(abc.ABC):
-    id: UUID | str | int
+class AddressFreeLocation:
+    coords: Coordinates
+    name: str
+
+
+@dataclass(frozen=True)
+class Listing(abc.ABC):
+    id: UUID | str
+
+    @abc.abstractmethod
+    def summarise(self) -> ListingSummary:
+        pass
+
+
+@dataclass(frozen=True)
+class AccommodationListing(Listing, abc.ABC):
+    id: UUID | str
     location: Location
     created_at: float
     """Time of listing creation"""
@@ -184,6 +237,7 @@ class InternalAccommodationListing(AccommodationListing):
 class ExternalAccommodationListing(AccommodationListing):
     original_listing_url: str
     id: str
+    author_name: str
     author_phone: str
     photo_urls: list[str]
     _short_description: str
@@ -216,3 +270,25 @@ class ExternalAccommodationListing(AccommodationListing):
 class Photo:
     id: UUID
     blob: bytes
+
+
+@dataclass(frozen=True)
+class SeekingListing(Listing):
+    id: UUID
+    author_email: str
+    location: AddressFreeLocation
+    created_at: float
+
+    title: str
+    description: str
+    photo_ids: tuple[UUID, ...]
+
+    def summarise(self) -> SeekingSummary:
+        return SeekingSummary(
+            id=self.id,
+            title=self.title,
+            short_description=self.description,
+            thumbnail_id=(self.photo_ids[0] if len(
+                self.photo_ids) > 0 else None),
+            location_name=self.location.name
+        )

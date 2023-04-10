@@ -15,8 +15,9 @@ from app.util.schema import Schemable
 from app.listings.models import (
     AccommodationSearchResult, AccommodationSummary, Country,
     ExternalAccommodationListing, ExternalAccommodationSummary,
-    InternalAccommodationListing, InternalAccommodationSummary, SortBy, Source,
-    UKAddress)
+    InternalAccommodationListing, InternalAccommodationSummary, ListingSummary,
+    ListingType, SeekingListing, SeekingSearchResult, SeekingSummary, SortBy,
+    Source, UKAddress)
 from app.util.encoding import CamelCaseDecoder
 from app.listings.models import Address, AccommodationListing
 
@@ -58,6 +59,23 @@ class AccommodationSearchParams(Schemable):
         return [
             Source(s) for s in self.sources.split(",")
         ] if self.sources else []
+
+
+class SeekingSearchParamsSchema(Schema):
+    location = fields.Str(required=True)
+    radius = fields.Float(required=True, validate=Range(min=0))
+    page = fields.Int(validate=Range(min=0))
+    size = fields.Int(validate=Range(min=1, max=100))
+
+
+@dataclass(frozen=True)
+class SeekingSearchParams(Schemable):
+    schema = SeekingSearchParamsSchema()
+
+    location: str
+    radius: float
+    page: int = 0
+    size: int = 10
 
 
 def validate_address(addr: str) -> dict[str, str]:
@@ -123,20 +141,38 @@ class AccommodationForm(Schemable):
         return d
 
 
+class SeekingFormSchema(Schema):
+    title = fields.Str(required=True)
+    description = fields.Str(required=True)
+    preferred_location = fields.Str(required=True)
+
+
+@dataclass(frozen=True)
+class SeekingForm(Schemable):
+    schema = SeekingFormSchema()
+
+    title: str
+    description: str
+    preferred_location: str
+
+
 class AuthorDTO:
-    def __init__(self, author: User) -> None:
-        self.name = author.name
-        self.userProfile = UserDTO(author)
+    def __init__(self, author: User | None, author_name: str | None = None
+                 ) -> None:
+        self.name = author.name if author else author_name
+        self.userProfile = UserDTO(author) if author else None
 
 
 class ContactInfoDTO:
-    def __init__(self, author: User) -> None:
-        self.email = author.email
-        self.phone_number = author.contact_details.phone_number
+    def __init__(self, author: User | None = None,
+                 phone_number: str | None = None) -> None:
+        self.email = author.email if author else None
+        self.phone_number = (
+            author.contact_details.phone_number if author else phone_number)
 
 
 class AccommodationListingDTO:
-    def __init__(self, listing: AccommodationListing, author: User):
+    def __init__(self, listing: AccommodationListing, author: User | None):
         self.id = f"{listing.source}_{listing.id}"
         self.title = listing.title
         self.description = listing.description
@@ -147,8 +183,19 @@ class AccommodationListingDTO:
         self.price = listing.price
         self.address = listing.location.address
         self.original_listing_url = self.get_original_listing_url(listing)
-        self.author = AuthorDTO(author)  # TODO conditionally set author
-        self.contact_info = ContactInfoDTO(author)
+        self.author = AuthorDTO(author, author_name=(
+            listing.author_name
+            if isinstance(listing, ExternalAccommodationListing)
+            else None
+        ))
+        self.contact_info = ContactInfoDTO(
+            author,
+            phone_number=(
+                listing.author_phone
+                if isinstance(listing, ExternalAccommodationListing)
+                else None
+            )
+        )
 
     @staticmethod
     def get_photo_urls(listing: AccommodationListing) -> list[str]:
@@ -167,6 +214,25 @@ class AccommodationListingDTO:
         if isinstance(listing, ExternalAccommodationListing):
             return listing.original_listing_url
         return None
+
+
+class SeekingListingDTO:
+    def __init__(self, listing: SeekingListing, author: User):
+        self.id = f"internal_{listing.id}"
+        self.title = listing.title
+        self.description = listing.description
+        self.photo_urls = self.get_photo_urls(listing)
+        self.preferred_location = listing.location
+        self.author = AuthorDTO(author)
+        self.contact_info = ContactInfoDTO(author)
+
+    @staticmethod
+    def get_photo_urls(listing: SeekingListing) -> list[str]:
+        return [
+            url_for("listings.get_listing_photo",
+                    listing_id=listing.id, photo_id=id)
+            for id in listing.photo_ids
+        ]
 
 
 @dataclass
@@ -204,6 +270,44 @@ class AccommodationSummaryDTO:
         return None
 
 
+@dataclass
+class SeekingSummaryDTO:
+    id: str
+    title: str
+    short_description: str
+    thumbnail_url: str | None
+    location_name: str
+
+    def __init__(self, summary: SeekingSummary):
+        self.id = f"internal_{summary.id}"
+        self.title = summary.title
+        self.short_description = summary.short_description
+        self.thumbnail_url = self.get_thumbnail_url(summary)
+        self.location_name = summary.location_name
+
+    @staticmethod
+    def get_thumbnail_url(summary: SeekingSummary) -> str | None:
+        if summary.thumbnail_id is not None:
+            return url_for(
+                "listings.get_listing_photo",
+                listing_id=summary.id, photo_id=summary.thumbnail_id
+            )
+        return None
+
+
+@dataclass
+class ListingSummaryDTO:
+    type: ListingType
+    listing: AccommodationSummaryDTO | SeekingSummaryDTO
+
+    def __init__(self, summary: ListingSummary):
+        if isinstance(summary, AccommodationSummary):
+            self.type = ListingType.accommodation
+            self.listing = AccommodationSummaryDTO(summary)
+        else:
+            raise TypeError("unsupported ListingSummary subtype")
+
+
 @dataclass(frozen=True)
 class SourceDTO:
     name: str
@@ -223,7 +327,19 @@ class AccommodationSearchResultDTO:
         self.accommodation = AccommodationSummaryDTO(result.accommodation)
 
 
-@ dataclass(frozen=True)
+@dataclass(frozen=True)
 class SearchResultDTO:
     sources: list[SourceDTO]
     search_results: list[AccommodationSearchResultDTO]
+
+
+@dataclass
+class SeekingSearchResultDTO:
+    distance: float
+    is_favourite: bool
+    accommodation: SeekingSummaryDTO
+
+    def __init__(self, result: SeekingSearchResult):
+        self.distance = result.distance
+        self.is_favourite = result.is_favourite
+        self.accommodation = SeekingSummaryDTO(result.seeking)

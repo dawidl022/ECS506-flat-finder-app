@@ -2,9 +2,12 @@ import React, { useRef, useState } from "react";
 
 import styles from "./UserCard.module.scss";
 import { useRouter } from "next/router";
+import useUser from "@/hooks/useUser";
+import AvatarPlaceholder from "@/components/AvatarPlaceholder";
 
 const UserCard = () => {
   const router = useRouter();
+  const { user, logout } = useUser();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -36,13 +39,19 @@ const UserCard = () => {
     };
   }, []);
   return (
-    <div ref={menuRef}>
+    <div className={styles.cardCon} ref={menuRef}>
       <button
         onClick={() => setIsOpen(prev => !prev)}
         className={styles.wrapper}
       >
-        <p>username</p>
-        <div className={styles.avaCon} />
+        <p>
+          {user?.name?.split(" ")[0] + " " + user?.name?.split(" ")[1][0] + "."}
+        </p>
+        <AvatarPlaceholder
+          size={42}
+          addStyles={{ margin: "0 6px 0 12px" }}
+          name={user?.name as string}
+        />
         <div className={styles.arrCon}>
           <img
             style={isOpen ? { transform: "scaleY(-1)" } : {}}
@@ -55,7 +64,7 @@ const UserCard = () => {
           <button
             onClick={() => {
               setIsOpen(false);
-              router.push("/profile/seagull");
+              router.push(`/profile/${user?.id}`);
             }}
             className={styles.menuItem}
           >
@@ -68,7 +77,6 @@ const UserCard = () => {
             className={styles.menuItem}
             onClick={() => {
               setIsOpen(false);
-              // TODO:
               router.push("/listings");
             }}
           >
@@ -80,7 +88,7 @@ const UserCard = () => {
           <button
             onClick={() => {
               setIsOpen(false);
-              // TODO: exit logic (delete cookie)
+              logout();
             }}
             className={styles.menuItem}
           >

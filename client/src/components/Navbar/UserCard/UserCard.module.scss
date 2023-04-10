@@ -1,3 +1,7 @@
+.cardCon {
+  position: relative;
+}
+
 .wrapper {
   display: flex;
   align-items: center;
@@ -18,13 +22,6 @@
     background-color: #e7e7e776;
   }
 
-  .avaCon {
-    height: 42px;
-    width: 42px;
-    background-color: rgb(160, 159, 159);
-    border-radius: 100%;
-    margin: 0 6px 0 12px;
-  }
   .arrCon {
     height: 24px;
     width: 24px;
@@ -37,7 +34,8 @@
 
 .dropDown {
   position: absolute;
-  top: 80px;
+  top: 70px;
+  right: 0;
   width: 180px;
   background-color: #fff;
   border-radius: 12px;
