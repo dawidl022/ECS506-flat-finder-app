@@ -37,6 +37,38 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     }
   };
 
+  const grantAdmin = (user: User) => {
+    if (confirm("Are you sure you want to grant " + user.email + " admin?")) {
+      api
+        .apiV1AdminsUserIdPut({ userId: user.id })
+        .then(() => {
+          router.reload();
+        })
+        .catch(err => {
+          alert("User failed to be granted administrator role. \nError:" + err);
+        });
+    }
+  };
+
+  const revokeAdmin = (user: User) => {
+    if (
+      confirm(
+        "Are you sure you want to revoke " + user.email + "'s admin role?"
+      )
+    ) {
+      api
+        .apiV1AdminsUserIdDelete({ userId: user.id })
+        .then(() => {
+          router.reload();
+        })
+        .catch(err => {
+          alert(
+            "User's administrator role failed to be revoked . \nError:" + err
+          );
+        });
+    }
+  };
+
   api
     .apiV1AdminsUserIdGet({ userId: currentUserId })
     .then(() => {
@@ -55,7 +87,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
     return (
       <div>
         <p> Administrator Access Only </p>
-        <button type="button" onClick={() => router.push("/index")}>
+        <button type="button" onClick={() => (window.location.href = "/")}>
           Return To Homepage
         </button>
       </div>
@@ -93,6 +125,35 @@ const AdminPanel: FC<AdminPanelProps> = ({ currentUserId }) => {
                         onClick={() => removeUserFromSystem(user)}
                       >
                         Remove User
+                      </button>
+                    </td>
+                  )}
+                  {user.isAdmin ? (
+                    <>
+                      {user.id === currentUserId ? (
+                        <td></td>
+                      ) : (
+                        <td>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              revokeAdmin(user);
+                            }}
+                          >
+                            Revoke Admin
+                          </button>
+                        </td>
+                      )}
+                    </>
+                  ) : (
+                    <td>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          grantAdmin(user);
+                        }}
+                      >
+                        Grant Admin
                       </button>
                     </td>
                   )}
