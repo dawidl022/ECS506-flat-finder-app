@@ -15,8 +15,6 @@ from app.listings.repository import (
     sort_and_page_listings)
 from app.clients.ListingAPIClient import ListingAPIClient
 from app.clients.APIException import APIException
-from geopy.geocoders import Nominatim
-from geopy.distance import geodesic
 
 
 class BaseGeocodingService(abc.ABC):
@@ -38,24 +36,19 @@ class GeocodingService(BaseGeocodingService):
         """
         TODO turn address into coordinates using geopy module
         """
-        geolocator = Nominatim(user_agent="flatfinder-app")
-        location = geolocator.geocode(addr.full_address)
-        return Coordinates(location.lat,location.long)
+        addr.address
+        return Coordinates(0, 0)
 
     def search_coords(self, location_query: str) -> Coordinates:
         """
         TODO turn address into coordinates using geopy module
         """
-        geolocator = Nominatim(user_agent="flatfinder-app")
-        location = geolocator.geocode(location_query)
-        return Coordinates(location.lat,location.long)
+        return Coordinates(0, 0)
 
     def calc_distance(self, c1: Coordinates, c2: Coordinates) -> float:
         """
         TODO calc distance using geopy module
         """
-        distance_in_miles = geodesic(c1, c2).miles
-        distance_in_km = geodesic(c1, c2).km
         return 0
 
 
