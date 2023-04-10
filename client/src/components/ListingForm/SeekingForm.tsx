@@ -2,6 +2,7 @@ import { FC, useState, FormEvent, ChangeEvent } from "react";
 import { useRouter } from "next/router";
 import { Configuration, DefaultApi } from "@/generated";
 import { handleFileInput } from "./handleFileInput";
+import useApi from "@/hooks/useApi";
 
 interface FormProps {
   listingId: string;
@@ -13,15 +14,7 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
-  const api = new DefaultApi(
-    new Configuration({ basePath: "http://127.0.0.1:5000" })
-  );
-
-  const baseForm = {
-    title,
-    description,
-    preferredLocation: location,
-  };
+  const { apiManager: api } = useApi();
 
   if (editExistingListing) {
     api
@@ -29,7 +22,7 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
       .then(res => {
         setTitle(res.seeking.title);
         setDescription(res.seeking.description);
-        setLocation(res.seeking.preferredLocation.name);
+        setLocation(res.seeking.preferredLocation);
       })
       .catch(err => {
         alert(`Could not find listing with ID:  ${listingId} \nError:  ${err}`);
@@ -56,18 +49,24 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
 
   const handleSubmit = (e: FormEvent<HTMLElement>) => {
     e.preventDefault();
+    const baseForm = {
+      title,
+      description,
+      preferredLocation: location,
+    };
+
     if (!editExistingListing) {
       api
         .apiV1ListingsSeekingPost({
           ...baseForm,
           photos: Array<Blob>(),
         })
+        .then(() => router.push({ pathname: "/myListings" }))
         .catch(err =>
           alert(
             "Seeking listing failed to be published. \nError: " + err.message
           )
-        )
-        .then(() => router.push({ pathname: "/myListings" }));
+        );
     } else {
       api
         .apiV1ListingsSeekingListingIdPut({

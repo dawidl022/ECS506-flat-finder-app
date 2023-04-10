@@ -25,12 +25,6 @@ import {
     ListingContactInfoFromJSONTyped,
     ListingContactInfoToJSON,
 } from './ListingContactInfo';
-import type { Location } from './Location';
-import {
-    LocationFromJSON,
-    LocationFromJSONTyped,
-    LocationToJSON,
-} from './Location';
 
 /**
  * 
@@ -64,10 +58,10 @@ export interface Seeking {
     photoUrls?: Array<string>;
     /**
      * 
-     * @type {Location}
+     * @type {string}
      * @memberof Seeking
      */
-    preferredLocation: Location;
+    preferredLocation: string;
     /**
      * 
      * @type {ListingAuthor}
@@ -111,7 +105,7 @@ export function SeekingFromJSONTyped(json: any, ignoreDiscriminator: boolean): S
         'title': json['title'],
         'description': json['description'],
         'photoUrls': !exists(json, 'photoUrls') ? undefined : json['photoUrls'],
-        'preferredLocation': LocationFromJSON(json['preferredLocation']),
+        'preferredLocation': json['preferredLocation'],
         'author': ListingAuthorFromJSON(json['author']),
         'contactInfo': ListingContactInfoFromJSON(json['contactInfo']),
     };
@@ -130,7 +124,7 @@ export function SeekingToJSON(value?: Seeking | null): any {
         'title': value.title,
         'description': value.description,
         'photoUrls': value.photoUrls,
-        'preferredLocation': LocationToJSON(value.preferredLocation),
+        'preferredLocation': value.preferredLocation,
         'author': ListingAuthorToJSON(value.author),
         'contactInfo': ListingContactInfoToJSON(value.contactInfo),
     };

@@ -1,4 +1,4 @@
-import { FC, useState, FormEvent, ChangeEvent } from "react";
+import { FC, useState, FormEvent, ChangeEvent, useEffect } from "react";
 import { useRouter } from "next/router";
 import { handleFileInput } from "./handleFileInput";
 import {
@@ -6,6 +6,7 @@ import {
   Configuration,
   DefaultApi,
 } from "@/generated";
+import useApi from "@/hooks/useApi";
 
 interface FormProps {
   listingId: string;
@@ -29,9 +30,7 @@ const AccommodationForm: FC<FormProps> = ({
   const [numberOfRooms, setNumberOfRooms] = useState(0);
   const [price, setPrice] = useState(0);
 
-  const api = new DefaultApi(
-    new Configuration({ basePath: "http://127.0.0.1:5000" })
-  );
+  const { apiManager: api } = useApi();
 
   const baseForm = {
     title,
@@ -48,25 +47,29 @@ const AccommodationForm: FC<FormProps> = ({
     price,
   };
 
-  if (editExistingListing) {
-    api
-      .apiV1ListingsAccommodationListingIdGet({ listingId })
-      .then(res => {
-        setTitle(res.accommodation.title);
-        setDescription(res.accommodation.description);
-        setLine1(res.accommodation.address.line1);
-        //as line2 is optional, check if there is an input
-        setLine2(res.accommodation.address.line2 ?? "");
-        setTown(res.accommodation.address.town);
-        setPostCode(res.accommodation.address.postCode);
-        setAccommodationType(res.accommodation.accommodationType);
-        setNumberOfRooms(res.accommodation.numberOfRooms);
-        setPrice(res.accommodation.price);
-      })
-      .catch(err => {
-        alert(`Could not find listing with ID:  ${listingId} \nError:  ${err}`);
-      });
-  }
+  useEffect(() => {
+    if (editExistingListing) {
+      api
+        .apiV1ListingsAccommodationListingIdGet({ listingId })
+        .then(res => {
+          setTitle(res.accommodation.title);
+          setDescription(res.accommodation.description);
+          setLine1(res.accommodation.address.line1);
+          //as line2 is optional, check if there is an input
+          setLine2(res.accommodation.address.line2 ?? "");
+          setTown(res.accommodation.address.town);
+          setPostCode(res.accommodation.address.postCode);
+          setAccommodationType(res.accommodation.accommodationType);
+          setNumberOfRooms(res.accommodation.numberOfRooms);
+          setPrice(res.accommodation.price);
+        })
+        .catch(err => {
+          alert(
+            `Could not find listing with ID:  ${listingId} \nError:  ${err}`
+          );
+        });
+    }
+  }, []);
 
   const preview = () => {
     router.push({
@@ -110,13 +113,14 @@ const AccommodationForm: FC<FormProps> = ({
           ...baseForm,
           photos: Array<Blob>(),
         })
+        .then(() => router.push({ pathname: "/myListings" }))
+
         .catch(err =>
           alert(
             "Accommodation listing failed to be published. \nError: " +
               err.message
           )
-        )
-        .then(() => router.push({ pathname: "/myListings" }));
+        );
     } else {
       api
         .apiV1ListingsAccommodationListingIdPut({

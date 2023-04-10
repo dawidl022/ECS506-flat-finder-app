@@ -222,7 +222,7 @@ class SeekingListingDTO:
         self.title = listing.title
         self.description = listing.description
         self.photo_urls = self.get_photo_urls(listing)
-        self.preferred_location = listing.location
+        self.preferred_location = listing.location.name
         self.author = AuthorDTO(author)
         self.contact_info = ContactInfoDTO(author)
 

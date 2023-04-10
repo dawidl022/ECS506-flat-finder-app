@@ -15,7 +15,7 @@ paths:
         authentication is not currently being handled gracefully.
       security: []
       responses:
-        "302":
+        '302':
           description: Redirect to Google auth provider.
           headers:
             Location:
@@ -37,33 +37,33 @@ paths:
         be returned. E.g. if location is set to "London", sources that only
         offer listings in the USA will be excluded from the results.
       parameters:
-        - $ref: "#/components/parameters/sourceLocation"
+        - $ref: '#/components/parameters/sourceLocation'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/availableSources"
+                $ref: '#/components/schemas/availableSources'
 
   /api/v1/listings/accommodation:
     get:
       summary: Get a list of accommodation listings, optionally filtered and sorted
       parameters:
-        - $ref: "#/components/parameters/searchLocation"
-        - $ref: "#/components/parameters/searchRadius"
-        - $ref: "#/components/parameters/maxPriceFilter"
-        - $ref: "#/components/parameters/sourcesFilter"
-        - $ref: "#/components/parameters/sortAccommodationsBy"
-        - $ref: "#/components/parameters/page"
-        - $ref: "#/components/parameters/size"
+        - $ref: '#/components/parameters/searchLocation'
+        - $ref: '#/components/parameters/searchRadius'
+        - $ref: '#/components/parameters/maxPriceFilter'
+        - $ref: '#/components/parameters/sourcesFilter'
+        - $ref: '#/components/parameters/sortAccommodationsBy'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/accommodationSearch"
+                $ref: '#/components/schemas/accommodationSearch'
 
     post:
       summary: Create a new accommodation listing
@@ -74,28 +74,28 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/accommodationForm"
+              $ref: '#/components/schemas/accommodationForm'
       responses:
-        "201":
-          description: "Created"
+        '201':
+          description: 'Created'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/accommodation"
+                $ref: '#/components/schemas/accommodation'
 
   /api/v1/listings/accommodation/{listingId}:
     get:
       summary: Get the details of an accommodation listing
       parameters:
-        - $ref: "#/components/parameters/listingId"
+        - $ref: '#/components/parameters/listingId'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/accommodationDetails"
-        "404":
+                $ref: '#/components/schemas/accommodationDetails'
+        '404':
           description: Listing not found
 
     put:
@@ -105,22 +105,22 @@ paths:
         user. Does not allow for updating photos to save bandwidth. Use
         dedicated photos endpoint for this use case.
       parameters:
-        - $ref: "#/components/parameters/listingId"
+        - $ref: '#/components/parameters/listingId'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/accommodationFormBase"
+              $ref: '#/components/schemas/accommodationFormBase'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/accommodationDetails"
-        "403":
+                $ref: '#/components/schemas/accommodationDetails'
+        '403':
           description: Forbidden. User has no rights to edit listing.
-        "404":
+        '404':
           description: Listing not found
 
     delete:
@@ -129,30 +129,30 @@ paths:
         Delete specified accommodation listing if owner is currently logged in
         user
       parameters:
-        - $ref: "#/components/parameters/listingId"
+        - $ref: '#/components/parameters/listingId'
       responses:
-        "204":
+        '204':
           description: Listing deleted successfully. No content to return.
-        "403":
+        '403':
           description: Forbidden. User has no rights to delete listing.
-        "404":
+        '404':
           description: Listing not found
 
   /api/v1/listings/seeking:
     get:
       summary: Get a list of seeking listings
       parameters:
-        - $ref: "#/components/parameters/searchLocation"
-        - $ref: "#/components/parameters/searchRadius"
-        - $ref: "#/components/parameters/page"
-        - $ref: "#/components/parameters/size"
+        - $ref: '#/components/parameters/searchLocation'
+        - $ref: '#/components/parameters/searchRadius'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/seekingSearchResults"
+                $ref: '#/components/schemas/seekingSearchResults'
 
     post:
       summary: Create a new seeking listing
@@ -163,28 +163,28 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/seekingForm"
+              $ref: '#/components/schemas/seekingForm'
       responses:
-        "201":
-          description: "Created"
+        '201':
+          description: 'Created'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/seekingDetails"
+                $ref: '#/components/schemas/seekingDetails'
 
   /api/v1/listings/seeking/{listingId}:
     get:
       summary: Get the details of a seeking listing
       parameters:
-        - $ref: "#/components/parameters/listingId"
+        - $ref: '#/components/parameters/listingId'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/seekingDetails"
-        "404":
+                $ref: '#/components/schemas/seekingDetails'
+        '404':
           description: Listing not found
 
     put:
@@ -194,22 +194,22 @@ paths:
         user. Does not allow for updating photos to save bandwidth. Use
         dedicated photos endpoint for this use case.
       parameters:
-        - $ref: "#/components/parameters/listingId"
+        - $ref: '#/components/parameters/listingId'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/seekingFormBase"
+              $ref: '#/components/schemas/seekingFormBase'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/seekingDetails"
-        "403":
+                $ref: '#/components/schemas/seekingDetails'
+        '403':
           description: Forbidden. User has no rights to edit listing.
-        "404":
+        '404':
           description: Listing not found
 
     delete:
@@ -218,20 +218,20 @@ paths:
         Delete specified seeking listing if owner is currently logged in
         user
       parameters:
-        - $ref: "#/components/parameters/listingId"
+        - $ref: '#/components/parameters/listingId'
       responses:
-        "204":
+        '204':
           description: Listing deleted successfully. No content to return.
-        "403":
+        '403':
           description: Forbidden. User has no rights to delete listing.
-        "404":
+        '404':
           description: Listing not found
 
   /api/v1/listings/{listingId}/photos:
     post:
       summary: Upload new photo for a listing
       parameters:
-        - $ref: "#/components/parameters/listingId"
+        - $ref: '#/components/parameters/listingId'
       requestBody:
         content:
           image:
@@ -239,54 +239,54 @@ paths:
               type: string
               format: binary
       responses:
-        "204":
+        '204':
           description: Photo uploaded successfully. No content to return.
-        "403":
+        '403':
           description: Forbidden. User has no rights to edit listing photos.
-        "404":
+        '404':
           description: Listing not found
 
   /api/v1/listings/{listingId}/photos/{photoId}:
     get:
       summary: Get a listing photo
       parameters:
-        - $ref: "#/components/parameters/listingId"
-        - $ref: "#/components/parameters/photoId"
+        - $ref: '#/components/parameters/listingId'
+        - $ref: '#/components/parameters/photoId'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             image:
               schema:
                 type: string
                 format: binary
-        "404":
+        '404':
           description: Listing or photo not found
 
     delete:
       summary: Delete a listing photo
       parameters:
-        - $ref: "#/components/parameters/listingId"
-        - $ref: "#/components/parameters/photoId"
+        - $ref: '#/components/parameters/listingId'
+        - $ref: '#/components/parameters/photoId'
       responses:
-        "204":
+        '204':
           description: Photo deleted successfully. No content to return.
-        "403":
+        '403':
           description: Forbidden. User has no rights to edit listing photos.
-        "404":
+        '404':
           description: Listing or photo not found
 
   /api/v1/users:
     get:
       summary: Get all users registered in system
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/usersList"
-        "403":
+                $ref: '#/components/schemas/usersList'
+        '403':
           description: Forbidden. Logged in user is not an admin.
 
   /api/v1/users/{userId}:
@@ -296,47 +296,46 @@ paths:
         Deleting a user deletes all of their data, but does not prevent the
         user with the email address from registering again.
       parameters:
-        - $ref: "#/components/parameters/userId"
+        - $ref: '#/components/parameters/userId'
       responses:
-        "204":
+        '204':
           description: User deleted successfully. No content to return.
-        "403":
+        '403':
           description: Forbidden. Logged in user is not an admin.
-        "404":
+        '404':
           description: User with given ID not found.
 
   /api/v1/users/{userId}/profile:
     get:
       summary: Get the profile of a user
       parameters:
-        - $ref: "#/components/parameters/userId"
+        - $ref: '#/components/parameters/userId'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/userProfile"
-        "404":
+                $ref: '#/components/schemas/userProfile'
+        '404':
           description: User with given ID not found.
     put:
       summary: Update user profile
-      description:
-        Can be used to both complete for the first time as well as update the
+      description: Can be used to both complete for the first time as well as update the
         profile of the currently logged in user.
       parameters:
-        - $ref: "#/components/parameters/userId"
+        - $ref: '#/components/parameters/userId'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/userProfileForm"
+              $ref: '#/components/schemas/userProfileForm'
       responses:
-        "204":
+        '204':
           description: Profile updated successfully. No content to return.
-        "403":
+        '403':
           description: Forbidden. Logged in user does not own the profile.
-        "404":
+        '404':
           description: User with given ID not found.
 
   /api/v1/users/{userId}/listings:
@@ -345,15 +344,15 @@ paths:
       description: >-
         Get all accommodation and seeking listings created by given user
       parameters:
-        - $ref: "#/components/parameters/userId"
+        - $ref: '#/components/parameters/userId'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/userListings"
-        "404":
+                $ref: '#/components/schemas/userListings'
+        '404':
           description: User not found.
 
   /api/v1/admins/{userId}:
@@ -364,43 +363,43 @@ paths:
         if the userId parameter matches the logged in user's userId. Admins
         can always call this endpoint.
       parameters:
-        - $ref: "#/components/parameters/userId"
+        - $ref: '#/components/parameters/userId'
       responses:
-        "204":
+        '204':
           description: >-
             User has admin privileges. No content to return.
-        "403":
+        '403':
           description: >-
             Forbidden. Logged in user is neither the account owner nor an admin.
-        "404":
+        '404':
           description: >-
             User does not have admin privileges or does not exist.
 
     put:
       summary: Grant admin privileges to user
       parameters:
-        - $ref: "#/components/parameters/userId"
+        - $ref: '#/components/parameters/userId'
       responses:
-        "204":
+        '204':
           description: >-
             User granted admin privileges successfully. No content to return.
-        "403":
+        '403':
           description: Forbidden. Logged in user is not an admin.
-        "404":
+        '404':
           description: >-
             User with given ID does not exist.
 
     delete:
       summary: Revoke admin privileges from user
       parameters:
-        - $ref: "#/components/parameters/userId"
+        - $ref: '#/components/parameters/userId'
       responses:
-        "204":
+        '204':
           description: >-
             User revoked admin privileges successfully. No content to return.
-        "403":
+        '403':
           description: Forbidden. Logged in user is not an admin.
-        "404":
+        '404':
           description: >-
             User with given ID does not exist.
 
@@ -413,9 +412,9 @@ components:
         - sources
       properties:
         searchResults:
-          $ref: "#/components/schemas/accommodationSearchResults"
+          $ref: '#/components/schemas/accommodationSearchResults'
         sources:
-          $ref: "#/components/schemas/searchSources"
+          $ref: '#/components/schemas/searchSources'
 
     accommodationSearchResults:
       type: array
@@ -427,11 +426,11 @@ components:
           - accommodation
         properties:
           distance:
-            $ref: "#/components/schemas/distance"
+            $ref: '#/components/schemas/distance'
           isFavourite:
-            $ref: "#/components/schemas/isFavourite"
+            $ref: '#/components/schemas/isFavourite'
           accommodation:
-            $ref: "#/components/schemas/accommodationSummary"
+            $ref: '#/components/schemas/accommodationSummary'
 
     searchSources:
       type: array
@@ -442,7 +441,7 @@ components:
           - enabled
         properties:
           name:
-            $ref: "#/components/schemas/listingSource"
+            $ref: '#/components/schemas/listingSource'
           enabled:
             type: boolean
           failed:
@@ -459,11 +458,11 @@ components:
           - seeking
         properties:
           distance:
-            $ref: "#/components/schemas/distance"
+            $ref: '#/components/schemas/distance'
           isFavourite:
-            $ref: "#/components/schemas/isFavourite"
+            $ref: '#/components/schemas/isFavourite'
           seeking:
-            $ref: "#/components/schemas/seekingSummary"
+            $ref: '#/components/schemas/seekingSummary'
 
     accommodationDetails:
       type: object
@@ -472,9 +471,9 @@ components:
         - accommodation
       properties:
         isFavourite:
-          $ref: "#/components/schemas/isFavourite"
+          $ref: '#/components/schemas/isFavourite'
         accommodation:
-          $ref: "#/components/schemas/accommodation"
+          $ref: '#/components/schemas/accommodation'
 
     distance:
       type: number
@@ -497,23 +496,23 @@ components:
         - postCode
       properties:
         id:
-          $ref: "#/components/schemas/listingId"
+          $ref: '#/components/schemas/listingId'
         title:
-          $ref: "#/components/schemas/listingTitle"
+          $ref: '#/components/schemas/listingTitle'
         shortDescription:
-          $ref: "#/components/schemas/listingShortDescription"
+          $ref: '#/components/schemas/listingShortDescription'
         thumbnailUrl:
-          $ref: "#/components/schemas/listingThumbnailUrl"
+          $ref: '#/components/schemas/listingThumbnailUrl'
         accommodationType:
-          $ref: "#/components/schemas/accommodationType"
+          $ref: '#/components/schemas/accommodationType'
         numberOfRooms:
-          $ref: "#/components/schemas/accommodationNumberOfRooms"
+          $ref: '#/components/schemas/accommodationNumberOfRooms'
         source:
-          $ref: "#/components/schemas/listingSource"
+          $ref: '#/components/schemas/listingSource'
         price:
-          $ref: "#/components/schemas/accommodationPrice"
+          $ref: '#/components/schemas/accommodationPrice'
         postCode:
-          $ref: "#/components/schemas/accommodationPostCode"
+          $ref: '#/components/schemas/accommodationPostCode'
 
     accommodation:
       type: object
@@ -531,29 +530,29 @@ components:
         - contactInfo
       properties:
         id:
-          $ref: "#/components/schemas/listingId"
+          $ref: '#/components/schemas/listingId'
         title:
-          $ref: "#/components/schemas/listingTitle"
+          $ref: '#/components/schemas/listingTitle'
         description:
-          $ref: "#/components/schemas/listingDescription"
+          $ref: '#/components/schemas/listingDescription'
         photoUrls:
-          $ref: "#/components/schemas/listingPhotoUrls"
+          $ref: '#/components/schemas/listingPhotoUrls'
         accommodationType:
-          $ref: "#/components/schemas/accommodationType"
+          $ref: '#/components/schemas/accommodationType'
         numberOfRooms:
-          $ref: "#/components/schemas/accommodationNumberOfRooms"
+          $ref: '#/components/schemas/accommodationNumberOfRooms'
         source:
-          $ref: "#/components/schemas/listingSource"
+          $ref: '#/components/schemas/listingSource'
         price:
-          $ref: "#/components/schemas/accommodationPrice"
+          $ref: '#/components/schemas/accommodationPrice'
         address:
-          $ref: "#/components/schemas/accommodationAddress"
+          $ref: '#/components/schemas/accommodationAddress'
         author:
-          $ref: "#/components/schemas/listingAuthor"
+          $ref: '#/components/schemas/listingAuthor'
         originalListingUrl:
-          $ref: "#/components/schemas/listingOriginalUrl"
+          $ref: '#/components/schemas/listingOriginalUrl'
         contactInfo:
-          $ref: "#/components/schemas/listingContactInfo"
+          $ref: '#/components/schemas/listingContactInfo'
 
     accommodationForm:
       type: object
@@ -567,19 +566,19 @@ components:
         - address
       properties:
         title:
-          $ref: "#/components/schemas/listingTitle"
+          $ref: '#/components/schemas/listingTitle'
         description:
-          $ref: "#/components/schemas/listingDescription"
+          $ref: '#/components/schemas/listingDescription'
         photos:
-          $ref: "#/components/schemas/listingPhotos"
+          $ref: '#/components/schemas/listingPhotos'
         accommodationType:
-          $ref: "#/components/schemas/accommodationType"
+          $ref: '#/components/schemas/accommodationType'
         numberOfRooms:
-          $ref: "#/components/schemas/accommodationNumberOfRooms"
+          $ref: '#/components/schemas/accommodationNumberOfRooms'
         price:
-          $ref: "#/components/schemas/accommodationPrice"
+          $ref: '#/components/schemas/accommodationPrice'
         address:
-          $ref: "#/components/schemas/accommodationAddress"
+          $ref: '#/components/schemas/accommodationAddress'
 
     accommodationFormBase:
       type: object
@@ -592,17 +591,17 @@ components:
         - address
       properties:
         title:
-          $ref: "#/components/schemas/listingTitle"
+          $ref: '#/components/schemas/listingTitle'
         description:
-          $ref: "#/components/schemas/listingDescription"
+          $ref: '#/components/schemas/listingDescription'
         accommodationType:
-          $ref: "#/components/schemas/accommodationType"
+          $ref: '#/components/schemas/accommodationType'
         numberOfRooms:
-          $ref: "#/components/schemas/accommodationNumberOfRooms"
+          $ref: '#/components/schemas/accommodationNumberOfRooms'
         price:
-          $ref: "#/components/schemas/accommodationPrice"
+          $ref: '#/components/schemas/accommodationPrice'
         address:
-          $ref: "#/components/schemas/accommodationAddress"
+          $ref: '#/components/schemas/accommodationAddress'
 
     seekingSummary:
       type: object
@@ -613,13 +612,13 @@ components:
         - locationName
       properties:
         id:
-          $ref: "#/components/schemas/listingId"
+          $ref: '#/components/schemas/listingId'
         title:
-          $ref: "#/components/schemas/listingTitle"
+          $ref: '#/components/schemas/listingTitle'
         shortDescription:
-          $ref: "#/components/schemas/listingShortDescription"
+          $ref: '#/components/schemas/listingShortDescription'
         thumbnailUrl:
-          $ref: "#/components/schemas/listingThumbnailUrl"
+          $ref: '#/components/schemas/listingThumbnailUrl'
         locationName:
           type: string
 
@@ -630,9 +629,9 @@ components:
         - seeking
       properties:
         isFavourite:
-          $ref: "#/components/schemas/isFavourite"
+          $ref: '#/components/schemas/isFavourite'
         seeking:
-          $ref: "#/components/schemas/seeking"
+          $ref: '#/components/schemas/seeking'
 
     seeking:
       type: object
@@ -645,19 +644,19 @@ components:
         - contactInfo
       properties:
         id:
-          $ref: "#/components/schemas/listingId"
+          $ref: '#/components/schemas/listingId'
         title:
-          $ref: "#/components/schemas/listingTitle"
+          $ref: '#/components/schemas/listingTitle'
         description:
-          $ref: "#/components/schemas/listingDescription"
+          $ref: '#/components/schemas/listingDescription'
         photoUrls:
-          $ref: "#/components/schemas/listingPhotoUrls"
+          $ref: '#/components/schemas/listingPhotoUrls'
         preferredLocation:
-          $ref: "#/components/schemas/location"
+          type: string
         author:
-          $ref: "#/components/schemas/listingAuthor"
+          $ref: '#/components/schemas/listingAuthor'
         contactInfo:
-          $ref: "#/components/schemas/listingContactInfo"
+          $ref: '#/components/schemas/listingContactInfo'
 
     seekingForm:
       type: object
@@ -667,11 +666,11 @@ components:
         - preferredLocation
       properties:
         title:
-          $ref: "#/components/schemas/listingTitle"
+          $ref: '#/components/schemas/listingTitle'
         description:
-          $ref: "#/components/schemas/listingDescription"
+          $ref: '#/components/schemas/listingDescription'
         photos:
-          $ref: "#/components/schemas/listingPhotos"
+          $ref: '#/components/schemas/listingPhotos'
         preferredLocation:
           type: string
 
@@ -683,9 +682,9 @@ components:
         - preferredLocation
       properties:
         title:
-          $ref: "#/components/schemas/listingTitle"
+          $ref: '#/components/schemas/listingTitle'
         description:
-          $ref: "#/components/schemas/listingDescription"
+          $ref: '#/components/schemas/listingDescription'
         preferredLocation:
           type: string
 
@@ -734,7 +733,7 @@ components:
         name:
           type: string
         userProfile:
-          $ref: "#/components/schemas/userProfile"
+          $ref: '#/components/schemas/userProfile'
 
     listingOriginalUrl:
       type: string
@@ -756,7 +755,7 @@ components:
         name:
           type: string
         coordinates:
-          $ref: "#/components/schemas/coordinates"
+          $ref: '#/components/schemas/coordinates'
 
     coordinates:
       type: object
@@ -784,7 +783,7 @@ components:
 
     accommodationAddress:
       anyOf:
-        - $ref: "#/components/schemas/UKAddress"
+        - $ref: '#/components/schemas/UKAddress'
 
     accommodationPostCode:
       type: string
@@ -814,7 +813,7 @@ components:
     usersList:
       type: array
       items:
-        $ref: "#/components/schemas/user"
+        $ref: '#/components/schemas/user'
 
     user:
       type: object
@@ -824,11 +823,11 @@ components:
         - isAdmin
       properties:
         id:
-          $ref: "#/components/schemas/userId"
+          $ref: '#/components/schemas/userId'
         email:
-          $ref: "#/components/schemas/userEmail"
+          $ref: '#/components/schemas/userEmail'
         name:
-          $ref: "#/components/schemas/userName"
+          $ref: '#/components/schemas/userName'
         isAdmin:
           type: boolean
 
@@ -840,13 +839,13 @@ components:
         - contactDetails
       properties:
         id:
-          $ref: "#/components/schemas/userId"
+          $ref: '#/components/schemas/userId'
         email:
-          $ref: "#/components/schemas/userEmail"
+          $ref: '#/components/schemas/userEmail'
         name:
-          $ref: "#/components/schemas/userName"
+          $ref: '#/components/schemas/userName'
         contactDetails:
-          $ref: "#/components/schemas/userContactDetails"
+          $ref: '#/components/schemas/userContactDetails'
 
     userProfileForm:
       type: object
@@ -855,9 +854,9 @@ components:
         - contactDetails
       properties:
         name:
-          $ref: "#/components/schemas/userName"
+          $ref: '#/components/schemas/userName'
         contactDetails:
-          $ref: "#/components/schemas/userContactDetails"
+          $ref: '#/components/schemas/userContactDetails'
 
     userId:
       type: string
@@ -893,13 +892,13 @@ components:
               - seeking
           listing:
             anyOf:
-              - $ref: "#/components/schemas/accommodationSummary"
-              - $ref: "#/components/schemas/seekingSummary"
+              - $ref: '#/components/schemas/accommodationSummary'
+              - $ref: '#/components/schemas/seekingSummary'
 
     availableSources:
       type: array
       items:
-        $ref: "#/components/schemas/listingSource"
+        $ref: '#/components/schemas/listingSource'
 
   parameters:
     searchLocation:
@@ -932,7 +931,7 @@ components:
       required: false
       description: Maximum monthly price of accommodations
       schema:
-        $ref: "#/components/schemas/accommodationPrice"
+        $ref: '#/components/schemas/accommodationPrice'
 
     sourcesFilter:
       name: sources
@@ -993,7 +992,7 @@ components:
       required: true
       description: ID of the listing to fetch or apply the operation on
       schema:
-        $ref: "#/components/schemas/listingId"
+        $ref: '#/components/schemas/listingId'
 
     photoId:
       name: photoId
@@ -1001,7 +1000,7 @@ components:
       required: true
       description: ID of the photo to fetch or apply the operation on
       schema:
-        $ref: "#/components/schemas/photoId"
+        $ref: '#/components/schemas/photoId'
 
     userId:
       name: userId
@@ -1009,7 +1008,7 @@ components:
       required: true
       description: ID of the user to fetch or apply the operation on
       schema:
-        $ref: "#/components/schemas/userId"
+        $ref: '#/components/schemas/userId'
 
   securitySchemes:
     bearerAuth:
