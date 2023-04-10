@@ -23,6 +23,9 @@ def register_common_blueprints(app: Flask) -> None:
     from app.listings import listings_bp
     app.register_blueprint(listings_bp)
 
+    from app.sources import sources_bp
+    app.register_blueprint(sources_bp)
+
     from app.user import users_bp
     app.register_blueprint(users_bp)
 
