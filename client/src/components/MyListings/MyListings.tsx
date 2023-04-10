@@ -2,44 +2,28 @@ import { FC, useState, useEffect } from "react";
 import { DefaultApi } from "@/generated/apis/DefaultApi";
 import { UserListingsInner as UserListingModel, UserListingsInner, UserListingsInnerTypeEnum } from "@/generated/models/UserListingsInner";
 import MyListingCard from "./MyListingCard";
+import useUser from "@/hooks/useUser"
+import useApi from "@/hooks/useApi"
   
 interface ListingByType {
     [key: string]: UserListingModel[];
   }
 
-const testData: UserListingsInner[] = [
-    {
-      type: UserListingsInnerTypeEnum.Accommodation,
-      listing: {
-        id: "1",
-        title: "Luxury apartment in the city center",
-        shortDescription: "Stylish and comfortable apartment in the heart of the city",
-        thumbnailUrl: "https://example.com/thumbnail.jpg",
-        accommodationType: "Apartment",
-        numberOfRooms: 2,
-        source: "Airbnb",
-        price: 150,
-        postCode: "12345"
-      }
-    },
-  ];
-
 const MyListings: FC = () => {
-    const [data, setData] = useState<UserListingModel[] | null>(testData);
+    const [data, setData] = useState<UserListingModel[] | null>(null);
     const [error, setError] = useState(false);
+    const { user } = useUser();
+    const { apiManager } = useApi();
 
-    // useEffect(() => {
-    //     new DefaultApi().apiV1UsersUserIdListingsGet({
-    //         userId: "123"
-    //     })
-    //     .then(res => setData(res))
-    //     .catch(() => setError(true)); 
-    // }, [])
+    useEffect(() => {
+        apiManager
+        .apiV1UsersUserIdListingsGet({ 
+            userId: user?.id as string 
+        })
+        .then(res => setData(res))
+        .catch(() => setError(true)); 
+    }, [])
 
-    /*
-        Divides the incoming data into two arrays for 'seeking' and 
-        'accommodation' type listings
-    */
     const listingByType: ListingByType | null = data && data.reduce((acc, item) => {
         if (!acc[item.type]) {
           acc[item.type] = [];

@@ -86,6 +86,12 @@ export interface UserListingsInnerListing {
      * @memberof UserListingsInnerListing
      */
     postCode: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserListingsInnerListing
+     */
+    locationName: string;
 }
 
 /**
@@ -101,6 +107,7 @@ export function instanceOfUserListingsInnerListing(value: object): boolean {
     isInstance = isInstance && "source" in value;
     isInstance = isInstance && "price" in value;
     isInstance = isInstance && "postCode" in value;
+    isInstance = isInstance && "locationName" in value;
 
     return isInstance;
 }
@@ -124,6 +131,7 @@ export function UserListingsInnerListingFromJSONTyped(json: any, ignoreDiscrimin
         'source': json['source'],
         'price': json['price'],
         'postCode': json['postCode'],
+        'locationName': json['locationName'],
     };
 }
 
@@ -145,6 +153,7 @@ export function UserListingsInnerListingToJSON(value?: UserListingsInnerListing 
         'source': value.source,
         'price': value.price,
         'postCode': value.postCode,
+        'locationName': value.locationName,
     };
 }
 

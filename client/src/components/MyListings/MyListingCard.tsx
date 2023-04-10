@@ -2,7 +2,8 @@ import { FC } from "react";
 import { useRouter } from "next/router";
 import { UserListingsInnerTypeEnum, UserListingsInner } from "@/generated/models/UserListingsInner";
 import { DefaultApi } from "@/generated/apis/DefaultApi";
-import style from "./MyListingCard.module.scss"
+import style from "./MyListingCard.module.scss";
+import useApi from "@/hooks/useApi";
 
 interface UserListingProps {
     listingInner: UserListingsInner;
@@ -11,6 +12,7 @@ interface UserListingProps {
 const MyListingCard: FC<UserListingProps> = ({listingInner}) => {
     const router = useRouter();
     const listing = listingInner.listing;
+    const {apiManager} = useApi();
 
     const redirect = (success: boolean) => {
         router.replace({
@@ -23,8 +25,9 @@ const MyListingCard: FC<UserListingProps> = ({listingInner}) => {
 
     const handleDelete = () => {
         const confirmed = window.confirm("Are you sure you want to delete this listing?");
-        
-        confirmed && new DefaultApi().apiV1ListingsAccommodationListingIdDelete({
+
+        confirmed && apiManager
+        .apiV1ListingsAccommodationListingIdDelete({ 
             listingId: listing.id,
         })
         .then(() => (redirect(true)))
