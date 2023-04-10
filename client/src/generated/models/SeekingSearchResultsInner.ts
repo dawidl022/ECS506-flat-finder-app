@@ -43,7 +43,7 @@ export interface SeekingSearchResultsInner {
      * @type {SeekingSummary}
      * @memberof SeekingSearchResultsInner
      */
-    accommodation?: SeekingSummary;
+    seeking: SeekingSummary;
 }
 
 /**
@@ -53,6 +53,7 @@ export function instanceOfSeekingSearchResultsInner(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "distance" in value;
     isInstance = isInstance && "isFavourite" in value;
+    isInstance = isInstance && "seeking" in value;
 
     return isInstance;
 }
@@ -69,7 +70,7 @@ export function SeekingSearchResultsInnerFromJSONTyped(json: any, ignoreDiscrimi
         
         'distance': json['distance'],
         'isFavourite': json['isFavourite'],
-        'accommodation': !exists(json, 'accommodation') ? undefined : SeekingSummaryFromJSON(json['accommodation']),
+        'seeking': SeekingSummaryFromJSON(json['seeking']),
     };
 }
 
@@ -84,7 +85,7 @@ export function SeekingSearchResultsInnerToJSON(value?: SeekingSearchResultsInne
         
         'distance': value.distance,
         'isFavourite': value.isFavourite,
-        'accommodation': SeekingSummaryToJSON(value.accommodation),
+        'seeking': SeekingSummaryToJSON(value.seeking),
     };
 }
 

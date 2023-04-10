@@ -5,16 +5,20 @@ import uuid
 import time
 from app.listings.exceptions import ListingNotFoundError
 from app.listings.models import (
-    AccommodationSearchResult, Address, Coordinates,
-    InternalAccommodationListing, ListingSummary, Photo, Source)
+    AccommodationSearchResult, Address, AddressFreeLocation, Coordinates,
+    InternalAccommodationListing, ListingSummary, Photo, SeekingListing,
+    SeekingSearchResult, Source)
 from app.listings.dtos import (
-    AccommodationForm, AccommodationSearchParams)
+    AccommodationForm, AccommodationSearchParams, SeekingForm,
+    SeekingSearchParams)
 from app.listings.models import AccommodationListing, Location
 from app.listings.repository import (
     AccommodationListingRepository, ListingPhotoRepository,
-    sort_and_page_listings)
+    SeekingListingRepository, sort_and_page_listings)
 from app.clients.ListingAPIClient import ListingAPIClient
 from app.clients.APIException import APIException
+from geopy.geocoders import Nominatim
+from geopy.distance import geodesic
 
 
 class BaseGeocodingService(abc.ABC):
@@ -36,20 +40,24 @@ class GeocodingService(BaseGeocodingService):
         """
         TODO turn address into coordinates using geopy module
         """
-        addr.address
-        return Coordinates(0, 0)
+        geolocator = Nominatim(user_agent="flatfinder-app")
+        location = geolocator.geocode(addr.full_address)
+        return Coordinates(location.lat, location.long)
 
     def search_coords(self, location_query: str) -> Coordinates:
         """
         TODO turn address into coordinates using geopy module
         """
-        return Coordinates(0, 0)
+        geolocator = Nominatim(user_agent="flatfinder-app")
+        location = geolocator.geocode(location_query)
+        return Coordinates(location.lat, location.long)
 
     def calc_distance(self, c1: Coordinates, c2: Coordinates) -> float:
         """
         TODO calc distance using geopy module
         """
-        return 0
+        distance = geodesic(c1, c2).km
+        return distance
 
 
 class SearchResult(NamedTuple):
@@ -95,6 +103,34 @@ class BaseListingsService(abc.ABC):
                                  ) -> list[ListingSummary]:
         pass
 
+    @abc.abstractmethod
+    def search_seeking_listings(
+        self, params: SeekingSearchParams
+    ) -> list[SeekingSearchResult]:
+        pass
+
+    @abc.abstractmethod
+    def create_seeking_listing(
+        self, form: SeekingForm, photos: list[bytes],
+        author_email: str
+    ) -> SeekingListing:
+        pass
+
+    @abc.abstractmethod
+    def get_seeking_listing(self, listing_id: uuid.UUID
+                            ) -> SeekingListing | None:
+        pass
+
+    @abc.abstractmethod
+    def update_seeking_listing(
+        self, listing_id: uuid.UUID, form: SeekingForm
+    ) -> SeekingListing:
+        pass
+
+    @abc.abstractmethod
+    def delete_seeking_listing(self, listing_id: uuid.UUID) -> None:
+        pass
+
 
 class ListingsCleanupService(abc.ABC):
     """
@@ -112,10 +148,12 @@ class ListingsService(BaseListingsService, ListingsCleanupService):
 
     def __init__(self, geocoder: BaseGeocodingService,
                  accommodation_listing_repo: AccommodationListingRepository,
+                 seeking_listing_repo: SeekingListingRepository,
                  listing_photo_repo: ListingPhotoRepository,
                  external_sources: dict[Source, ListingAPIClient]) -> None:
         self.geocoder = geocoder
         self.accommodation_listing_repo = accommodation_listing_repo
+        self.seeking_listing_repo = seeking_listing_repo
         self.listing_photo_repo = listing_photo_repo
         self.external_sources = external_sources
 
@@ -223,8 +261,10 @@ class ListingsService(BaseListingsService, ListingsCleanupService):
         updated_listing = dataclasses.replace(
             listing,
             **form.to_dict(),
-            location=dataclasses.replace(
-                listing.location, address=form.decoded_address)
+            location=Location(
+                coords=self.geocoder.get_coords(form.decoded_address),
+                address=form.decoded_address
+            )
         )
 
         self.accommodation_listing_repo.save_listing(updated_listing)
@@ -247,6 +287,84 @@ class ListingsService(BaseListingsService, ListingsCleanupService):
                 user_email
             )
         ]
+
+    def search_seeking_listings(
+        self, params: SeekingSearchParams
+    ) -> list[SeekingSearchResult]:
+        coords = self.geocoder.search_coords(params.location)
+        listings = self.seeking_listing_repo.search_by_location(
+            coords=coords,
+            radius=params.radius,
+            page=params.page,
+            size=params.size
+        )
+
+        return [SeekingSearchResult(
+            distance=self.geocoder.calc_distance(
+                coords, seeking.location.coords),
+            is_favourite=False,  # favourites not currently supported
+            seeking=seeking.summarise()
+        ) for seeking in listings]
+
+    def create_seeking_listing(
+        self, form: SeekingForm, photos: list[bytes],
+        author_email: str
+    ) -> SeekingListing:
+        listing_photos = [Photo(id=uuid.uuid4(), blob=photo)
+                          for photo in photos]
+
+        # TODO what happens when this fails due to garbage input?
+        coords = self.geocoder.search_coords(form.preferred_location)
+
+        listing = SeekingListing(
+            id=uuid.uuid4(),
+            location=AddressFreeLocation(
+                coords=coords,
+                name=form.preferred_location
+            ),
+            created_at=time.time(),
+            author_email=author_email,
+            title=form.title,
+            description=form.description,
+            photo_ids=tuple(photo.id for photo in listing_photos),
+        )
+
+        self.listing_photo_repo.save_photos(listing_photos)
+        self.seeking_listing_repo.save_listing(listing)
+
+        return listing
+
+    def get_seeking_listing(self, listing_id: uuid.UUID
+                            ) -> SeekingListing | None:
+        return self.seeking_listing_repo.get_listing_by_id(listing_id)
+
+    def update_seeking_listing(
+        self, listing_id: uuid.UUID, form: SeekingForm
+    ) -> SeekingListing:
+        listing = self.seeking_listing_repo.get_listing_by_id(listing_id)
+
+        if listing is None:
+            raise ListingNotFoundError()
+
+        # TODO what happens when this fails due to garbage input?
+        coords = self.geocoder.search_coords(form.preferred_location)
+
+        updated_listing = dataclasses.replace(
+            listing,
+            title=form.title,
+            description=form.description,
+            location=AddressFreeLocation(
+                coords=coords,
+                name=form.preferred_location,
+            )
+        )
+
+        self.seeking_listing_repo.save_listing(updated_listing)
+
+        return updated_listing
+
+    def delete_seeking_listing(self, listing_id: uuid.UUID) -> None:
+        self.seeking_listing_repo.delete_listing(listing_id)
 
     def delete_listings_authored_by(self, user_email: str) -> None:
         user_listings = self.get_listings_authored_by(user_email)
