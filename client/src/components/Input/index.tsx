@@ -19,10 +19,11 @@ const Input: React.FC<InputProps> = ({
 }) => {
   return (
     <div className={styles.wrapper}>
-      <p className={styles.label}>
+      <label htmlFor={`input-${label}`} className={styles.label}>
         {label} {isRequired && <span>*</span>}
-      </p>
+      </label>
       <input
+        id={`input-${label}`}
         placeholder={placeholder}
         value={value}
         onChange={e => setValue && setValue(e.target.value)}

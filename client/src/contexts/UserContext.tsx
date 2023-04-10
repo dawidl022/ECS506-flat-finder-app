@@ -7,14 +7,16 @@ import {
   useEffect,
   useState,
 } from "react";
-import { Configuration, DefaultApi, UserProfile } from "@/generated";
+import { UserProfile } from "@/generated";
 import { useCookies } from "react-cookie";
 import jwtDecode from "jwt-decode";
-import useApiConfig from "@/hooks/useApiConfig";
+
 import { useRouter } from "next/router";
+import useApi from "@/hooks/useApi";
 
 type JwtPayload = {
   email: string;
+  // user id
   sub: string;
 };
 
@@ -41,27 +43,25 @@ const UserContextProvider = ({ children }: UserContextProviderProps) => {
 
   const router = useRouter();
 
-  const { config, token } = useApiConfig();
+  const { apiManager, token } = useApi();
 
   const logout = () => {
     removeCookie("token");
     setUser(null);
-    router.push("/auth");
+    router.push("/login");
   };
 
   useEffect(() => {
     setIsLoading(true);
     if (!token) return setIsLoading(false);
     const payload = jwtDecode(token) as JwtPayload;
-    new DefaultApi(new Configuration(config))
-      .apiV1UsersUserIdProfileGet({ userId: payload.sub })
-      .then(res => {
-        setUser(res);
-        setIsLoading(false);
-        if (res.name === undefined) {
-          router.push("/finish-auth");
-        }
-      });
+    apiManager.apiV1UsersUserIdProfileGet({ userId: payload.sub }).then(res => {
+      setUser(res);
+      setIsLoading(false);
+      if (res.name === undefined) {
+        router.push("/finish-auth");
+      }
+    });
   }, []);
 
   // Redirect if user not signed in or didnt finish regestration

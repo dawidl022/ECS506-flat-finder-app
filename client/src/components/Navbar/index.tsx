@@ -17,8 +17,8 @@ const Navbar = () => {
           {user ? (
             <UserCard />
           ) : (
-            <Link href="/auth">
-              <p className={styles.loginBtn}>Sign up</p>
+            <Link href="/login">
+              <p className={styles.loginBtn}>Log in</p>
             </Link>
           )}
         </div>

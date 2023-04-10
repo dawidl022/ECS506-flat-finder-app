@@ -2,9 +2,9 @@ import React from "react";
 
 import styles from "./FinishAuth.module.scss";
 import Input from "@/components/Input";
-import useApiConfig from "@/hooks/useApiConfig";
-import { Configuration, DefaultApi } from "@/generated";
 import useUser from "@/hooks/useUser";
+import useApi from "@/hooks/useApi";
+import { useRouter } from "next/router";
 
 interface UserInput {
   firstName: string;
@@ -13,7 +13,8 @@ interface UserInput {
 }
 
 const FinishAuth = () => {
-  const [userData, setUser] = React.useState<UserInput>({
+  const router = useRouter();
+  const [userProfile, setUserProfile] = React.useState<UserInput>({
     firstName: "",
     lastName: "",
     phone: "",
@@ -21,23 +22,28 @@ const FinishAuth = () => {
 
   const { user } = useUser();
 
-  const { config } = useApiConfig();
+  const { apiManager } = useApi();
 
   const handleFinishRegistration = () => {
     // TODO: handle error
-    if (!userData.firstName || !userData.lastName || !userData.phone) return;
-    console.log(userData.firstName + " " + userData.lastName);
+    if (!userProfile.firstName || !userProfile.lastName || !userProfile.phone)
+      return;
+    console.log(userProfile.firstName + " " + userProfile.lastName);
 
-    // FIX:
-    new DefaultApi(new Configuration(config))
+    apiManager
       .apiV1UsersUserIdProfilePut({
         userId: user?.id as string,
         userProfileForm: {
-          name: userData.firstName + " " + userData.lastName,
-          contactDetails: {},
+          name: userProfile.firstName + " " + userProfile.lastName,
+          contactDetails: {
+            phoneNumber: userProfile.phone,
+          },
         },
       })
-      .then(res => console.log(res));
+      .then(res => {
+        router.push("/");
+      })
+      .catch(err => alert(err));
   };
 
   return (
@@ -50,9 +56,9 @@ const FinishAuth = () => {
               label="First name"
               placeholder="Enter your first name"
               isRequired
-              value={userData.firstName}
+              value={userProfile.firstName}
               setValue={(val: string) =>
-                setUser(prev => {
+                setUserProfile(prev => {
                   return { ...prev, firstName: val };
                 })
               }
@@ -62,9 +68,9 @@ const FinishAuth = () => {
               label="Last name"
               placeholder="Enter your last name"
               isRequired
-              value={userData.lastName}
+              value={userProfile.lastName}
               setValue={(val: string) =>
-                setUser(prev => {
+                setUserProfile(prev => {
                   return { ...prev, lastName: val };
                 })
               }
@@ -75,9 +81,9 @@ const FinishAuth = () => {
             label="Phone"
             placeholder="Enter your phone"
             isRequired
-            value={userData.phone}
+            value={userProfile.phone}
             setValue={(val: string) =>
-              setUser(prev => {
+              setUserProfile(prev => {
                 return { ...prev, phone: val };
               })
             }

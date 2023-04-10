@@ -3,6 +3,7 @@ import React, { useRef, useState } from "react";
 import styles from "./UserCard.module.scss";
 import { useRouter } from "next/router";
 import useUser from "@/hooks/useUser";
+import AvatarPlaceholder from "@/components/AvatarPlaceholder";
 
 const UserCard = () => {
   const router = useRouter();
@@ -43,8 +44,14 @@ const UserCard = () => {
         onClick={() => setIsOpen(prev => !prev)}
         className={styles.wrapper}
       >
-        <p>{user?.email}</p>
-        <div className={styles.avaCon} />
+        <p>
+          {user?.name?.split(" ")[0] + " " + user?.name?.split(" ")[1][0] + "."}
+        </p>
+        <AvatarPlaceholder
+          size={42}
+          addStyles={{ margin: "0 6px 0 12px" }}
+          name={user?.name as string}
+        />
         <div className={styles.arrCon}>
           <img
             style={isOpen ? { transform: "scaleY(-1)" } : {}}

@@ -2,17 +2,27 @@ import ProfileCard from "@/components/ProfileCard";
 import { GetServerSideProps, GetServerSidePropsContext, NextPage } from "next";
 
 import React from "react";
-import { User } from "@/generated";
+import { UserProfile } from "@/generated";
+import useApi from "@/hooks/useApi";
+
+import * as cookie from "cookie";
+import useUser from "@/hooks/useUser";
 
 interface UserProfileProps {
-  userData: User;
+  userData: UserProfile;
 }
 
 const UserProfile: NextPage<UserProfileProps> = ({ userData }) => {
-  console.log(userData);
+  const { user } = useUser();
+  const isMe = user?.id === userData.id;
   return (
     <div className="container">
-      <ProfileCard userData={userData} />
+      {userData.id ? (
+        <ProfileCard isMe={isMe} userData={userData} />
+      ) : (
+        // TODO: nice message
+        <p>No such a user</p>
+      )}
     </div>
   );
 };
@@ -23,14 +33,19 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const { userId }: any = context.params;
+  const token = cookie.parse(context.req.headers.cookie as string).token;
+
+  const { apiManager } = useApi(token);
+  let result;
+  try {
+    const res = await apiManager.apiV1UsersUserIdProfileGet({ userId });
+    result = res;
+  } catch (error) {}
+
   return {
     props: {
       userData: {
-        id: userId,
-        name: userId,
-        email: "somegmail@gmail.com",
-        phone: "+2924242",
-        somethingelse: "smth",
+        ...result,
       },
     },
   };
