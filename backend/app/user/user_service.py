@@ -37,7 +37,18 @@ class BaseUserService(ABC):
         pass
 
 
-class UserService(BaseUserService):
+class AdminService(ABC):
+
+    @abstractmethod
+    def grant_admin(self, user_id: UUID) -> None:
+        pass
+
+    @abstractmethod
+    def revoke_admin(self, user_id: UUID) -> None:
+        pass
+
+
+class UserService(BaseUserService, AdminService):
 
     def __init__(
         self, repo: UserRepository,
@@ -75,9 +86,25 @@ class UserService(BaseUserService):
         return self.repo.get_all_users()
 
     def deregister_user(self, user_id: UUID) -> None:
-        user = self.get_user(user_id)
-        if user is None:
-            raise UserNotFoundError()
+        user = self._must_get_user(user_id)
 
         self.listings_service.delete_listings_authored_by(user.email)
         self.repo.delete_user(user_id)
+
+    def grant_admin(self, user_id: UUID) -> None:
+        user = self._must_get_user(user_id)
+
+        updated_user = dataclasses.replace(user, is_admin=True)
+        self.repo.save_user(updated_user)
+
+    def revoke_admin(self, user_id: UUID) -> None:
+        user = self._must_get_user(user_id)
+
+        updated_user = dataclasses.replace(user, is_admin=False)
+        self.repo.save_user(updated_user)
+
+    def _must_get_user(self, user_id: UUID) -> User:
+        user = self.get_user(user_id)
+        if user is None:
+            raise UserNotFoundError()
+        return user

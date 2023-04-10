@@ -386,6 +386,9 @@ paths:
             User granted admin privileges successfully. No content to return.
         "403":
           description: Forbidden. Logged in user is not an admin.
+        "404":
+          description: >-
+            User with given ID does not exist.
 
     delete:
       summary: Revoke admin privileges from user
@@ -397,6 +400,9 @@ paths:
             User revoked admin privileges successfully. No content to return.
         "403":
           description: Forbidden. Logged in user is not an admin.
+        "404":
+          description: >-
+            User with given ID does not exist.
 
 components:
   schemas:
