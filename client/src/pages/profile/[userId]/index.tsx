@@ -1,7 +1,7 @@
 import ProfileCard from "@/components/ProfileCard";
 import { GetServerSideProps, GetServerSidePropsContext, NextPage } from "next";
-
-import React from "react";
+import { useRouter } from "next/router";
+import { useState, useEffect } from "react";
 import { User } from "@/generated";
 
 interface UserProfileProps {
@@ -9,9 +9,20 @@ interface UserProfileProps {
 }
 
 const UserProfile: NextPage<UserProfileProps> = ({ userData }) => {
-  console.log(userData);
+  const router = useRouter();
+  const [success, setSuccess] = useState<boolean | undefined>(false);
+  const [error, setError] = useState<boolean | undefined>(false);
+
+  useEffect(() => {
+    const query = router.query.success;
+    if (query === "true") { setSuccess(true) };
+    if (query === "false") { setError(true) };
+  }, [router.query]);
+  
   return (
     <div className="container">
+      {success && <p>Successfully deleted listing</p>}
+      {error && <p>Error: could not delete listing</p>}
       <ProfileCard userData={userData} />
     </div>
   );

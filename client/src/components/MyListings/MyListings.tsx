@@ -62,7 +62,7 @@ const MyListings: FC = () => {
                         {listings.length > 0 && listings.map((listingInner) => (
                             <MyListingCard 
                                 key={listingInner.listing.id}
-                                listing={listingInner.listing}
+                                listingInner={listingInner}
                             />
                         ))}
                     </div>
