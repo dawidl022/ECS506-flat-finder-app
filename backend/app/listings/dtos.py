@@ -16,7 +16,7 @@ from app.listings.models import (
     AccommodationSearchResult, AccommodationSummary, Country,
     ExternalAccommodationListing, ExternalAccommodationSummary,
     InternalAccommodationListing, InternalAccommodationSummary, ListingSummary,
-    ListingType, SortBy, Source, UKAddress)
+    ListingType, SeekingListing, SeekingSearchResult, SeekingSummary, SortBy, Source, UKAddress)
 from app.util.encoding import CamelCaseDecoder
 from app.listings.models import Address, AccommodationListing
 
@@ -156,7 +156,7 @@ class SeekingForm(Schemable):
 
 
 class AuthorDTO:
-    def __init__(self, author: User | None, author_name: str | None) -> None:
+    def __init__(self, author: User | None, author_name: str | None = None) -> None:
         self.name = author.name if author else author_name
         self.userProfile = UserDTO(author) if author else None
 
@@ -214,6 +214,25 @@ class AccommodationListingDTO:
         return None
 
 
+class SeekingListingDTO:
+    def __init__(self, listing: SeekingListing, author: User):
+        self.id = f"internal_{listing.id}"
+        self.title = listing.title
+        self.description = listing.description
+        self.photo_urls = self.get_photo_urls(listing)
+        self.preferred_location = listing.location
+        self.author = AuthorDTO(author)
+        self.contact_info = ContactInfoDTO(author)
+
+    @staticmethod
+    def get_photo_urls(listing: SeekingListing) -> list[str]:
+        return [
+            url_for("listings.get_listing_photo",
+                    listing_id=listing.id, photo_id=id)
+            for id in listing.photo_ids
+        ]
+
+
 @dataclass
 class AccommodationSummaryDTO:
     id: str
@@ -251,8 +270,27 @@ class AccommodationSummaryDTO:
 
 @dataclass
 class SeekingSummaryDTO:
-    # TODO
-    pass
+    id: str
+    title: str
+    short_description: str
+    thumbnail_url: str | None
+    location_name: str
+
+    def __init__(self, summary: SeekingSummary):
+        self.id = f"internal_{summary.id}"
+        self.title = summary.title
+        self.short_description = summary.short_description
+        self.thumbnail_url = self.get_thumbnail_url(summary)
+        self.location_name = summary.location_name
+
+    @staticmethod
+    def get_thumbnail_url(summary: SeekingSummary) -> str | None:
+        if summary.thumbnail_id is not None:
+            return url_for(
+                "listings.get_listing_photo",
+                listing_id=summary.id, photo_id=summary.thumbnail_id
+            )
+        return None
 
 
 @dataclass
@@ -287,7 +325,19 @@ class AccommodationSearchResultDTO:
         self.accommodation = AccommodationSummaryDTO(result.accommodation)
 
 
-@ dataclass(frozen=True)
+@dataclass(frozen=True)
 class SearchResultDTO:
     sources: list[SourceDTO]
     search_results: list[AccommodationSearchResultDTO]
+
+
+@dataclass
+class SeekingSearchResultDTO:
+    distance: float
+    is_favourite: bool
+    accommodation: SeekingSummaryDTO
+
+    def __init__(self, result: SeekingSearchResult):
+        self.distance = result.distance
+        self.is_favourite = result.is_favourite
+        self.accommodation = SeekingSummaryDTO(result.seeking)

@@ -54,6 +54,7 @@ class SeekingSummary(ListingSummary):
     title: str
     short_description: str
     thumbnail_id: UUID | None
+    location_name: str
 
     @classmethod
     def listing_type(cls) -> ListingType:
@@ -288,5 +289,6 @@ class SeekingListing(Listing):
             title=self.title,
             short_description=self.description,
             thumbnail_id=(self.photo_ids[0] if len(
-                self.photo_ids) > 0 else None)
+                self.photo_ids) > 0 else None),
+            location_name=self.location.name
         )
