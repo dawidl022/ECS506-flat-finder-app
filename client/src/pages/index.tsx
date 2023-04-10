@@ -3,8 +3,7 @@ import Image from "next/image";
 import { Inter } from "@next/font/google";
 import styles from "@/styles/Home.module.scss";
 import Tabs from "@/components/Tabs";
-import ListingForm from "@/components/ListingForm/ListingForm";
-
+import Filter from "@/components/Filter/Filter";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
@@ -20,7 +19,9 @@ export default function Home() {
       <main>
         <div className="container">
           <h2>Hello</h2>
-          <ListingForm />
+          <Tabs tabs={["1", "2"]} />
+          {/* <Filter /> */}
+          <div>{/* Infinite scroll */}</div>
         </div>
       </main>
     </>
