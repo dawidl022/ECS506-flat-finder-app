@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from "react";
 import { DefaultApi } from "@/generated/apis/DefaultApi";
-import { AccommodationDetails as AccommodationDetailsModel } from "@/generated/models/AccommodationDetails";
 import AccommodationDetails from "./AccommodationDetails";
+import { Accommodation } from "@/generated";
 
 interface AccommodationDetailsProps {
   listingId: string;
@@ -10,7 +10,7 @@ interface AccommodationDetailsProps {
 const FetchedAccommodationDetails: FC<AccommodationDetailsProps> = ({
   listingId,
 }) => {
-  const [data, setData] = useState<AccommodationDetailsModel | null>(null);
+  const [data, setData] = useState<Accommodation | null>(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const FetchedAccommodationDetails: FC<AccommodationDetailsProps> = ({
       ) : !data ? (
         <p>Loading</p>
       ) : (
-        <AccommodationDetails accommodation={data.accommodation} />
+        <AccommodationDetails accommodation={data} />
       )}
     </div>
   );

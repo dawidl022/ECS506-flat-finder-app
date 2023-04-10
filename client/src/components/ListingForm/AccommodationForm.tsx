@@ -52,16 +52,16 @@ const AccommodationForm: FC<FormProps> = ({
       api
         .apiV1ListingsAccommodationListingIdGet({ listingId })
         .then(res => {
-          setTitle(res.accommodation.title);
-          setDescription(res.accommodation.description);
-          setLine1(res.accommodation.address.line1);
+          setTitle(res.title);
+          setDescription(res.description);
+          setLine1(res.address.line1);
           //as line2 is optional, check if there is an input
-          setLine2(res.accommodation.address.line2 ?? "");
-          setTown(res.accommodation.address.town);
-          setPostCode(res.accommodation.address.postCode);
-          setAccommodationType(res.accommodation.accommodationType);
-          setNumberOfRooms(res.accommodation.numberOfRooms);
-          setPrice(res.accommodation.price);
+          setLine2(res.address.line2 ?? "");
+          setTown(res.address.town);
+          setPostCode(res.address.postCode);
+          setAccommodationType(res.accommodationType);
+          setNumberOfRooms(res.numberOfRooms);
+          setPrice(res.price);
         })
         .catch(err => {
           alert(

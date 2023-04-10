@@ -94,7 +94,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/accommodationDetails'
+                $ref: '#/components/schemas/accommodation'
         '404':
           description: Listing not found
 
@@ -117,7 +117,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/accommodationDetails'
+                $ref: '#/components/schemas/accommodation'
         '403':
           description: Forbidden. User has no rights to edit listing.
         '404':
@@ -170,7 +170,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/seekingDetails'
+                $ref: '#/components/schemas/seeking'
 
   /api/v1/listings/seeking/{listingId}:
     get:
@@ -183,7 +183,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/seekingDetails'
+                $ref: '#/components/schemas/seeking'
         '404':
           description: Listing not found
 
@@ -206,7 +206,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/seekingDetails'
+                $ref: '#/components/schemas/seeking'
         '403':
           description: Forbidden. User has no rights to edit listing.
         '404':
@@ -464,17 +464,6 @@ components:
           seeking:
             $ref: '#/components/schemas/seekingSummary'
 
-    accommodationDetails:
-      type: object
-      required:
-        - isFavourite
-        - accommodation
-      properties:
-        isFavourite:
-          $ref: '#/components/schemas/isFavourite'
-        accommodation:
-          $ref: '#/components/schemas/accommodation'
-
     distance:
       type: number
       description: Listing's distance in km from search location
@@ -621,17 +610,6 @@ components:
           $ref: '#/components/schemas/listingThumbnailUrl'
         locationName:
           type: string
-
-    seekingDetails:
-      type: object
-      required:
-        - isFavourite
-        - seeking
-      properties:
-        isFavourite:
-          $ref: '#/components/schemas/isFavourite'
-        seeking:
-          $ref: '#/components/schemas/seeking'
 
     seeking:
       type: object

@@ -20,13 +20,20 @@ const MyListings: FC = () => {
   const { apiManager } = useApi();
 
   useEffect(() => {
-    apiManager
-      .apiV1UsersUserIdListingsGet({
-        userId: user?.id as string,
-      })
-      .then(res => setData(res))
-      .catch(() => setError(true));
-  }, []);
+    if (user?.id) {
+      apiManager
+        .apiV1UsersUserIdListingsGet({
+          userId: user?.id as string,
+        })
+        .then(res => {
+          setData(res);
+        })
+        .catch(err => {
+          console.log(err);
+          setError(true);
+        });
+    }
+  }, [user]);
 
   const listingByType: ListingByType | null =
     data &&

@@ -10,7 +10,7 @@ from werkzeug.datastructures import FileStorage
 from app.auth.jwt import get_current_user_email, get_current_user_id
 from app.listings.exceptions import ListingNotFoundError
 
-from app.util.marshmallow import get_form, get_params, get_input
+from app.util.marshmallow import get_form, get_params, get_input, get_body
 from app.util.encoding import CamelCaseEncoder
 from app.util.encoding import CamelCaseDecoder
 from app.clients.APIException import APIException
@@ -267,10 +267,10 @@ def get_author(user_service, source, listing):
 @jwt_required()
 def put_accommodation_listing(
         listing_id: str,
-        listing_service: BaseListingsService,
+        listing_service: BaseListingsService, 
         user_service: BaseUserService
 ) -> Response:
-    form = validate_and_get_create_accommodation_form()
+    form = get_body(AccommodationForm)
 
     listing = get_accommodation_listing_authored_by_current_user(
         listing_id, listing_service, action="update")
@@ -294,7 +294,7 @@ def put_seeking_listing(
         listing_service: BaseListingsService,
         user_service: BaseUserService
 ) -> Response:
-    form = get_form(SeekingForm)
+    form = get_body(SeekingForm)
 
     listing = get_seeking_listing_authored_by_current_user(
         listing_id, listing_service, action="update")

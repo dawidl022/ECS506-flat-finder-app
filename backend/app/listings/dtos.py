@@ -304,6 +304,9 @@ class ListingSummaryDTO:
         if isinstance(summary, AccommodationSummary):
             self.type = ListingType.accommodation
             self.listing = AccommodationSummaryDTO(summary)
+        if isinstance(summary, SeekingSummary):
+            self.type = ListingType.seeking
+            self.listing = SeekingSummaryDTO(summary)
         else:
             raise TypeError("unsupported ListingSummary subtype")
 
