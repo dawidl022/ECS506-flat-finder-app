@@ -1,5 +1,8 @@
 import unittest
 import uuid
+from app.listings.dtos import AccommodationForm, AccommodationSearchParams
+from app.listings.models import AccommodationListing, ListingSummary, Source
+from app.listings.service import ListingsCleanupService, BaseListingsService, SearchResult
 from app.user.user_dtos import UserProfileForm
 
 from app.user.user_models import ContactDetails, User
@@ -9,8 +12,14 @@ from app.user.user_service import UserNotFoundError, UserService
 
 class TestUserClass(unittest.TestCase):
 
+    class StubListingsService(ListingsCleanupService):
+        def delete_listings_authored_by(self, user_email: str):
+            # TODO
+            pass
+
     def setUp(self) -> None:
-        self.service = UserService(InMemoryUserRepository())
+        self.service = UserService(
+            InMemoryUserRepository(), self.StubListingsService())
 
     def test_get_user_id_for_email__given_user_not_registered__registers_user_and_returns_id(self):
         user_id1 = self.service.get_user_id_for_email("email1@example.com")
