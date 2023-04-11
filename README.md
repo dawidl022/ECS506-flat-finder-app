@@ -2,6 +2,8 @@
 
 [Full Requirements](docs/requirements/requirements.md)
 
+[Acceptance tests document](docs/prototype/acceptance-tests.md)
+
 ## UML Diagrams
 
 ### Use Case Diagram
