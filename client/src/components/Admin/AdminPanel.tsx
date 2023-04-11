@@ -115,6 +115,8 @@ const AdminPanel: FC = () => {
               <th>Name</th>
               <th>Email</th>
               <th>Admin </th>
+              <th>Remove User</th>
+              <th>Admin Command</th>
             </tr>
           </thead>
           <tbody>
