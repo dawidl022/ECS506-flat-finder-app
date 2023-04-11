@@ -7,6 +7,8 @@ import useApi from "@/hooks/useApi";
 import { User } from "@/generated";
 import useUser from "@/hooks/useUser";
 
+import styles from "./Admin.module.scss";
+
 const AdminPanel: FC = () => {
   const { apiManager } = useApi();
   const { user: currentUser } = useUser();
@@ -105,7 +107,7 @@ const AdminPanel: FC = () => {
     return <p>Error fetching data</p>;
   } else {
     return (
-      <div>
+      <div className={styles.wrapper}>
         {/* get each user and display their email */}
         <table>
           <tr>
