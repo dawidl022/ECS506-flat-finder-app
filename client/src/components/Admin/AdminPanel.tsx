@@ -96,8 +96,6 @@ const AdminPanel: FC = () => {
     return (
       <div>
         <p> Administrator Access Only </p>
-        {/* TODO: */}
-        {/* <button type="button" onClick={() => (window.location.href = "/")}> */}
         <button type="button" onClick={() => router.push("/")}>
           Return To Homepage
         </button>

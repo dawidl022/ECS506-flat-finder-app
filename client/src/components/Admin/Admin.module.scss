@@ -1,7 +1,35 @@
 .wrapper {
   width: 100%;
+}
 
-  //   table {
-  //     width: 100%;
-  //   }
+.wrapper th {
+  width: 10%;
+  border-radius: 8px;
+  overflow: hidden;
+  -webkit-box-shadow: 0px 5px 10px 0px rgba(202, 201, 251, 0.8);
+  -moz-box-shadow: 0px 5px 10px 0px rgba(202, 201, 251, 0.8);
+  box-shadow: 0px 5px 10px 0px rgba(202, 201, 251, 0.8);
+  border: 1px solid rgba(202, 201, 251, 0.8);
+  padding: 16px 12px;
+}
+
+.wrapper td {
+  width: 10%;
+  border-radius: 8px;
+  overflow: hidden;
+  -webkit-box-shadow: 0px 5px 10px 0px rgba(202, 201, 251, 0.8);
+  -moz-box-shadow: 0px 5px 10px 0px rgba(202, 201, 251, 0.8);
+  box-shadow: 0px 5px 10px 0px rgba(202, 201, 251, 0.8);
+  border: 1px solid rgba(202, 201, 251, 0.8);
+  padding: 16px 12px;
+}
+
+.wrapper button {
+  background-color: transparent;
+  cursor: pointer;
+  text-align: center;
+  border: none;
+  display: block;
+  width: 100%;
+  font-size: 13px;
 }

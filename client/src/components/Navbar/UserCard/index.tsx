@@ -92,7 +92,7 @@ const UserCard = () => {
               className={styles.menuItem}
               onClick={() => {
                 setIsOpen(false);
-                router.push("/listings");
+                router.push("/admin");
               }}
             >
               <div className={styles.iconCon}>
