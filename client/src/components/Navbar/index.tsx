@@ -1,5 +1,4 @@
 import React from "react";
-
 import styles from "./Navbar.module.scss";
 import UserCard from "./UserCard";
 import Link from "next/link";
@@ -28,7 +27,7 @@ const Navbar = () => {
       <div className="container">
         <div className={styles.navbarInner}>
           <Link href="/">
-            <h1>Logo</h1>
+            <img src="/FDM.png" alt="logo" className={styles.logo} />
           </Link>
           {user ? (
             <UserCard />
