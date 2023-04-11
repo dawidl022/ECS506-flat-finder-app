@@ -1,0 +1,40 @@
+.wrapper {
+  margin-top: 12px;
+  form {
+    label {
+      display: block;
+      margin-bottom: 6px;
+    }
+    .locationInput,
+    .select {
+      border: 1px #4286f49a solid;
+      border-radius: 4px;
+      outline: none;
+      padding: 4px 8px;
+      width: 100%;
+      margin-bottom: 12px;
+      &:focus {
+        border: 1px #4285f4 solid;
+
+        box-shadow: 0 0 2px #4285f4;
+      }
+    }
+
+    button {
+      width: 100%;
+      padding: 8px;
+      border-radius: 4px;
+      background-color: #4285f4;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.1s ease-in-out;
+
+      &:hover {
+        background-color: lighten(#4285f4, 5%);
+      }
+      &:active {
+        transform: translateY(2px);
+      }
+    }
+  }
+}

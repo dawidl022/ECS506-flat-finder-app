@@ -21,8 +21,8 @@ export default function Home() {
 
       <main>
         <div className="container">
-          <h2>Hello</h2>
-          <Tabs tabs={["1", "2"]} />
+          {/* <h2>Hello</h2> */}
+          {/* <Tabs tabs={["1", "2"]} /> */}
           {/* <Filter /> */}
           <div>
             {/* <InfiniteListings location="london" radius={10000000} /> */}

@@ -1,5 +1,7 @@
 import { FC, useState, FormEvent } from "react";
 
+import styles from "./Search.module.scss";
+
 interface Search {
   handleSubmit: (location: string, radius: number) => void;
 }
@@ -14,10 +16,11 @@ const SearchComponent: FC<Search> = ({ handleSubmit }) => {
   };
 
   return (
-    <div>
+    <div className={styles.wrapper}>
       <form onSubmit={submitInputs}>
         <label htmlFor="loc">Location:</label>
         <input
+          className={styles.locationInput}
           id="loc"
           type="text"
           placeholder="location"
@@ -27,6 +30,7 @@ const SearchComponent: FC<Search> = ({ handleSubmit }) => {
         />
         <label htmlFor="radius">Radius:</label>
         <select
+          className={styles.select}
           id="radius"
           value={radius}
           onChange={e => setTargetRadius(parseFloat(e.target.value))}

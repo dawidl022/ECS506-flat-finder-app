@@ -16,17 +16,29 @@ const AccommodationSummaryTile: FC<AccommodationSummaryProps> = ({
       <Link href={`/listings/accommodation/${accommodation.id}`}>
         <img
           src={accommodation.thumbnailUrl}
-          width={150}
-          height={150}
           alt={`listing ${accommodation.id}`}
         />
-        <p> {accommodation.title} </p>
-        <p> {`£${accommodation.price}`} </p>
-        {/* <p> {accommodation.shortDescription} </p> */}
-        <p> {accommodation.accommodationType} </p>
-        <p> {accommodation.numberOfRooms} </p>
-        <p> {accommodation.postCode} </p>
-        <p> {accommodation.source} </p>
+        <div className={styles.body}>
+          <div className={styles.header}>
+            <p className={styles.title}>{accommodation.title}</p>
+            <p className={styles.price}>{`£${accommodation.price}`}</p>
+          </div>
+          {/* <p> {accommodation.shortDescription} </p> */}
+          <div className={styles.moreDetails}>
+            <p>
+              <span>Accommodation type:</span> {accommodation.accommodationType}{" "}
+            </p>
+            <p>
+              <span>rooms number:</span> {accommodation.numberOfRooms}{" "}
+            </p>
+            <p>
+              <span>postcode:</span> {accommodation.postCode}{" "}
+            </p>
+            <p>
+              <span>source:</span> {accommodation.source}{" "}
+            </p>
+          </div>
+        </div>
       </Link>
     </div>
   );

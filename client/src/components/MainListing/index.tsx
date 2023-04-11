@@ -42,12 +42,12 @@ const MainListings = () => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.filters}>
-        <SearchComponent handleSubmit={search} />
         <Filter
           sources={sources}
           maxPrice={maxPrice}
           handleApply={applyFilters}
         />
+        <SearchComponent handleSubmit={search} />
       </div>
       <main className={styles.main}>
         {isSubmitted && (

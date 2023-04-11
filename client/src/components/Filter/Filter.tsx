@@ -1,5 +1,7 @@
 import { FC, FormEvent, useEffect, useState } from "react";
 
+import styles from "./Filter.module.scss";
+
 interface FilterProps {
   sources: { [key: string]: boolean };
   maxPrice?: number;
@@ -22,10 +24,13 @@ const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
   }, [sources]);
 
   return (
-    <div>
+    <div className={styles.wrapper}>
       <form onSubmit={e => e.preventDefault()}>
-        <label htmlFor="maxPrice">Max Price: </label>
+        <label className={styles.maxPriceLabel} htmlFor="maxPrice">
+          Max Price:{" "}
+        </label>
         <input
+          className={styles.maxPriceInput}
           type="number"
           name="maxPrice"
           id="maxPrice"
@@ -46,6 +51,7 @@ const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
                     name={source}
                     id={source}
                     checked={chooseSources[source]}
+                    className={styles.checkbox}
                     onChange={() =>
                       setSource({
                         ...chooseSources,

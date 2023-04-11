@@ -26,6 +26,7 @@ const Listing: FC<AccommodationDetailsProps> = ({
   size = 9,
 }) => {
   const [data, setData] = useState<Array<AccommodationSearchResultsInner>>([]);
+  // CHANGE
   const [isLoading, setIsLoading] = useState(true);
   const { apiManager } = useApi();
   const [pageNumber, setPageNumber] = React.useState(0);
@@ -67,6 +68,7 @@ const Listing: FC<AccommodationDetailsProps> = ({
         size,
       })
       .then(res => {
+        console.log(res);
         setData(prev => {
           const prevIds = prev.map(listing => listing.accommodation.id);
           const finalResult = res.searchResults.filter(
@@ -90,8 +92,7 @@ const Listing: FC<AccommodationDetailsProps> = ({
   };
 
   useEffect(() => {
-    if (attempts > 0) {
-      //   console.log(attempts);
+    if (attempts > 0 && pageNumber === 0) {
       getMoreAccommodation();
     }
   }, [pageNumber]);
@@ -102,6 +103,18 @@ const Listing: FC<AccommodationDetailsProps> = ({
 
   return (
     <div className={styles.listingWrapper}>
+      {/* <AccommodationSummaryTile
+        accommodation={{
+          id: "1",
+          shortDescription: "lorem ipsum 30",
+          title: "Test 1",
+          price: 120,
+          accommodationType: "Test",
+          postCode: "E11 444",
+          numberOfRooms: 2,
+          source: "Test thing",
+        }}
+      /> */}
       {data.map((item, index) => {
         return (
           <div key={index}>
