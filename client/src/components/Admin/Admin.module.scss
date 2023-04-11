@@ -2,6 +2,12 @@
   width: 100%;
 }
 
+.wrapper table {
+  border-collapse: separate;
+  border-spacing: 10px 5px;
+
+}
+
 .wrapper th {
   width: 10%;
   border-radius: 8px;
@@ -30,6 +36,15 @@
   text-align: center;
   border: none;
   display: block;
-  width: 100%;
+  width: 105%;
+  padding-left: 10px; padding-right: 10px;
   font-size: 13px;
+}
+
+.adminGrant  {
+  background-color: rgb(14, 187, 57);
+}
+
+.adminRevoke  {
+  background-color: rgb(235, 104, 104);
 }

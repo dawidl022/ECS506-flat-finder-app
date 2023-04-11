@@ -132,7 +132,7 @@ const AdminPanel: FC = () => {
                     {user.id === currentUser?.id ? (
                       <td></td>
                     ) : (
-                      <td>
+                      <td className={styles.adminRevoke}>
                         <button
                           type="button"
                           onClick={() => removeUserFromSystem(user)}
@@ -146,7 +146,7 @@ const AdminPanel: FC = () => {
                         {user.id === currentUser?.id ? (
                           <td></td>
                         ) : (
-                          <td>
+                          <td className={styles.adminRevoke}>
                             <button
                               type="button"
                               onClick={() => {
@@ -159,8 +159,8 @@ const AdminPanel: FC = () => {
                         )}
                       </>
                     ) : (
-                      <td>
-                        <button
+                      <td className={styles.adminGrant}>
+                      <button
                           type="button"
                           onClick={() => {
                             grantAdmin(user);

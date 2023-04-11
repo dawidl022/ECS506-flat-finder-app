@@ -28,7 +28,6 @@ const UserCard = () => {
   };
 
   React.useEffect(() => {
-    console.log("123");
     if (user?.id) checkIsAdmin();
   }, [user]);
 
