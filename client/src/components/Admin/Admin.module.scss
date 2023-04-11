@@ -5,7 +5,6 @@
 .wrapper table {
   border-collapse: separate;
   border-spacing: 10px 5px;
-
 }
 
 .wrapper th {
@@ -37,14 +36,15 @@
   border: none;
   display: block;
   width: 105%;
-  padding-left: 10px; padding-right: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
   font-size: 13px;
 }
 
-.adminGrant  {
+.adminGrant {
   background-color: rgb(14, 187, 57);
 }
 
-.adminRevoke  {
+.adminRevoke {
   background-color: rgb(235, 104, 104);
 }

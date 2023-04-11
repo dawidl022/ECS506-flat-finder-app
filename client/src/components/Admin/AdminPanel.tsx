@@ -160,7 +160,7 @@ const AdminPanel: FC = () => {
                       </>
                     ) : (
                       <td className={styles.adminGrant}>
-                      <button
+                        <button
                           type="button"
                           onClick={() => {
                             grantAdmin(user);
