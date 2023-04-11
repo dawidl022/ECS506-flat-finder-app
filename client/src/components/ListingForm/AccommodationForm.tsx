@@ -30,6 +30,8 @@ const AccommodationForm: FC<FormProps> = ({
   const [numberOfRooms, setNumberOfRooms] = useState(0);
   const [price, setPrice] = useState(0);
 
+  const [photos, setPhotos] = useState<Blob[]>();
+
   const { apiManager: api } = useApi();
 
   const baseForm = {
@@ -111,7 +113,7 @@ const AccommodationForm: FC<FormProps> = ({
       api
         .apiV1ListingsAccommodationPost({
           ...baseForm,
-          photos: Array<Blob>(),
+          photos: photos ?? [],
         })
         .then(() => router.push({ pathname: "/myListings" }))
 
@@ -256,7 +258,12 @@ const AccommodationForm: FC<FormProps> = ({
             <label htmlFor="photos">Photos:{""}</label>
             <input
               type="file"
-              onChange={handleFileInput}
+              onChange={e => {
+                if (e.target.files != null) {
+                  handleFileInput(e); // TODO rename function
+                  setPhotos(Array.from(e.target.files));
+                }
+              }}
               id="photos"
               accept="image/*"
               multiple

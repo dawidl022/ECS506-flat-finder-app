@@ -80,7 +80,7 @@ class SeekingSearchParams(Schemable):
 
 def validate_address(addr: str) -> dict[str, str]:
     address = cast(
-        dict[str, str], CamelCaseDecoder.snake_casify(json.loads(addr)))
+        dict[str, str], CamelCaseDecoder.snake_casify(json.loads(addr)) if isinstance(addr, str) else addr)
     country = address.get("country")
     if country is None:
         raise marshmallow.ValidationError(
@@ -118,13 +118,15 @@ class AccommodationForm(Schemable):
     accommodation_type: str
     number_of_rooms: int
     price: int
-    address: str
+    address: str | Address
 
     @property
     def decoded_address(self) -> Address:
         address = cast(
             dict[str, str],
-            CamelCaseDecoder.snake_casify(json.loads(self.address))
+            CamelCaseDecoder.snake_casify(
+            json.loads(self.address) if isinstance(self.address, str) else self.address
+            )
         )
         country = address["country"]
 
@@ -301,14 +303,14 @@ class ListingSummaryDTO:
     listing: AccommodationSummaryDTO | SeekingSummaryDTO
 
     def __init__(self, summary: ListingSummary):
-        if isinstance(summary, AccommodationSummary):
-            self.type = ListingType.accommodation
-            self.listing = AccommodationSummaryDTO(summary)
+        print(summary)
         if isinstance(summary, SeekingSummary):
             self.type = ListingType.seeking
             self.listing = SeekingSummaryDTO(summary)
         else:
-            raise TypeError("unsupported ListingSummary subtype")
+            self.type = ListingType.accommodation
+            self.listing = AccommodationSummaryDTO(summary)
+        #     raise TypeError("unsupported ListingSummary subtype")
 
 
 @dataclass(frozen=True)

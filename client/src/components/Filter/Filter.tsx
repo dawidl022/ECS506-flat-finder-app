@@ -11,10 +11,9 @@ const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
   //set the max price to blank if the prop is null
   const [price, setPrice] = useState(maxPrice ? maxPrice.toString() : "");
 
-  useEffect(
-    () => handleApply(chooseSources, parseInt(price) || undefined),
-    [chooseSources, price]
-  );
+  useEffect(() => {
+    handleApply(chooseSources, parseInt(price) || undefined);
+  }, [chooseSources, price]);
 
   useEffect(() => {
     if (Object.keys(sources).length > 0) {
