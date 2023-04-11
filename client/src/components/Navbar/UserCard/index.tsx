@@ -4,10 +4,13 @@ import styles from "./UserCard.module.scss";
 import { useRouter } from "next/router";
 import useUser from "@/hooks/useUser";
 import AvatarPlaceholder from "@/components/AvatarPlaceholder";
+import useApi from "@/hooks/useApi";
 
 const UserCard = () => {
   const router = useRouter();
   const { user, logout } = useUser();
+  const { apiManager } = useApi();
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -17,6 +20,17 @@ const UserCard = () => {
   React.useEffect(() => {
     popupState.current = isOpen;
   }, [isOpen]);
+
+  const checkIsAdmin = () => {
+    apiManager
+      .apiV1AdminsUserIdGet({ userId: user?.id as string })
+      .then(() => setIsAdmin(true));
+  };
+
+  React.useEffect(() => {
+    console.log("123");
+    if (user?.id) checkIsAdmin();
+  }, [user]);
 
   React.useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -73,6 +87,20 @@ const UserCard = () => {
             </div>
             <p>Profile</p>
           </button>
+          {isAdmin && (
+            <button
+              className={styles.menuItem}
+              onClick={() => {
+                setIsOpen(false);
+                router.push("/listings");
+              }}
+            >
+              <div className={styles.iconCon}>
+                <img src="/icons/admin.svg" />
+              </div>
+              <p>Admin</p>
+            </button>
+          )}
           <button
             className={styles.menuItem}
             onClick={() => {

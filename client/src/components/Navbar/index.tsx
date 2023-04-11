@@ -7,8 +7,24 @@ import useUser from "@/hooks/useUser";
 
 const Navbar = () => {
   const { user } = useUser();
+  const [isActive, setIsActive] = React.useState(false);
+
+  const changeBackground = () => {
+    // console.log(window.scrollY);
+    if (window.scrollY >= 60) setIsActive(true);
+    else setIsActive(false);
+  };
+
+  React.useEffect(() => {
+    document.addEventListener("scroll", changeBackground);
+
+    return () => {
+      document.removeEventListener("scroll", changeBackground);
+    };
+  }, []);
+
   return (
-    <nav className={styles.wrapper}>
+    <nav className={isActive ? styles.wrapperActive : styles.wrapper}>
       <div className="container">
         <div className={styles.navbarInner}>
           <Link href="/">
