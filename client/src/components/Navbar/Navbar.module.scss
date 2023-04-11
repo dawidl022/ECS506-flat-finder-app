@@ -33,9 +33,10 @@
 
 .logo {
   height: 110px;
-  width: 110px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  aspect-ratio: 1;
+  object-fit: contain;
 }
