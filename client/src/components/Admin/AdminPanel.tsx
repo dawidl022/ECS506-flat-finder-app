@@ -110,68 +110,71 @@ const AdminPanel: FC = () => {
       <div className={styles.wrapper}>
         {/* get each user and display their email */}
         <table>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Admin </th>
-          </tr>
-
-          {!users ? (
+          <thead>
             <tr>
-              <td>Loading</td>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Admin </th>
             </tr>
-          ) : (
-            users.map((user: User, index) => {
-              return (
-                <tr key={index}>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>{user.isAdmin ? "Yes" : "No"}</td>
-                  {user.id === currentUser?.id ? (
-                    <td></td>
-                  ) : (
-                    <td>
-                      <button
-                        type="button"
-                        onClick={() => removeUserFromSystem(user)}
-                      >
-                        Remove User
-                      </button>
-                    </td>
-                  )}
-                  {user.isAdmin ? (
-                    <>
-                      {user.id === currentUser?.id ? (
-                        <td></td>
-                      ) : (
-                        <td>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              revokeAdmin(user);
-                            }}
-                          >
-                            Revoke Admin
-                          </button>
-                        </td>
-                      )}
-                    </>
-                  ) : (
-                    <td>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          grantAdmin(user);
-                        }}
-                      >
-                        Grant Admin
-                      </button>
-                    </td>
-                  )}
-                </tr>
-              );
-            })
-          )}
+          </thead>
+          <tbody>
+            {!users ? (
+              <tr>
+                <td>Loading</td>
+              </tr>
+            ) : (
+              users.map((user: User, index) => {
+                return (
+                  <tr key={index}>
+                    <td>{user.name}</td>
+                    <td>{user.email}</td>
+                    <td>{user.isAdmin ? "Yes" : "No"}</td>
+                    {user.id === currentUser?.id ? (
+                      <td></td>
+                    ) : (
+                      <td>
+                        <button
+                          type="button"
+                          onClick={() => removeUserFromSystem(user)}
+                        >
+                          Remove User
+                        </button>
+                      </td>
+                    )}
+                    {user.isAdmin ? (
+                      <>
+                        {user.id === currentUser?.id ? (
+                          <td></td>
+                        ) : (
+                          <td>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                revokeAdmin(user);
+                              }}
+                            >
+                              Revoke Admin
+                            </button>
+                          </td>
+                        )}
+                      </>
+                    ) : (
+                      <td>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            grantAdmin(user);
+                          }}
+                        >
+                          Grant Admin
+                        </button>
+                      </td>
+                    )}
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
         </table>
       </div>
     );
