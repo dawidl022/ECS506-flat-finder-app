@@ -5,7 +5,10 @@ import Listing from "./Listing";
 import SearchComponent from "../Search/searchComponent";
 import Filter from "../Filter/Filter";
 import useApi from "@/hooks/useApi";
-import { AccommodationSearchResultsInner } from "@/generated";
+import {
+  AccommodationSearchResultsInner,
+  SeekingSearchResultsInner,
+} from "@/generated";
 
 const MainListings = () => {
   const [location, setLocation] = useState("");
@@ -21,6 +24,9 @@ const MainListings = () => {
   // LISTING
   const [isEnded, setIsEnded] = React.useState(false);
   const [data, setData] = useState<Array<AccommodationSearchResultsInner>>([]);
+  const [seekingData, setSeekingData] = useState<
+    Array<SeekingSearchResultsInner>
+  >([]);
 
   const [pageNumber, setPageNumber] = React.useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -50,6 +56,14 @@ const MainListings = () => {
   };
 
   const getData = async (setPage?: number) => {
+    if (selectedTab === 0) {
+      getAccData(setPage);
+    } else {
+      getSeekingData(setPage);
+    }
+  };
+
+  const getAccData = async (setPage?: number) => {
     setIsLoading(true);
     setIsFirst(false);
     apiManager
@@ -71,6 +85,34 @@ const MainListings = () => {
           const prevIds = prev.map(listing => listing.accommodation.id);
           const finalResult = res.searchResults.filter(
             result => !prevIds.includes(result.accommodation.id)
+          );
+          return [...prev, ...finalResult];
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const getSeekingData = async (setPage?: number) => {
+    setIsLoading(true);
+    setIsFirst(false);
+    apiManager
+      .apiV1ListingsSeekingGet({
+        location,
+        radius: radius || 20,
+        page: setPage || pageNumber,
+        size: 15,
+      })
+      .then(res => {
+        console.log(res);
+        if (res.length === 0) {
+          setIsEnded(true);
+        }
+        setSeekingData(prev => {
+          const prevIds = prev.map(listing => listing.seeking.id);
+          const finalResult = res.filter(
+            result => !prevIds.includes(result.seeking.id)
           );
           return [...prev, ...finalResult];
         });
@@ -102,11 +144,13 @@ const MainListings = () => {
           ))}
         </div>
         <div className={styles.content}>
-          <Filter
-            sources={sources}
-            maxPrice={maxPrice}
-            handleApply={applyFilters}
-          />
+          {selectedTab === 0 && (
+            <Filter
+              sources={sources}
+              maxPrice={maxPrice}
+              handleApply={applyFilters}
+            />
+          )}
           <SearchComponent
             location={location}
             setLocation={setLocation}
@@ -117,13 +161,17 @@ const MainListings = () => {
         </div>
       </div>
       <main className={styles.main}>
-        <Listing
-          isEnded={isEnded}
-          data={data}
-          isLoading={isLoading}
-          setPageNumber={setPageNumber}
-          isFirst={isFirst}
-        />
+        {selectedTab === 0 ? (
+          <Listing
+            isEnded={isEnded}
+            data={data}
+            isLoading={isLoading}
+            setPageNumber={setPageNumber}
+            isFirst={isFirst}
+          />
+        ) : (
+          <p>Seeking list component #todo</p>
+        )}
       </main>
     </div>
   );

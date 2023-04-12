@@ -83,9 +83,9 @@ const UserCard = () => {
             className={styles.menuItem}
           >
             <div className={styles.iconCon}>
-              <img src="/icons/book.svg" />
+              <img src="/icons/home.svg" />
             </div>
-            <p>Listings</p>
+            <p>Home</p>
           </button>
           <button
             onClick={() => {

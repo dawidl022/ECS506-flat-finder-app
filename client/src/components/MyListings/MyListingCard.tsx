@@ -5,7 +5,7 @@ import {
   UserListingsInner,
 } from "@/generated/models/UserListingsInner";
 import { DefaultApi } from "@/generated/apis/DefaultApi";
-import style from "./MyListingCard.module.scss";
+import styles from "./MyListingCard.module.scss";
 import useApi from "@/hooks/useApi";
 
 interface UserListingProps {
@@ -52,15 +52,24 @@ const MyListingCard: FC<UserListingProps> = ({ listingInner }) => {
   };
 
   return (
-    <div className={style.wrapper}>
+    <div className={styles.wrapper}>
       <img src={`http://127.0.0.1:5000${listing.thumbnailUrl}`} />
-      <p>{listing.id}</p>
-      <p>{listing.title}</p>
-      <p>{listing.postCode}</p>
-      <p>{`£${listing.price}`}</p>
+      <div className={styles.content}>
+        <div className={styles.header}>
+          <p className={styles.title}>{listing.title}</p>
+          <p className={styles.price}>{`£${listing.price}`}</p>
+        </div>
+        <p>{listing.postCode}</p>
 
-      <button onClick={handleEdit}>Edit</button>
-      <button onClick={handleDelete}>Delete</button>
+        <div className={styles.btnCon}>
+          <button className={styles.editBtn} onClick={handleEdit}>
+            Edit
+          </button>
+          <button className={styles.deleteBtn} onClick={handleDelete}>
+            Delete
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
