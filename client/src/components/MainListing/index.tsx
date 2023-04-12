@@ -5,6 +5,7 @@ import Listing from "./Listing";
 import SearchComponent from "../Search/searchComponent";
 import Filter from "../Filter/Filter";
 import useApi from "@/hooks/useApi";
+import { AccommodationSearchResultsInner } from "@/generated";
 
 const MainListings = () => {
   const [location, setLocation] = useState("");
@@ -16,6 +17,13 @@ const MainListings = () => {
 
   const [selectedTab, setSelectedTab] = useState(0);
   const tabs = ["Accommodations", "Seeking list"];
+
+  // LISTING
+  const [isEnded, setIsEnded] = React.useState(false);
+  const [data, setData] = useState<Array<AccommodationSearchResultsInner>>([]);
+
+  const [pageNumber, setPageNumber] = React.useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     apiManager.apiV1SourcesAccommodationGet().then(sources => {
@@ -41,6 +49,36 @@ const MainListings = () => {
     setMaxPrice(maxPrice);
   };
 
+  const getData = async () => {
+    setIsLoading(true);
+    apiManager
+      .apiV1ListingsAccommodationGet({
+        location,
+        radius: radius || 20,
+        maxPrice,
+        sources: Object.keys(sources).filter(s => sources[s]),
+        sortBy: "newest",
+        page: pageNumber,
+        size: 15,
+      })
+      .then(res => {
+        console.log(res);
+        if (res.searchResults.length === 0) {
+          setIsEnded(true);
+        }
+        setData(prev => {
+          const prevIds = prev.map(listing => listing.accommodation.id);
+          const finalResult = res.searchResults.filter(
+            result => !prevIds.includes(result.accommodation.id)
+          );
+          return [...prev, ...finalResult];
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.filters}>
@@ -63,18 +101,20 @@ const MainListings = () => {
             maxPrice={maxPrice}
             handleApply={applyFilters}
           />
-          <SearchComponent handleSubmit={search} />
+          <SearchComponent handleSubmit={getData} />
         </div>
       </div>
       <main className={styles.main}>
-        {isSubmitted && (
+        {/* {isSubmitted && (
           <Listing
             sources={Object.keys(sources).filter(s => sources[s])}
             location={location}
             radius={radius ?? 20}
             maxPrice={maxPrice}
           />
-        )}
+        )} */}
+
+        <Listing data={data} isLoading={isLoading} />
       </main>
     </div>
   );

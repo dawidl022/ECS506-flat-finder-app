@@ -18,60 +18,65 @@ interface AccommodationDetailsProps {
   size?: number;
 }
 
-const Listing: FC<AccommodationDetailsProps> = ({
-  location,
-  radius,
-  maxPrice,
-  sources,
-  sortBy,
-  size = 9,
-}) => {
-  const [data, setData] = useState<Array<AccommodationSearchResultsInner>>([]);
+// const Listing: FC<AccommodationDetailsProps> = ({
+//   location,
+//   radius,
+//   maxPrice,
+//   sources,
+//   sortBy,
+//   size = 9,
+// })
+const Listing: FC<any> = ({ data, isLoading }) => {
+  // const [data, setData] = useState<Array<AccommodationSearchResultsInner>>([]);
   // CHANGE
-  const [isLoading, setIsLoading] = useState(true);
-  const { apiManager } = useApi();
+  // const [isLoading, setIsLoading] = useState(true);
+  // const { apiManager } = useApi();
   const [pageNumber, setPageNumber] = React.useState(0);
+  const [isEnded, setIsEnded] = React.useState(false);
 
-  React.useEffect(() => {
-    getData();
-  }, [pageNumber]);
+  // React.useEffect(() => {
+  //   getData();
+  // }, [pageNumber]);
 
-  const getData = async () => {
-    console.log("Started loading ", pageNumber);
-    setIsLoading(true);
-    apiManager
-      .apiV1ListingsAccommodationGet({
-        location,
-        radius,
-        maxPrice,
-        sources,
-        sortBy,
-        page: pageNumber,
-        size: 3,
-      })
-      .then(res => {
-        console.log("DATA from api", res);
-        setData(prev => {
-          const prevIds = prev.map(listing => listing.accommodation.id);
-          const finalResult = res.searchResults.filter(
-            result => !prevIds.includes(result.accommodation.id)
-          );
-          console.log(
-            `Loaded page ${pageNumber}; loaded: ${finalResult.length}`
-          );
+  // React.useEffect(() => {
+  //   setPageNumber(0);
+  //   setIsEnded(false);
+  // }, [location, radius, maxPrice, sources, sortBy]);
 
-          return [...prev, ...finalResult];
-        });
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
+  // const getData = async () => {
+  //   setIsLoading(true);
+  //   apiManager
+  //     .apiV1ListingsAccommodationGet({
+  //       location,
+  //       radius,
+  //       maxPrice,
+  //       sources,
+  //       sortBy,
+  //       page: pageNumber,
+  //       size: 15,
+  //     })
+  //     .then(res => {
+  //       if (res.searchResults.length === 0) {
+  //         // alert("No");
+  //         setIsEnded(true);
+  //       }
+  //       setData(prev => {
+  //         const prevIds = prev.map(listing => listing.accommodation.id);
+  //         const finalResult = res.searchResults.filter(
+  //           result => !prevIds.includes(result.accommodation.id)
+  //         );
+  //         return [...prev, ...finalResult];
+  //       });
+  //     })
+  //     .finally(() => {
+  //       setIsLoading(false);
+  //     });
+  // };
 
   return (
     <>
       <div className={styles.listingWrapper}>
-        {data.map((item, index) => {
+        {data.map((item: any, index: number) => {
           return (
             <div key={index}>
               <AccommodationSummaryTile accommodation={item.accommodation} />
@@ -82,9 +87,11 @@ const Listing: FC<AccommodationDetailsProps> = ({
       <div className={styles.loadBtnCon}>
         {isLoading ? (
           <LoadingSpinner conStyles={{ paddingTop: 60 }} />
+        ) : isEnded ? (
+          <p>No more data</p>
         ) : (
           <button
-            onClick={() => setPageNumber(prev => prev + 1)}
+            // onClick={() => setPageNumber(prev => prev + 1)}
             className={styles.loadBtn}
           >
             Load more

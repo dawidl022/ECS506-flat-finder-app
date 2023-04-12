@@ -370,10 +370,10 @@ def delete_accommodation_listing(
     return make_response("", NO_CONTENT)
 
 
-@bp.delete("/seeking/<listing_id>")
+@bp.delete("/seeking/<uuid:listing_id>")
 @jwt_required()
 def delete_seeking_listing(
-        listing_id: str, listing_service: BaseListingsService) -> Response:
+        listing_id: uuid.UUID, listing_service: BaseListingsService) -> Response:
     listing = get_seeking_listing_authored_by_current_user(
         listing_id, listing_service, action="delete")
 
