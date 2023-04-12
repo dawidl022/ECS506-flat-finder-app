@@ -20,13 +20,13 @@ from .models import AccommodationListing, SeekingListing, Source
 from app.user.user_models import User, ContactDetails
 from app.user.user_service import BaseUserService
 from .models import AccommodationListing, InternalAccommodationListing, Source
+from .dtos import EditAccommodationForm
 
 from .dtos import (
     AccommodationForm,
     AccommodationListingDTO,
     AccommodationSearchParams,
     AccommodationSearchResultDTO,
-    EditAccommodationForm,
     SearchResultDTO,
     SeekingForm,
     SeekingListingDTO,
@@ -269,7 +269,7 @@ def get_author(user_service, source, listing):
 @jwt_required()
 def put_accommodation_listing(
         listing_id: str,
-        listing_service: BaseListingsService,
+        listing_service: BaseListingsService, 
         user_service: BaseUserService
 ) -> Response:
     form = get_body(EditAccommodationForm)

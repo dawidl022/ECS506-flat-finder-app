@@ -161,7 +161,19 @@ class EditAccommodationForm(Schemable):
     accommodation_type: str
     number_of_rooms: int
     price: int
-    address: Address
+    address: dict[str, Any]
+
+    @property
+    def decoded_address(self) -> Address:
+        
+        country = self.address["country"]
+
+        match Country(country):
+            case Country.UK:
+                return dacite.from_dict(data_class=UKAddress, data=self.address,
+                                        config=dacite.Config(cast=[StrEnum]))
+
+        raise ValueError("Unexpected country")
 
     def to_dict(self) -> dict[str, Any]:
         d = vars(self).copy()

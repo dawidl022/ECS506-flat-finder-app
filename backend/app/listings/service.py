@@ -19,7 +19,6 @@ from app.clients.ListingAPIClient import ListingAPIClient
 from app.clients.APIException import APIException
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
-
 from app.listings.dtos import EditAccommodationForm
 
 
@@ -88,7 +87,7 @@ class BaseListingsService(abc.ABC):
 
     @abc.abstractmethod
     def update_accommodation_listing(
-        self, listing_id: uuid.UUID, form: EditAccommodationForm
+        self, listing_id: uuid.UUID, form: AccommodationForm
     ) -> AccommodationListing:
         pass
 
@@ -282,8 +281,8 @@ class ListingsService(BaseListingsService, ListingsCleanupService):
             listing,
             **form.to_dict(),
             location=Location(
-                coords=self.geocoder.get_coords(form.address),
-                address=form.address
+                coords=self.geocoder.get_coords(form.decoded_address),
+                address=form.decoded_address
             )
         )
 

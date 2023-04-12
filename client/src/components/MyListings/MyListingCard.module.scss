@@ -8,6 +8,9 @@
   transition: transform 0.1s ease-in-out;
   width: 280px;
   img {
-    height: 175px;
+    width: 100%;
+    // height: 200px;
+    height: 200px;
+    object-fit: cover;
   }
 }
