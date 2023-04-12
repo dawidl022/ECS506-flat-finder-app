@@ -1,8 +1,9 @@
 import { UserProfile, UserProfileForm } from "@/generated";
 import React from "react";
-
+import Link from "next/link";
 import styles from "./CardData.module.scss";
 import useApi from "@/hooks/useApi";
+import { User } from "@/generated";
 
 interface CardDataProps {
   userData: UserProfile;
@@ -18,11 +19,21 @@ const CardData: React.FC<CardDataProps> = ({
   updateUser,
 }) => {
   const { apiManager } = useApi();
+  const [users, setUsers] = React.useState<User[]>([]);
   const [newUserData, setNewUserData] = React.useState({
     name: userData.name,
     email: userData.email,
     contactDetails: userData.contactDetails,
   });
+
+  React.useEffect(() => {
+    apiManager
+      .apiV1UsersGet()
+      .then((users: User[]) => {
+        setUsers(users);
+      })
+      .catch(err => console.log(err));
+  }, []);
 
   const onCancelClickHandle = () => {
     setIsEditing(false);
@@ -117,6 +128,20 @@ const CardData: React.FC<CardDataProps> = ({
           )}
         </div>
       </div>
+
+      {users.map(user => {
+        if (user.id === userData.id) {
+          return (
+            <Link
+              className={styles.blue}
+              href="/profile/[userId]"
+              as={`/profile/${userData.id}`}
+            >
+              See more listings by this user
+            </Link>
+          );
+        }
+      })}
       {isEditing && (
         <div className={styles.btnRow}>
           <button
