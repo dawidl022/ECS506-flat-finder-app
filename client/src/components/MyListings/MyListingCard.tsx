@@ -57,9 +57,20 @@ const MyListingCard: FC<UserListingProps> = ({ listingInner }) => {
       <div className={styles.content}>
         <div className={styles.header}>
           <p className={styles.title}>{listing.title}</p>
-          <p className={styles.price}>{`£${listing.price}`}</p>
+          {listingInner.type !== "seeking" && (
+            <p className={styles.price}>{`£${listing.price}`}</p>
+          )}
         </div>
-        <p>{listing.postCode}</p>
+        {listingInner.type !== "seeking" && (
+          <p className={styles.value}>
+            <span>postcode: </span>
+            {listing.postCode}
+          </p>
+        )}
+
+        <p className={styles.value}>
+          <span>description: </span> {listing.shortDescription}
+        </p>
 
         <div className={styles.btnCon}>
           <button className={styles.editBtn} onClick={handleEdit}>

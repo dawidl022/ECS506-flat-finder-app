@@ -6,8 +6,12 @@
   }
 
   .listingsWrapper {
+    padding: 0 0 0 24px;
     overflow-y: hidden;
     overflow-x: auto;
     white-space: nowrap;
+    // Don't judge me =)
+    width: calc(100% + 48px);
+    margin-left: -24px;
   }
 }
