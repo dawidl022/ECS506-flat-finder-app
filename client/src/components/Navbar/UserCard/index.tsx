@@ -77,6 +77,18 @@ const UserCard = () => {
           <button
             onClick={() => {
               setIsOpen(false);
+              router.push(`/`);
+            }}
+            className={styles.menuItem}
+          >
+            <div className={styles.iconCon}>
+              <img src="/icons/book.svg" />
+            </div>
+            <p>Listings</p>
+          </button>
+          <button
+            onClick={() => {
+              setIsOpen(false);
               router.push(`/profile/${user?.id}`);
             }}
             className={styles.menuItem}
