@@ -53,6 +53,17 @@
   color: #fff;
 }
 
+.accessWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.accessWrapper p {
+  margin-top: 2%;
+}
+
 .accessWrapper img {
   height: 110px;
   display: flex;
@@ -65,4 +76,5 @@
   background-color: transparent;
   color: rgb(75, 147, 209);
   cursor: pointer;
+  margin-top: 1%;
 }
