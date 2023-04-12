@@ -2,6 +2,7 @@ import { FC } from "react";
 
 import { Accommodation } from "@/generated/models/Accommodation";
 import ContactDetails from "@/components/Listing/ContactDetails";
+import sanitizeHtml from 'sanitize-html';
 
 interface AccommodationDetailsProps {
   accommodation: Accommodation;
@@ -10,6 +11,7 @@ interface AccommodationDetailsProps {
 const AccommodationDetails: FC<AccommodationDetailsProps> = ({
   accommodation,
 }) => {
+
   return (
     <>
       <div>
@@ -20,8 +22,9 @@ const AccommodationDetails: FC<AccommodationDetailsProps> = ({
             price may not have a tag 'price', it may just display the value
             with a different font weight
         */}
+        
         <h1>{accommodation.title}</h1>
-        <p>{accommodation.description}</p>
+        <p dangerouslySetInnerHTML={{__html: sanitizeHtml(accommodation.description)}}/>
         {<p>{accommodation.accommodationType}</p>}
         {<p>{accommodation.numberOfRooms}</p>}
         <p>{accommodation.source}</p>

@@ -1,4 +1,4 @@
-import { FC, useState, FormEvent } from "react";
+import { FC, FormEvent } from "react";
 
 import styles from "./Search.module.scss";
 
@@ -18,9 +18,6 @@ const SearchComponent: FC<Search> = ({
   setRadius,
   handleSubmit,
 }) => {
-  // const [location, setTargetLocation] = useState("");
-  // const [radius, setTargetRadius] = useState(0);
-
   const submitInputs = (e: FormEvent) => {
     e.preventDefault();
     handleSubmit();
