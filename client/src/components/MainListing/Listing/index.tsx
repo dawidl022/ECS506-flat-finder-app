@@ -29,34 +29,14 @@ const Listing: FC<AccommodationDetailsProps> = ({
   // CHANGE
   const [isLoading, setIsLoading] = useState(true);
   const { apiManager } = useApi();
-  const [pageNumber, setPageNumber] = React.useState(0);
-  const [attempts, setAttempts] = React.useState(3);
+  // const [pageNumber, setPageNumber] = React.useState(0);
 
-  const intObserver = useRef<any>(null);
-  const hasNextPage = true;
+  React.useEffect(() => {
+    getData();
+  }, []);
 
-  const lastPostRef = useCallback(
-    (item: any) => {
-      //   console.log(data);
-      if (isLoading) return;
-
-      if (intObserver.current) intObserver.current.disconnect();
-
-      intObserver.current = new IntersectionObserver(data => {
-        if (data[0].isIntersecting && hasNextPage) {
-          //   console.log("We are near the last post!");
-          setPageNumber((prev: number) => prev + 1);
-        }
-      });
-
-      if (item) intObserver.current.observe(item);
-    },
-    [isLoading, hasNextPage]
-  );
-
-  const getMoreAccommodation = async () => {
+  const getData = async () => {
     setIsLoading(true);
-    // console.log("START LOADING");
     apiManager
       .apiV1ListingsAccommodationGet({
         location,
@@ -64,8 +44,8 @@ const Listing: FC<AccommodationDetailsProps> = ({
         maxPrice,
         sources,
         sortBy,
-        page: pageNumber,
-        size,
+        page: 0,
+        size: 50,
       })
       .then(res => {
         console.log(res);
@@ -74,58 +54,34 @@ const Listing: FC<AccommodationDetailsProps> = ({
           const finalResult = res.searchResults.filter(
             result => !prevIds.includes(result.accommodation.id)
           );
-          if (finalResult.length < 3) {
-            setPageNumber((prev: number) => prev + 1);
-            setAttempts(prev => prev - 1);
-          } else {
-            setAttempts(3);
-          }
 
           return [...prev, ...finalResult];
         });
       })
-      .catch(err => setAttempts(prev => prev - 1))
       .finally(() => {
         setIsLoading(false);
-        // console.log("STOP LOADING");
       });
   };
-
-  useEffect(() => {
-    if (attempts > 0 && pageNumber === 0) {
-      getMoreAccommodation();
-    }
-  }, [pageNumber]);
 
   if (isLoading) {
     return <h1>Loading...</h1>;
   }
 
   return (
-    <div className={styles.listingWrapper}>
-      {/* <AccommodationSummaryTile
-        accommodation={{
-          id: "1",
-          shortDescription: "lorem ipsum 30",
-          title: "Test 1",
-          price: 120,
-          accommodationType: "Test",
-          postCode: "E11 444",
-          numberOfRooms: 2,
-          source: "Test thing",
-        }}
-      /> */}
-      {data.map((item, index) => {
-        return (
-          <div key={index}>
-            <AccommodationSummaryTile accommodation={item.accommodation} />
-          </div>
-        );
-      })}
-
-      <p ref={lastPostRef}></p>
-      {attempts <= 0 && <p>End of results</p>}
-    </div>
+    <>
+      <div className={styles.listingWrapper}>
+        {data.map((item, index) => {
+          return (
+            <div key={index}>
+              <AccommodationSummaryTile accommodation={item.accommodation} />
+            </div>
+          );
+        })}
+      </div>
+      <div className={styles.loadBtnCon}>
+        <button className={styles.loadBtn}>Load more</button>
+      </div>
+    </>
   );
 };
 

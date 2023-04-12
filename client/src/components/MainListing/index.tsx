@@ -15,6 +15,9 @@ const MainListings = () => {
   const { apiManager } = useApi();
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+  const [selectedTab, setSelectedTab] = useState(0);
+  const tabs = ["Accommodations", "Seeking list"];
+
   useEffect(() => {
     apiManager.apiV1SourcesAccommodationGet().then(sources => {
       const tmp = sources.reduce(
@@ -42,18 +45,32 @@ const MainListings = () => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.filters}>
-        <Filter
-          sources={sources}
-          maxPrice={maxPrice}
-          handleApply={applyFilters}
-        />
-        <SearchComponent handleSubmit={search} />
+        <div className={styles.tabs}>
+          {tabs.map((tab, index) => (
+            <button
+              onClick={() => setSelectedTab(index)}
+              key={index}
+              className={
+                index === selectedTab ? styles.selectedItem : styles.item
+              }
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+        <div className={styles.content}>
+          <Filter
+            sources={sources}
+            maxPrice={maxPrice}
+            handleApply={applyFilters}
+          />
+          <SearchComponent handleSubmit={search} />
+        </div>
       </div>
       <main className={styles.main}>
         {isSubmitted && (
           <Listing
             sources={Object.keys(sources).filter(s => sources[s])}
-            size={9}
             location={location}
             radius={radius ?? 20}
             maxPrice={maxPrice}
