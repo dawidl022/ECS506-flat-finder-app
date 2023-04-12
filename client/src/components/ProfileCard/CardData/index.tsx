@@ -67,7 +67,14 @@ const CardData: React.FC<CardDataProps> = ({
         <div className={styles.detailsRow}>
           <p className={styles.title}>Email:</p>
 
-          <p className={styles.value}>{userData.email}</p>
+          {userData.email ? (
+            <a href={`mailto:${userData.email}`}>
+              <p className={styles.value}>{userData.email}</p>
+            </a>
+          ) : (
+            <p className={styles.value}>N/A</p>
+          )}
+
           {/* TODO: user can not change his mail, right? */}
           {/* {isEditing ? (
             <input className={styles.valueInput} placeholder={userData.email} />
@@ -98,9 +105,11 @@ const CardData: React.FC<CardDataProps> = ({
               }}
             />
           ) : (
-            <p className={styles.value}>
-              {userData.contactDetails.phoneNumber}
-            </p>
+            <a href={`tel:${userData.contactDetails.phoneNumber}`}>
+              <p className={styles.value}>
+                {userData.contactDetails.phoneNumber}
+              </p>
+            </a>
           )}
         </div>
       </div>
