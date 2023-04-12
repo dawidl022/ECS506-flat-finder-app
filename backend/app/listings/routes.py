@@ -1,5 +1,6 @@
 from http.client import (
-    BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, SERVICE_UNAVAILABLE)
+    BAD_REQUEST, FORBIDDEN, NO_CONTENT, NOT_FOUND, SERVICE_UNAVAILABLE,
+    CREATED)
 import os
 from typing import cast
 import uuid
@@ -8,7 +9,7 @@ from flask import Blueprint, Response, abort, jsonify, make_response, request
 from flask_jwt_extended import jwt_required
 from werkzeug.datastructures import FileStorage
 from app.auth.jwt import get_current_user_email, get_current_user_id
-from app.listings.exceptions import ListingNotFoundError
+from app.listings.exceptions import ListingNotFoundError, PhotoNotFoundError
 
 from app.util.marshmallow import get_form, get_params, get_input
 from app.util.encoding import CamelCaseEncoder
@@ -384,7 +385,73 @@ def delete_seeking_listing(
     return make_response("", NO_CONTENT)
 
 
-@bp.get("/<listing_id>/photos/<photo_id>")
-def get_listing_photo(listing_id: str, photo_id: str):
-    # TODO
-    pass
+@bp.post("/<listing_id>/photos")
+@jwt_required()
+def upload_listing_photo(listing_id: str,
+                         blob: bytes,  # TODO this is likely not the way to get the uploaded photo
+                         listing_service: BaseListingsService
+                         ) -> Response:
+    listing = get_accommodation_listing_authored_by_current_user(
+        listing_id, listing_service, action="upload photo")
+
+    try:
+        # upload photo then update listing photo_ids to have the new photo
+        listing_service.upload_listing_photo(listing.id, blob)
+    except ListingNotFoundError:
+        abort(make_response(
+            {'listingId': "listing not found"}, NOT_FOUND))
+
+    return make_response("", CREATED)
+
+
+@bp.get("/<listing_id>/photos/<uuid:photo_id>")
+@jwt_required()
+def get_listing_photo(listing_id: str,
+                      photo_id: uuid.UUID,
+                      listing_service: BaseListingsService
+                      ) -> Response:
+    source, listing_uuid = extract_listing_id_and_source(listing_id)
+
+    if source != Source.internal:
+        abort(make_response(
+            {"source": f"photos not available for {source}"},
+            NOT_FOUND))
+
+    try:
+        photo = listing_service.get_listing_photo(
+            uuid.UUID(listing_uuid), photo_id)
+
+    except ValueError:
+        abort(make_response(
+            {'msg': "invalid ids given"}, BAD_REQUEST))
+    except ListingNotFoundError:
+        abort(make_response(
+            {'listingId': "listing not found"}, NOT_FOUND))
+    except PhotoNotFoundError:
+        abort(make_response(
+            {'photoId': "photo not found"}, NOT_FOUND))
+
+    response = make_response(photo.blob)
+    response.headers.set('Content-Type', 'image')
+    return response
+
+
+@bp.delete("/<listing_id>/photos/<photo_id>")
+@jwt_required()
+def delete_listing_photo(listing_id: str,
+                         photo_id: str,
+                         listing_service: BaseListingsService
+                         ) -> Response:
+    listing = get_accommodation_listing_authored_by_current_user(
+        listing_id, listing_service, action="delete photo")
+
+    try:
+        listing_service.delete_listing_photo(listing.id, uuid.UUID(photo_id))
+    except ListingNotFoundError:
+        abort(make_response(
+            {'listingId': "listing not found"}, NOT_FOUND))
+    except PhotoNotFoundError:
+        abort(make_response(
+            {'photoId': "photo not found"}, NOT_FOUND))
+
+    return make_response("", NO_CONTENT)

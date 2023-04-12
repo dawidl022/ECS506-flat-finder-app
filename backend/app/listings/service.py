@@ -3,7 +3,7 @@ import dataclasses
 from typing import NamedTuple
 import uuid
 import time
-from app.listings.exceptions import ListingNotFoundError
+from app.listings.exceptions import ListingNotFoundError, PhotoNotFoundError
 from app.listings.models import (
     AccommodationSearchResult, Address, AddressFreeLocation, Coordinates,
     InternalAccommodationListing, ListingSummary, Photo, SeekingListing,
@@ -129,6 +129,24 @@ class BaseListingsService(abc.ABC):
 
     @abc.abstractmethod
     def delete_seeking_listing(self, listing_id: uuid.UUID) -> None:
+        pass
+
+    @abc.abstractmethod
+    def upload_listing_photo(self, listing_id: uuid.UUID,
+                             blob: bytes
+                             ) -> Photo:
+        pass
+
+    @abc.abstractmethod
+    def get_listing_photo(self, listing_id: uuid.UUID,
+                          photo_id: uuid.UUID
+                          ) -> Photo:
+        pass
+
+    @abc.abstractmethod
+    def delete_listing_photo(self, listing_id: uuid.UUID,
+                             photo_id: uuid.UUID
+                             ) -> None:
         pass
 
 
@@ -377,3 +395,66 @@ class ListingsService(BaseListingsService, ListingsCleanupService):
                 # TODO clean up seeking listings too
             except ListingNotFoundError:
                 pass
+
+    def upload_listing_photo(self, listing_id: uuid.UUID,
+                             blob: bytes
+                             ) -> Photo:
+        # get listing if exists
+        listing = self.accommodation_listing_repo.get_listing_by_id(listing_id)
+        if listing is None:
+            raise ListingNotFoundError()
+
+        # create photo object and save to photo repo
+        photo = Photo(uuid.uuid4(), blob)
+        self.listing_photo_repo.save_photos([photo])
+
+        # update listing by adding the photo to it
+        updated_listing = dataclasses.replace(
+            listing,
+            photo_ids=tuple(list(listing.photo_ids) + [photo.id])
+        )
+        self.accommodation_listing_repo.save_listing(updated_listing)
+        return photo
+
+    def get_listing_photo(self, listing_id: uuid.UUID,
+                          photo_id: uuid.UUID
+                          ) -> Photo:
+        # get listing if exists
+        listing = self.accommodation_listing_repo.get_listing_by_id(listing_id)
+        if listing is None:
+            raise ListingNotFoundError()
+
+        # check if photo is part of this listing
+        if photo_id not in listing.photo_ids:
+            raise PhotoNotFoundError()
+
+        # get photo from photo repo
+        photo = self.listing_photo_repo.get_photo_by_id(photo_id)
+        if photo is None:
+            raise PhotoNotFoundError()
+
+        return photo
+
+    def delete_listing_photo(self, listing_id: uuid.UUID,
+                             photo_id: uuid.UUID
+                             ) -> None:
+        # get listing if exists
+        listing = self.accommodation_listing_repo.get_listing_by_id(listing_id)
+        if listing is None:
+            raise ListingNotFoundError()
+
+        # check if photo is part of this listing
+        if photo_id not in listing.photo_ids:
+            raise PhotoNotFoundError()
+
+        # delete photo if exists for that listing
+        self.listing_photo_repo.delete_photos([photo_id])
+
+        # then update the listing by removing the photo from photo_ids
+        new_photo_ids = list(listing.photo_ids)
+        new_photo_ids.remove(photo_id)
+        updated_listing = dataclasses.replace(
+            listing,
+            photo_ids=tuple(new_photo_ids)
+        )
+        self.accommodation_listing_repo.save_listing(updated_listing)
