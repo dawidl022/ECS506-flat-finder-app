@@ -20,6 +20,7 @@ from app.clients.APIException import APIException
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 from app.listings.dtos import EditAccommodationForm
+from app.listings.models import AccommodationSummary, SeekingSummary
 
 
 class BaseGeocodingService(abc.ABC):
@@ -391,10 +392,11 @@ class ListingsService(BaseListingsService, ListingsCleanupService):
 
         for listing in user_listings:
             try:
-                if isinstance(listing, InternalAccommodationListing):
-                    self.delete_accommodation_listing(listing.id)
+                if isinstance(listing, AccommodationSummary):
+                    self.delete_accommodation_listing(uuid.UUID(listing.id))
 
-                # TODO clean up seeking listings too
+                elif isinstance(listing, SeekingSummary):
+                    self.delete_seeking_listing(listing.id)
             except ListingNotFoundError:
                 pass
 
