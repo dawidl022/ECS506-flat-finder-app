@@ -12,7 +12,7 @@ from .test_routes import model_listing, model_listing_summary
 from app.listings.exceptions import ListingNotFoundError
 from app.listings.models import Address, Coordinates, ExternalAccommodationListing, InternalAccommodationListing, Location, Photo, SeekingListing, SortBy, Source, UKAddress
 from app.listings.dtos import AccommodationForm
-from app.listings.service import BaseGeocodingService, ListingsService, AccommodationSearchResult, SearchResult
+from app.listings.service import GeocodingService, ListingsService, AccommodationSearchResult, SearchResult
 from app.listings.repository import AccommodationListingRepository, ListingPhotoRepository, SeekingListingRepository
 from app.listings.models import AccommodationSearchResult, Address, Coordinates, Location, Photo, SortBy, UKAddress
 from app.listings.dtos import AccommodationForm, AccommodationSearchParams
@@ -25,7 +25,7 @@ expected_search_coords = Coordinates(51.5, 0)
 expected_distance = 10
 
 
-class StubGeocodingService(BaseGeocodingService):
+class StubGeocodingService(GeocodingService):
     def get_coords(self, addr: Address) -> Coordinates:
         return expected_coords
 
@@ -677,3 +677,46 @@ def generate_internal_listings_with_decreasing_creation_time(
         )
         for i in range(n)
     ]
+
+class GeocodingServiceTest(unittest.TestCase):
+    def test_get_coords(self):
+        
+        service = GeocodingService
+
+        address = UKAddress(
+            line1="Queen Mary University of London",
+            line2="Mile End Road",
+            town="London",
+            post_code="E1 4NS",
+        )
+        
+        expected_result=(51.5247272,-0.03931034663016243)
+
+        self.assertEqual(
+            expected_result,
+            service.get_coords(address.full_address)
+        )
+
+    def test_search_coords(self):
+        
+        service = GeocodingService
+        
+        expected_result=(51.5247272,-0.03931034663016243)
+
+        self.assertEqual(
+            expected_result,
+            service.search_coords("QMUL")
+        )
+
+    def test_calc_distance(self):
+        
+        service = GeocodingService
+
+        expected_result=("1.6387285427693696 km")
+
+        self.assertEqual(
+            expected_result,
+            service.calc_distance((51.5247272,-0.03931034663016243),(51.51750265,-0.05988506461942615))
+        )
+
+    
