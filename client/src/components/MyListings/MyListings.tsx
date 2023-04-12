@@ -9,6 +9,8 @@ import MyListingCard from "./MyListingCard";
 import useUser from "@/hooks/useUser";
 import useApi from "@/hooks/useApi";
 
+import styles from "./MyListings.module.scss";
+
 interface ListingByType {
   [key: string]: UserListingModel[];
 }
@@ -58,13 +60,15 @@ const MyListings: FC = () => {
               <h3>
                 {type.charAt(0).toUpperCase() + type.slice(1) + " listings"}
               </h3>
-              {listings.length > 0 &&
-                listings.map(listingInner => (
-                  <MyListingCard
-                    key={listingInner.listing.id}
-                    listingInner={listingInner}
-                  />
-                ))}
+              <div className={styles.listingsWrapper}>
+                {listings.length > 0 &&
+                  listings.map(listingInner => (
+                    <MyListingCard
+                      key={listingInner.listing.id}
+                      listingInner={listingInner}
+                    />
+                  ))}
+              </div>
             </div>
           ))}
         </>
