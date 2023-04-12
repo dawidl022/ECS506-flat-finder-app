@@ -26,6 +26,7 @@ from .dtos import (
     AccommodationListingDTO,
     AccommodationSearchParams,
     AccommodationSearchResultDTO,
+    EditAccommodationForm,
     SearchResultDTO,
     SeekingForm,
     SeekingListingDTO,
@@ -268,10 +269,10 @@ def get_author(user_service, source, listing):
 @jwt_required()
 def put_accommodation_listing(
         listing_id: str,
-        listing_service: BaseListingsService, 
+        listing_service: BaseListingsService,
         user_service: BaseUserService
 ) -> Response:
-    form = get_body(AccommodationForm)
+    form = get_body(EditAccommodationForm)
 
     listing = get_accommodation_listing_authored_by_current_user(
         listing_id, listing_service, action="update")

@@ -80,7 +80,7 @@ class SeekingSearchParams(Schemable):
 
 def validate_address(addr: str) -> dict[str, str]:
     address = cast(
-        dict[str, str], CamelCaseDecoder.snake_casify(json.loads(addr)) if isinstance(addr, str) else addr)
+        dict[str, str], CamelCaseDecoder.snake_casify(json.loads(addr)))
     country = address.get("country")
     if country is None:
         raise marshmallow.ValidationError(
@@ -118,14 +118,14 @@ class AccommodationForm(Schemable):
     accommodation_type: str
     number_of_rooms: int
     price: int
-    address: str | Address
+    address: str
 
     @property
     def decoded_address(self) -> Address:
         address = cast(
             dict[str, str],
             CamelCaseDecoder.snake_casify(
-            json.loads(self.address) if isinstance(self.address, str) else self.address
+                json.loads(self.address)
             )
         )
         country = address["country"]
@@ -136,6 +136,32 @@ class AccommodationForm(Schemable):
                                         config=dacite.Config(cast=[StrEnum]))
 
         raise ValueError("Unexpected country")
+
+    def to_dict(self) -> dict[str, Any]:
+        d = vars(self).copy()
+        del d["address"]
+        return d
+
+
+class EditAccommodationFormSchema(Schema):
+    title = fields.Str(required=True)
+    description = fields.Str(required=True)
+    accommodation_type = fields.Str(required=True)
+    number_of_rooms = fields.Int(required=True, validate=Range(min=1))
+    price = fields.Int(validate=Range(min=0))
+    address = fields.Field(required=True)
+
+
+@dataclass(frozen=True)
+class EditAccommodationForm(Schemable):
+    schema = EditAccommodationFormSchema()
+
+    title: str
+    description: str
+    accommodation_type: str
+    number_of_rooms: int
+    price: int
+    address: Address
 
     def to_dict(self) -> dict[str, Any]:
         d = vars(self).copy()

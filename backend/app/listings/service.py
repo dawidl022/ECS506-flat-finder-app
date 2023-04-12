@@ -20,6 +20,8 @@ from app.clients.APIException import APIException
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 
+from app.listings.dtos import EditAccommodationForm
+
 
 class BaseGeocodingService(abc.ABC):
     @abc.abstractmethod
@@ -86,7 +88,7 @@ class BaseListingsService(abc.ABC):
 
     @abc.abstractmethod
     def update_accommodation_listing(
-        self, listing_id: uuid.UUID, form: AccommodationForm
+        self, listing_id: uuid.UUID, form: EditAccommodationForm
     ) -> AccommodationListing:
         pass
 
@@ -269,7 +271,7 @@ class ListingsService(BaseListingsService, ListingsCleanupService):
         raise ValueError("Unknown source for accommodation listing")
 
     def update_accommodation_listing(
-        self, listing_id: uuid.UUID, form: AccommodationForm
+        self, listing_id: uuid.UUID, form: EditAccommodationForm
     ) -> AccommodationListing:
         listing = self.accommodation_listing_repo.get_listing_by_id(listing_id)
 
@@ -280,8 +282,8 @@ class ListingsService(BaseListingsService, ListingsCleanupService):
             listing,
             **form.to_dict(),
             location=Location(
-                coords=self.geocoder.get_coords(form.decoded_address),
-                address=form.decoded_address
+                coords=self.geocoder.get_coords(form.address),
+                address=form.address
             )
         )
 
