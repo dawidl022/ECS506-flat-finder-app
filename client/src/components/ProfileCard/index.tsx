@@ -25,13 +25,17 @@ const ProfileCard: FC<ProfileCardProps> = ({ userData, isMe = false }) => {
       .then(res => setUser(res));
   };
 
+  React.useEffect(() => {
+    setUser(userData);
+  }, [userData]);
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.card}>
-        <p style={{ position: "absolute", left: 12 }}>
+        {/* <p style={{ position: "absolute", left: 12 }}>
           DEBUG: <br /> is my profile: {isMe ? "True" : "False"} <br />
           is editing: {isEditing ? "True" : "False"}
-        </p>
+        </p> */}
         {isMe && !isEditing && <EditingButton setIsEditing={setIsEditing} />}
 
         <div className={styles.avaCon}>

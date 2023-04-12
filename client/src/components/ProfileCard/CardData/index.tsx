@@ -103,15 +103,6 @@ const CardData: React.FC<CardDataProps> = ({
             </p>
           )}
         </div>
-        <div className={styles.detailsRow}>
-          {/* TODO:  */}
-          <p className={styles.title}>More info</p>
-          {isEditing ? (
-            <input className={styles.valueInput} placeholder={"whateva"} />
-          ) : (
-            <p className={styles.value}>{"whateva"}</p>
-          )}
-        </div>
       </div>
       {isEditing && (
         <div className={styles.btnRow}>
