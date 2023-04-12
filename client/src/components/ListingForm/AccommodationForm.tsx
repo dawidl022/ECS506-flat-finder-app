@@ -26,7 +26,7 @@ const AccommodationForm: FC<FormProps> = ({
   const [postCode, setPostCode] = useState("");
   const [country] = useState("United Kingdom");
 
-  const [accommodationType, setAccommodationType] = useState("");
+  const [accommodationType, setAccommodationType] = useState("Flat");
   const [numberOfRooms, setNumberOfRooms] = useState(0);
   const [price, setPrice] = useState(0);
 
@@ -115,7 +115,7 @@ const AccommodationForm: FC<FormProps> = ({
           ...baseForm,
           photos: photos ?? [],
         })
-        .then(() => router.push({ pathname: "/myListings" }))
+        // .then(() => router.push({ pathname: "/myListings" }))
 
         .catch(err =>
           alert(
@@ -131,7 +131,7 @@ const AccommodationForm: FC<FormProps> = ({
             ...baseForm,
           },
         })
-        .then(() => router.push({ pathname: "/myListings" }))
+        // .then(() => router.push({ pathname: "/myListings" }))
         .catch(err => {
           alert("Error whilst updating listing. \nError: " + err);
         });
@@ -245,10 +245,10 @@ const AccommodationForm: FC<FormProps> = ({
           value={accommodationType}
           onChange={e => setAccommodationType(e.target.value)}
         >
+          <option value={"Flat"}>Flat</option>
           <option value={"Detached"}>Detached House</option>
           <option value={"Semi-detached"}>Semi-detached House</option>
           <option value={"Terraced"}>Terraced House</option>
-          <option value={"Flats"}>Flats</option>
           <option value={"Bungalows"}>Bungalows</option>
         </select>
         <br />

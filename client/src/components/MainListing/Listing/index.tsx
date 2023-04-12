@@ -47,7 +47,7 @@ const Listing: FC<AccommodationDetailsProps> = ({
         sources,
         sortBy,
         page: pageNumber,
-        size: 15,
+        size: 3,
       })
       .then(res => {
         console.log("DATA from api", res);

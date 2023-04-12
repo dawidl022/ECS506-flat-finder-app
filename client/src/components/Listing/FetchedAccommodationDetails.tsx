@@ -2,6 +2,7 @@ import { FC, useState, useEffect } from "react";
 import { DefaultApi } from "@/generated/apis/DefaultApi";
 import AccommodationDetails from "./AccommodationDetails";
 import { Accommodation } from "@/generated";
+import useApi from "@/hooks/useApi";
 
 interface AccommodationDetailsProps {
   listingId: string;
@@ -10,11 +11,13 @@ interface AccommodationDetailsProps {
 const FetchedAccommodationDetails: FC<AccommodationDetailsProps> = ({
   listingId,
 }) => {
+  alert(listingId);
   const [data, setData] = useState<Accommodation | null>(null);
   const [error, setError] = useState(false);
+  const { apiManager } = useApi();
 
   useEffect(() => {
-    new DefaultApi()
+    apiManager
       .apiV1ListingsAccommodationListingIdGet({
         listingId: listingId,
       })
