@@ -5,6 +5,10 @@ import { handleFileInput } from "./handleFileInput";
 import useApi from "@/hooks/useApi";
 import useUser from "@/hooks/useUser";
 
+import styles from "./Form.module.scss";
+import Input from "../Input";
+import TextArea from "../TextArea";
+
 interface FormProps {
   listingId: string;
   editExistingListing: Boolean;
@@ -100,46 +104,31 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
   };
 
   return (
-    <div>
-      <div>
-        Seeking Form
-        <form onSubmit={handleSubmit}>
-          <label htmlFor="title">Title: </label>
-          <input
-            id="title"
-            type="text"
-            placeholder="Title REQUIRED"
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            required
-          />
-          <br />
-          <label htmlFor="description">Description: </label>
-
-          <textarea
-            rows={15}
-            cols={30}
-            id="description"
-            placeholder="Description REQUIRED"
+    <div className={styles.wrapper}>
+      <h2 className={styles.title}>Seeking Form</h2>
+      <form className={styles.form} onSubmit={handleSubmit}>
+        <section className={styles.inputs}>
+          <Input label="Title" isRequired value={title} setValue={setTitle} />
+          <TextArea
+            label="Description"
             value={description}
-            onChange={e => setDescription(e.target.value)}
-            required
+            setValue={setDescription}
+            isRequired
           />
-          <br />
-          <label htmlFor="location">Location: </label>
-          <input
-            type="text"
-            id="location"
-            placeholder="Location REQUIRED"
+        </section>
+        <section className={styles.inputs}>
+          <Input
+            label="Location"
+            isRequired
             value={location}
-            onChange={e => setLocation(e.target.value)}
-            required
+            setValue={setLocation}
           />
 
-          <br />
           {!editExistingListing && (
-            <div>
-              <label htmlFor="photos">Photos:{""}</label>
+            <div className={styles.fileUploadCon}>
+              <label htmlFor="photos">
+                <img src="/icons/upload.svg" /> Upload photo
+              </label>
               <input
                 type="file"
                 id="photos"
@@ -154,14 +143,19 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
               />
             </div>
           )}
-          <br />
-          <button type="button" onClick={preview} disabled={!checkInputs()}>
+        </section>
+        <section className={styles.btnCon}>
+          <button
+            className={styles.previewBtn}
+            type="button"
+            onClick={preview}
+            disabled={!checkInputs()}
+          >
             Preview
           </button>
-          <br />
-          <button>Add</button>
-        </form>
-      </div>
+          <button className={styles.addBtn}>Add</button>
+        </section>
+      </form>
     </div>
   );
 };

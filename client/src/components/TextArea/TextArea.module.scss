@@ -1,0 +1,25 @@
+.wrapper {
+  flex: 1;
+  .label {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 4px;
+    span {
+      color: red;
+    }
+  }
+  textarea {
+    border: 1px #4286f49a solid;
+    border-radius: 4px;
+    outline: none;
+    padding: 8px 10px;
+    height: 200px;
+    resize: none;
+    width: 100%;
+    &:focus {
+      border: 1px #4285f4 solid;
+
+      box-shadow: 0 0 3px #4285f4;
+    }
+  }
+}

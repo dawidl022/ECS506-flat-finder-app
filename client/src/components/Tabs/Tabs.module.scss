@@ -4,24 +4,29 @@
   gap: 12px;
   flex-wrap: nowrap;
   overflow-x: auto;
+  margin-top: 12px;
 
   .activeTabCon {
     padding: 10px 12px;
-    border: 1px solid #a1a1a1;
+    border: 1px solid #4285f4;
     border-radius: 20px;
     font-size: 15px;
     transition: all 0.1s ease-in-out;
     cursor: pointer;
     flex-wrap: nowrap;
     white-space: nowrap;
-    background-color: #202020;
+    background-color: #4285f4;
+    font-weight: bold;
     color: #fff;
   }
 
   .tabCon {
     padding: 10px 12px;
-    border: 1px solid #a1a1a1;
+    border: 1px solid #4285f4;
     border-radius: 20px;
+    background-color: #fff;
+    color: #4285f4;
+    font-weight: bold;
     font-size: 15px;
     transition: all 0.1s ease-in-out;
     cursor: pointer;
@@ -30,7 +35,7 @@
 
     &:hover,
     &:focus-visible {
-      background-color: #202020;
+      background-color: #4285f4;
       color: #fff;
     }
   }
