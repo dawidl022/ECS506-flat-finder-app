@@ -45,8 +45,7 @@ const AccommodationDetails: FC<AccommodationDetailsProps> = ({
           {<p>Type: {accommodation.accommodationType}</p>}
           {<p>Number of rooms: {accommodation.numberOfRooms}</p>}
           <p>Source: {accommodation.source}</p>
-          {<a href={accommodation.originalListingUrl}>Click Here to go to the original listing</a>}
-
+          {accommodation.originalListingUrl && <a href={accommodation.originalListingUrl}>View original listing on Zoopla</a>}
           <p dangerouslySetInnerHTML={{__html: sanitizeHtml(accommodation.description)}}/>
         </div>
         
