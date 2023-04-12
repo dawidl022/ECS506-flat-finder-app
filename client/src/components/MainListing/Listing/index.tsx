@@ -7,6 +7,7 @@ import useApi from "@/hooks/useApi";
 import React, { FC, useCallback, useEffect, useRef, useState } from "react";
 
 import styles from "../MainListing.module.scss";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface AccommodationDetailsProps {
   location: string;
@@ -64,7 +65,7 @@ const Listing: FC<AccommodationDetailsProps> = ({
   };
 
   if (isLoading) {
-    return <h1>Loading...</h1>;
+    return <LoadingSpinner conStyles={{ paddingTop: 120 }} />;
   }
 
   return (
