@@ -86,6 +86,18 @@ const UserCard = () => {
             </div>
             <p>Profile</p>
           </button>
+          <button
+            className={styles.menuItem}
+            onClick={() => {
+              setIsOpen(false);
+              router.push("/create");
+            }}
+          >
+            <div className={styles.iconCon}>
+              <img src="/icons/plus.svg" />
+            </div>
+            <p>Create</p>
+          </button>
           {isAdmin && (
             <button
               className={styles.menuItem}
@@ -100,18 +112,7 @@ const UserCard = () => {
               <p>Admin</p>
             </button>
           )}
-          <button
-            className={styles.menuItem}
-            onClick={() => {
-              setIsOpen(false);
-              router.push("/listings");
-            }}
-          >
-            <div className={styles.iconCon}>
-              <img src="/icons/book.svg" />
-            </div>
-            <p>Listing</p>
-          </button>
+
           <button
             onClick={() => {
               setIsOpen(false);

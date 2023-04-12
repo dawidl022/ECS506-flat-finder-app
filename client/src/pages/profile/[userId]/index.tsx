@@ -7,6 +7,7 @@ import useApi from "@/hooks/useApi";
 
 import * as cookie from "cookie";
 import useUser from "@/hooks/useUser";
+import Popup from "@/components/Popup";
 
 interface UserProfileProps {
   userData: UserProfile;
@@ -18,6 +19,8 @@ const UserProfile: NextPage<UserProfileProps> = ({ userData }) => {
   const router = useRouter();
   const [success, setSuccess] = useState<boolean | undefined>(false);
   const [error, setError] = useState<boolean | undefined>(false);
+
+  const [isPopup, setIsPopup] = useState(false);
 
   useEffect(() => {
     const query = router.query.success;
@@ -34,6 +37,12 @@ const UserProfile: NextPage<UserProfileProps> = ({ userData }) => {
       {success && <p>Successfully deleted listing</p>}
       {error && <p>Error: could not delete listing</p>}
 
+      <p style={{ marginTop: 70 }} onClick={() => setIsPopup(true)}>
+        TEST
+      </p>
+      <Popup visible={isPopup} setVisible={setIsPopup}>
+        <h1>123</h1>
+      </Popup>
       {userData.id ? (
         <ProfileCard isMe={isMe} userData={userData} />
       ) : (
