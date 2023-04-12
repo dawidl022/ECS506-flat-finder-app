@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AccommodationSummary } from "@/generated/models/AccommodationSummary";
 
 import styles from "./Tile.module.scss";
+import PhotoGallery from "../PhotoGallery";
 
 interface AccommodationSummaryProps {
   accommodation: AccommodationSummary;
@@ -15,6 +16,7 @@ const AccommodationSummaryTile: FC<AccommodationSummaryProps> = ({
     <div className={styles.wrapper}>
       <Link href={`/listings/accommodation/${accommodation.id}`}>
         <div className={styles.imgCon}>
+          {/* <PhotoGallery/> */}
           {accommodation.thumbnailUrl ? (
             <img
               className={styles.accImg}

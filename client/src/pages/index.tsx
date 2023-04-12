@@ -13,12 +13,12 @@ import { useRouter } from "next/router";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const { user } = useUser();
+  const { user, isLoading } = useUser();
   const router = useRouter();
 
-  // React.useEffect(() => {
-  //   if (!user) router.push("/login");
-  // }, []);
+  React.useEffect(() => {
+    if ((!user || !user?.name) && !isLoading) router.push("/login");
+  }, [isLoading, user]);
   return (
     <>
       <Head>
@@ -30,14 +30,7 @@ export default function Home() {
 
       <main>
         <div className="container">
-          {/* <h2>Hello</h2> */}
-          {/* <Tabs tabs={["1", "2"]} /> */}
-          {/* <Filter /> */}
-          <div>
-            {/* <InfiniteListings location="london" radius={10000000} /> */}
-            {/* <Pagination /> */}
-            {user?.name && <MainListings />}
-          </div>
+          <div>{user?.name && <MainListings />}</div>
         </div>
       </main>
     </>

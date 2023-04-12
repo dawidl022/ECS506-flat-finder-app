@@ -30,13 +30,14 @@ const Listing: FC<AccommodationDetailsProps> = ({
   // CHANGE
   const [isLoading, setIsLoading] = useState(true);
   const { apiManager } = useApi();
-  // const [pageNumber, setPageNumber] = React.useState(0);
+  const [pageNumber, setPageNumber] = React.useState(0);
 
   React.useEffect(() => {
     getData();
-  }, []);
+  }, [pageNumber]);
 
   const getData = async () => {
+    console.log("Started loading ", pageNumber);
     setIsLoading(true);
     apiManager
       .apiV1ListingsAccommodationGet({
@@ -45,15 +46,18 @@ const Listing: FC<AccommodationDetailsProps> = ({
         maxPrice,
         sources,
         sortBy,
-        page: 0,
-        size: 50,
+        page: pageNumber,
+        size: 15,
       })
       .then(res => {
-        console.log(res);
+        console.log("DATA from api", res);
         setData(prev => {
           const prevIds = prev.map(listing => listing.accommodation.id);
           const finalResult = res.searchResults.filter(
             result => !prevIds.includes(result.accommodation.id)
+          );
+          console.log(
+            `Loaded page ${pageNumber}; loaded: ${finalResult.length}`
           );
 
           return [...prev, ...finalResult];
@@ -63,10 +67,6 @@ const Listing: FC<AccommodationDetailsProps> = ({
         setIsLoading(false);
       });
   };
-
-  if (isLoading) {
-    return <LoadingSpinner conStyles={{ paddingTop: 120 }} />;
-  }
 
   return (
     <>
@@ -80,7 +80,16 @@ const Listing: FC<AccommodationDetailsProps> = ({
         })}
       </div>
       <div className={styles.loadBtnCon}>
-        <button className={styles.loadBtn}>Load more</button>
+        {isLoading ? (
+          <LoadingSpinner conStyles={{ paddingTop: 60 }} />
+        ) : (
+          <button
+            onClick={() => setPageNumber(prev => prev + 1)}
+            className={styles.loadBtn}
+          >
+            Load more
+          </button>
+        )}
       </div>
     </>
   );
