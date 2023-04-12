@@ -25,6 +25,7 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
   const [location, setLocation] = useState("");
   const { apiManager: api } = useApi();
   const { user } = useUser();
+  const [photos, setPhotos] = useState<Blob[]>();
 
   useEffect(() => {
     if (editExistingListing) {
@@ -71,10 +72,11 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
     };
 
     if (!editExistingListing) {
+      console.log(photos);
       api
         .apiV1ListingsSeekingPost({
           ...baseForm,
-          photos: Array<Blob>(),
+          photos: photos ?? [],
         })
         .then(() => router.push({ pathname: `/profile/${user?.id}` }))
         .catch(err =>
@@ -141,7 +143,12 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
               <input
                 type="file"
                 id="photos"
-                onChange={handleFileInput}
+                onChange={e => {
+                  if (e.target.files != null) {
+                    handleFileInput(e);
+                    setPhotos(Array.from(e.target.files));
+                  }
+                }}
                 accept="image/*"
                 multiple
               />
