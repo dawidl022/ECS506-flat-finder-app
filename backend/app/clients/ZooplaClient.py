@@ -127,7 +127,7 @@ class ZooplaClient(ListingAPIClient):
     def parseListing(x) -> ExternalAccommodationListing:
         listing_id: int = x['listing_id']
         title: str = x['title']
-        desc: str = x['description']
+        desc: str = x['short_description']
         photos: list[str] = x['original_image']
         type: str = x['property_type']
         numRooms: int = x['num_bedrooms']
