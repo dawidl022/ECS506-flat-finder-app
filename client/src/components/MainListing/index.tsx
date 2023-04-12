@@ -102,7 +102,7 @@ const MainListings = () => {
         location,
         radius: radius || 20,
         page: setPage || pageNumber,
-        size: 5,
+        size: 15,
       })
       .then(res => {
         console.log(res);
