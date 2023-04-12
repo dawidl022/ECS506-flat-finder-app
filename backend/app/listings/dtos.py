@@ -165,7 +165,7 @@ class EditAccommodationForm(Schemable):
 
     @property
     def decoded_address(self) -> Address:
-        
+
         country = self.address["country"]
 
         match Country(country):
@@ -380,9 +380,9 @@ class SearchResultDTO:
 class SeekingSearchResultDTO:
     distance: float
     is_favourite: bool
-    accommodation: SeekingSummaryDTO
+    seeking: SeekingSummaryDTO
 
     def __init__(self, result: SeekingSearchResult):
         self.distance = result.distance
         self.is_favourite = result.is_favourite
-        self.accommodation = SeekingSummaryDTO(result.seeking)
+        self.seeking = SeekingSummaryDTO(result.seeking)
