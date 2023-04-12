@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { useRouter } from "next/router";
 import {
   UserListingsInnerTypeEnum,
@@ -7,6 +7,7 @@ import {
 import { DefaultApi } from "@/generated/apis/DefaultApi";
 import styles from "./MyListingCard.module.scss";
 import useApi from "@/hooks/useApi";
+import Popup from "../Popup";
 
 interface UserListingProps {
   listingInner: UserListingsInner;
@@ -16,6 +17,7 @@ const MyListingCard: FC<UserListingProps> = ({ listingInner }) => {
   const router = useRouter();
   const listing = listingInner.listing;
   const { apiManager } = useApi();
+  const [isDeletePopup, setIsDeletePopup] = useState(false);
 
   const redirect = (success: boolean) => {
     router.replace({
@@ -28,17 +30,17 @@ const MyListingCard: FC<UserListingProps> = ({ listingInner }) => {
   };
 
   const handleDelete = () => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this listing?"
-    );
+    // const confirmed = window.confirm(
+    //   "Are you sure you want to delete this listing?"
+    // );
 
-    confirmed &&
-      apiManager
-        .apiV1ListingsAccommodationListingIdDelete({
-          listingId: listing.id,
-        })
-        .then(() => redirect(true))
-        .catch(() => redirect(false));
+    // confirmed &&
+    apiManager
+      .apiV1ListingsAccommodationListingIdDelete({
+        listingId: listing.id,
+      })
+      .then(() => redirect(true))
+      .catch(() => redirect(false));
   };
 
   const handleEdit = () => {
@@ -53,6 +55,15 @@ const MyListingCard: FC<UserListingProps> = ({ listingInner }) => {
 
   return (
     <div className={styles.wrapper}>
+      <Popup visible={isDeletePopup}>
+        <div>
+          <h2>Delete?</h2>
+          <div className={styles.btnConPopup}>
+            <button onClick={() => handleDelete()}>Yes</button>
+            <button onClick={() => setIsDeletePopup(false)}>No</button>
+          </div>
+        </div>
+      </Popup>
       <img src={`http://127.0.0.1:5000${listing.thumbnailUrl}`} />
       <div className={styles.content}>
         <div className={styles.header}>
@@ -76,7 +87,10 @@ const MyListingCard: FC<UserListingProps> = ({ listingInner }) => {
           <button className={styles.editBtn} onClick={handleEdit}>
             Edit
           </button>
-          <button className={styles.deleteBtn} onClick={handleDelete}>
+          <button
+            className={styles.deleteBtn}
+            onClick={() => setIsDeletePopup(true)}
+          >
             Delete
           </button>
         </div>

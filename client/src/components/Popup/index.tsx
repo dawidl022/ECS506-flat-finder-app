@@ -1,6 +1,9 @@
-import React, { CSSProperties, FC, useRef } from "react";
+"use client";
+import React, { CSSProperties, FC, useRef, useState } from "react";
 
 import styles from "./Popup.module.scss";
+
+import ReactDOM from "react-dom";
 
 interface PopupProps {
   visible: boolean;
@@ -16,6 +19,11 @@ const Popup: FC<PopupProps> = ({
   containerStyle,
 }) => {
   const popupRef = useRef<any>();
+  const [isBrowser, setIsBrowser] = useState(false);
+
+  React.useEffect(() => {
+    setIsBrowser(true);
+  }, []);
 
   React.useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -30,22 +38,40 @@ const Popup: FC<PopupProps> = ({
       document.removeEventListener("mousedown", handler);
     };
   }, [visible]);
+  if (isBrowser)
+    return ReactDOM.createPortal(
+      <div className={`overlay ${visible ? "show" : "hide"}`}>
+        <div
+          ref={popupRef}
+          className="modal"
+          style={{ ...containerStyle }}
+          onClick={e => {
+            // setVisible(false);
+            e.stopPropagation();
+          }}
+        >
+          {children}
+        </div>
+      </div>,
+      document.getElementById("portal") as HTMLElement
+    );
+  return <div></div>;
 
-  return (
-    <div className={`overlay ${visible ? "show" : "hide"}`}>
-      <div
-        ref={popupRef}
-        className="modal"
-        style={{ ...containerStyle }}
-        onClick={e => {
-          // setVisible(false);
-          e.stopPropagation();
-        }}
-      >
-        {children}
-      </div>
-    </div>
-  );
+  // return (
+  //   <div className={`overlay ${visible ? "show" : "hide"}`}>
+  //     <div
+  //       ref={popupRef}
+  //       className="modal"
+  //       style={{ ...containerStyle }}
+  //       onClick={e => {
+  //         // setVisible(false);
+  //         e.stopPropagation();
+  //       }}
+  //     >
+  //       {children}
+  //     </div>
+  //   </div>
+  // );
 };
 
 export default Popup;

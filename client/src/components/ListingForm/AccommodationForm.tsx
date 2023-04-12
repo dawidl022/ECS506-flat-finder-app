@@ -12,6 +12,7 @@ import Input from "../Input";
 import TextArea from "../TextArea";
 
 import styles from "./Form.module.scss";
+import useUser from "@/hooks/useUser";
 
 interface FormProps {
   listingId: string;
@@ -30,6 +31,7 @@ const AccommodationForm: FC<FormProps> = ({
   const [town, setTown] = useState("");
   const [postCode, setPostCode] = useState("");
   const [country] = useState("United Kingdom");
+  const { user } = useUser();
 
   const [accommodationType, setAccommodationType] = useState("Flat");
   const [numberOfRooms, setNumberOfRooms] = useState(0);
@@ -120,7 +122,7 @@ const AccommodationForm: FC<FormProps> = ({
           ...baseForm,
           photos: photos ?? [],
         })
-        // .then(() => router.push({ pathname: "/myListings" }))
+        .then(() => router.push({ pathname: `/profile/${user?.id}` }))
 
         .catch(err =>
           alert(
@@ -136,7 +138,7 @@ const AccommodationForm: FC<FormProps> = ({
             ...baseForm,
           },
         })
-        // .then(() => router.push({ pathname: "/myListings" }))
+        .then(() => router.push({ pathname: `/profile/${user?.id}` }))
         .catch(err => {
           alert("Error whilst updating listing. \nError: " + err);
         });
