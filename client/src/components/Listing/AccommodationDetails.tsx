@@ -1,5 +1,5 @@
 import { FC } from "react";
-
+import PhotoGallery from "../PhotoGallery";
 import { Accommodation } from "@/generated/models/Accommodation";
 import ContactDetails from "@/components/Listing/ContactDetails";
 import sanitizeHtml from 'sanitize-html';
@@ -12,17 +12,24 @@ const AccommodationDetails: FC<AccommodationDetailsProps> = ({
   accommodation,
 }) => {
 
+  const setPhotoUrls = () => {
+    if (accommodation.source === 'internal') {
+      return accommodation.photoUrls.map(photo => `http://127.0.0.1:5000/${photo}`);
+    } else {
+      return accommodation.photoUrls;
+    }
+  
+  }
+
   return (
     <>
       <div>
-        {/* TODO: Photo gallery component */}
-
         {/* 
             Tags not included as this can be implemented alongside styling - eg. 
             price may not have a tag 'price', it may just display the value
             with a different font weight
         */}
-        
+        <PhotoGallery photoUrls={setPhotoUrls()}/>        
         <h1>{accommodation.title}</h1>
         <p dangerouslySetInnerHTML={{__html: sanitizeHtml(accommodation.description)}}/>
         {<p>{accommodation.accommodationType}</p>}
