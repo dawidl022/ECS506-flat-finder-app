@@ -52,3 +52,17 @@
 .adminGrant button, .adminRevoke button {
   color: #fff;
 }
+
+.accessWrapper img {
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  object-fit: contain;
+}
+
+.accessWrapper button {
+  background-color: transparent;
+  color: rgb(75, 147, 209);
+  cursor: pointer;
+}

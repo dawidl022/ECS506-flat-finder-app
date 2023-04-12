@@ -94,7 +94,8 @@ const AdminPanel: FC = () => {
     return <p>Loading</p>;
   } else if (!isCurrentUserAdmin) {
     return (
-      <div>
+      <div className={styles.accessWrapper}>
+        <img src="no-access.png" alt="lock" />
         <p> Administrator Access Only </p>
         <button type="button" onClick={() => router.push("/")}>
           Return To Homepage
