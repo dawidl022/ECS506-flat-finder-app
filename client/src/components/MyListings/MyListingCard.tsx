@@ -1,3 +1,5 @@
+"use client";
+
 import { FC, useState } from "react";
 import { useRouter } from "next/router";
 import {
@@ -9,38 +11,65 @@ import styles from "./MyListingCard.module.scss";
 import useApi from "@/hooks/useApi";
 import Popup from "../Popup";
 
+import { toast } from "react-toastify";
 interface UserListingProps {
   listingInner: UserListingsInner;
+  fetchData: () => void;
 }
 
-const MyListingCard: FC<UserListingProps> = ({ listingInner }) => {
+const MyListingCard: FC<UserListingProps> = ({ listingInner, fetchData }) => {
   const router = useRouter();
   const listing = listingInner.listing;
   const { apiManager } = useApi();
-  const [isDeletePopup, setIsDeletePopup] = useState(false);
 
-  const redirect = (success: boolean) => {
-    router.replace({
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        success: success,
-      },
+  const notify = () => {
+    toast.success("Listing is deleted", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+  };
+
+  const notifyUnsuccess = () => {
+    toast.error("Something went wrong", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
     });
   };
 
   const handleDelete = () => {
-    // const confirmed = window.confirm(
-    //   "Are you sure you want to delete this listing?"
-    // );
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this listing?"
+    );
 
-    // confirmed &&
-    apiManager
-      .apiV1ListingsAccommodationListingIdDelete({
-        listingId: listing.id,
-      })
-      .then(() => redirect(true))
-      .catch(() => redirect(false));
+    confirmed && listingInner.type !== "seeking"
+      ? apiManager
+          .apiV1ListingsAccommodationListingIdDelete({
+            listingId: listing.id,
+          })
+          .then(() => {
+            notify();
+            fetchData();
+          })
+          .catch(() => notifyUnsuccess())
+      : apiManager
+          .apiV1ListingsSeekingListingIdDelete({ listingId: listing.id })
+          .then(() => {
+            notify();
+            fetchData();
+          })
+          .catch(() => notifyUnsuccess());
   };
 
   const handleEdit = () => {
@@ -55,15 +84,6 @@ const MyListingCard: FC<UserListingProps> = ({ listingInner }) => {
 
   return (
     <div className={styles.wrapper}>
-      <Popup visible={isDeletePopup}>
-        <div>
-          <h2>Delete?</h2>
-          <div className={styles.btnConPopup}>
-            <button onClick={() => handleDelete()}>Yes</button>
-            <button onClick={() => setIsDeletePopup(false)}>No</button>
-          </div>
-        </div>
-      </Popup>
       <img src={`http://127.0.0.1:5000${listing.thumbnailUrl}`} />
       <div className={styles.content}>
         <div className={styles.header}>
@@ -89,7 +109,9 @@ const MyListingCard: FC<UserListingProps> = ({ listingInner }) => {
           </button>
           <button
             className={styles.deleteBtn}
-            onClick={() => setIsDeletePopup(true)}
+            onClick={() => {
+              handleDelete();
+            }}
           >
             Delete
           </button>

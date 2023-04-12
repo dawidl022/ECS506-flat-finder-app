@@ -7,6 +7,10 @@ import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import React from "react";
 
+import { ToastContainer, toast } from "react-toastify";
+
+import "react-toastify/dist/ReactToastify.css";
+
 export default function App({ Component, pageProps, ...appProps }: AppProps) {
   const paths = [`/login`, `/finish-auth`];
 
@@ -33,6 +37,7 @@ export default function App({ Component, pageProps, ...appProps }: AppProps) {
 
   return (
     <UserContextProvider>
+      <ToastContainer />
       {paths.includes(appProps.router.pathname) ? (
         <Component {...pageProps} />
       ) : (

@@ -25,6 +25,10 @@ const MyListings: FC<MyListingsProps> = ({ userId }) => {
   const { apiManager } = useApi();
 
   useEffect(() => {
+    fetchData();
+  }, [userId]);
+
+  const fetchData = () => {
     if (userId) {
       apiManager
         .apiV1UsersUserIdListingsGet({
@@ -38,7 +42,7 @@ const MyListings: FC<MyListingsProps> = ({ userId }) => {
           setError(true);
         });
     }
-  }, [userId]);
+  };
 
   const listingByType: ListingByType | null =
     data &&
@@ -67,6 +71,7 @@ const MyListings: FC<MyListingsProps> = ({ userId }) => {
                 {listings.length > 0 &&
                   listings.map(listingInner => (
                     <MyListingCard
+                      fetchData={fetchData}
                       key={listingInner.listing.id}
                       listingInner={listingInner}
                     />
