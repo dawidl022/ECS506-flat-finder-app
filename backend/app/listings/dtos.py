@@ -80,7 +80,7 @@ class SeekingSearchParams(Schemable):
 
 def validate_address(addr: str) -> dict[str, str]:
     address = cast(
-        dict[str, str], CamelCaseDecoder.snake_casify(json.loads(addr)) if isinstance(addr, str) else addr)
+        dict[str, str], CamelCaseDecoder.snake_casify(json.loads(addr)))
     country = address.get("country")
     if country is None:
         raise marshmallow.ValidationError(
@@ -143,8 +143,19 @@ class AccommodationForm(Schemable):
         return d
 
 
+class EditAccommodationFormSchema(Schema):
+    title = fields.Str(required=True)
+    description = fields.Str(required=True)
+    accommodation_type = fields.Str(required=True)
+    number_of_rooms = fields.Int(required=True, validate=Range(min=1))
+    price = fields.Int(validate=Range(min=0))
+    address = fields.Field(required=True)
+
+
 @dataclass(frozen=True)
 class EditAccommodationForm(Schemable):
+    schema = EditAccommodationFormSchema()
+
     title: str
     description: str
     accommodation_type: str
