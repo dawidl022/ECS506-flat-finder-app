@@ -24,7 +24,8 @@ const UserCard = () => {
   const checkIsAdmin = () => {
     apiManager
       .apiV1AdminsUserIdGet({ userId: user?.id as string })
-      .then(() => setIsAdmin(true));
+      .then(() => setIsAdmin(true))
+      .catch(err => console.log("FUCK", err));
   };
 
   React.useEffect(() => {

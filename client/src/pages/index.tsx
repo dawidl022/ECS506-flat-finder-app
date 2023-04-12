@@ -7,9 +7,18 @@ import Filter from "@/components/Filter/Filter";
 import InfiniteListings from "@/components/InfiniteListings";
 import Pagination from "@/components/Pagination";
 import MainListings from "@/components/MainListing";
+import useUser from "@/hooks/useUser";
+import React from "react";
+import { useRouter } from "next/router";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+  const { user } = useUser();
+  const router = useRouter();
+
+  // React.useEffect(() => {
+  //   if (!user) router.push("/login");
+  // }, []);
   return (
     <>
       <Head>
@@ -27,7 +36,7 @@ export default function Home() {
           <div>
             {/* <InfiniteListings location="london" radius={10000000} /> */}
             {/* <Pagination /> */}
-            <MainListings />
+            {user?.name && <MainListings />}
           </div>
         </div>
       </main>
