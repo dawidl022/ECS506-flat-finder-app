@@ -3,7 +3,9 @@ import PhotoGallery from "../PhotoGallery";
 import { Accommodation } from "@/generated/models/Accommodation";
 import ContactDetails from "@/components/Listing/ContactDetails";
 import sanitizeHtml from 'sanitize-html';
-
+import styles from './AccommodationListing.module.scss';
+import ProfileCard from "../ProfileCard";
+import UserProfile from "@/pages/profile/[userId]";
 interface AccommodationDetailsProps {
   accommodation: Accommodation;
 }
@@ -18,42 +20,48 @@ const AccommodationDetails: FC<AccommodationDetailsProps> = ({
     } else {
       return accommodation.photoUrls;
     }
-  
   }
 
+  const user : UserProfile = {
+    id: accommodation.author.userProfile?.id ?? "N/A",
+    name: accommodation.author.name ?? "N/A",
+    email: accommodation.contactInfo.email ?? "N/A",
+    contactDetails: {
+      phoneNumber: accommodation.contactInfo.phoneNumber ?? "N/A",
+    }
+  }
+
+
   return (
-    <>
-      <div>
-        {/* 
-            Tags not included as this can be implemented alongside styling - eg. 
-            price may not have a tag 'price', it may just display the value
-            with a different font weight
-        */}
+    <div className={styles.wrapper}>
         <PhotoGallery photoUrls={setPhotoUrls()}/>        
-        <h1>{accommodation.title}</h1>
-        <p dangerouslySetInnerHTML={{__html: sanitizeHtml(accommodation.description)}}/>
-        {<p>{accommodation.accommodationType}</p>}
-        {<p>{accommodation.numberOfRooms}</p>}
-        <p>{accommodation.source}</p>
-        {<p>{`£${accommodation.price}`}</p>}
-        {<a href={accommodation.originalListingUrl}>Original Listing</a>}
-      </div>
-      <div>
-        <h3>Address</h3>
-        <p>{accommodation.address.line1}</p>
-        <p>{accommodation.address.line2}</p>
-        <p>{accommodation.address.town}</p>
-        <p>{accommodation.address.postCode}</p>
-      </div>
-      <div>
-        <h3>Contact Details</h3>
-        <ContactDetails
-          phoneNumber={accommodation.contactInfo?.phoneNumber ?? null}
-          emailAddress={accommodation.contactInfo?.email ?? null}
-        />
-      </div>
-      <div>{/* TODO: Author details */}</div>
-    </>
+        <div className={styles.header}>
+          <h1>{accommodation.title}</h1>
+          {<h1>{`£${accommodation.price} PCM`}</h1>}
+        </div>
+
+        <div className={styles.information}>
+          <h2>Information:</h2>
+          {<p>Type: {accommodation.accommodationType}</p>}
+          {<p>Number of rooms: {accommodation.numberOfRooms}</p>}
+          <p>Source: {accommodation.source}</p>
+          {<a href={accommodation.originalListingUrl}>Click Here to go to the original listing</a>}
+
+          <p dangerouslySetInnerHTML={{__html: sanitizeHtml(accommodation.description)}}/>
+        </div>
+        
+        <div className={styles.address}>
+          <h2>Address:</h2>
+          {accommodation.address.line1 && <p>Line 1: {accommodation.address.line1}</p>}
+          {accommodation.address.line2 && <p>Line 2: {accommodation.address.line2}</p>}
+          <p>Town: {accommodation.address.town}</p>
+          <p>Post Code: {accommodation.address.postCode}</p>
+        </div>
+
+        <div className={styles.author}>
+          <ProfileCard userData={user}/>
+        </div>
+    </div>
   );
 };
 

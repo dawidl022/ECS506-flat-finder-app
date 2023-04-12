@@ -2,7 +2,6 @@ import { FC, useState, useEffect } from "react";
 import AccommodationDetails from "./AccommodationDetails";
 import { Accommodation } from "@/generated";
 import useApi from "@/hooks/useApi";
-import styles from './AccommodationListing.module.scss';
 interface AccommodationDetailsProps {
   listingId: string;
 }
@@ -24,7 +23,7 @@ const FetchedAccommodationDetails: FC<AccommodationDetailsProps> = ({
   }, [listingId]);
 
   return (
-    <div className={styles.wrapper}>
+    <div>
       {error ? (
         <p>Error fetching data</p>
       ) : !data ? (

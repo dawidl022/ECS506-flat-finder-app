@@ -1,6 +1,7 @@
 import { FC } from "react";
 import { Seeking } from "@/generated/models/Seeking";
 import ContactDetails from "@/components/Listing/ContactDetails";
+import ProfileCard from "../ProfileCard";
 
 interface SeekingDetailsProps {
   seeking: Seeking;
@@ -8,7 +9,7 @@ interface SeekingDetailsProps {
 
 const SeekingDetails: FC<SeekingDetailsProps> = ({ seeking }) => {
   return (
-    <>
+    <div>
       <div>
         <h1>{seeking.title}</h1>
         <p>{seeking.description}</p>
@@ -22,8 +23,13 @@ const SeekingDetails: FC<SeekingDetailsProps> = ({ seeking }) => {
         />
       </div>
 
-      <div>{/* TODO: Author details */}</div>
-    </>
+      <div>      
+        {seeking.author.userProfile?.id ? (
+        <ProfileCard userData={seeking.author.userProfile}/>
+      ) : null} 
+      </div>
+
+    </div>
   );
 };
 

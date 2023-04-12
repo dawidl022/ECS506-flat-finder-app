@@ -42,7 +42,7 @@ const AccommodationSummaryTile: FC<AccommodationSummaryProps> = ({
               <span>type:</span> {accommodation.accommodationType}
             </p>
             <p>
-              <span>rooms number:</span> {accommodation.numberOfRooms}
+              <span>number of rooms:</span> {accommodation.numberOfRooms}
             </p>
             <p>
               <span>postcode:</span> {accommodation.postCode}
