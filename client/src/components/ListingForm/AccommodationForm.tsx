@@ -8,6 +8,11 @@ import {
 } from "@/generated";
 import useApi from "@/hooks/useApi";
 
+import Input from "../Input";
+import TextArea from "../TextArea";
+
+import styles from "./Form.module.scss";
+
 interface FormProps {
   listingId: string;
   editExistingListing: Boolean;
@@ -139,146 +144,120 @@ const AccommodationForm: FC<FormProps> = ({
   };
 
   return (
-    <div>
-      Accommodation Form
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="title">Title: </label>
-        <input
-          type="text"
-          placeholder="Title REQUIRED"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-          required
-        />
-        <br />
+    <div className={styles.wrapper}>
+      <h2 className={styles.title}>Accommodation Form</h2>
+      <form className={styles.form} onSubmit={handleSubmit}>
+        <section className={styles.inputs}>
+          <Input label="Title" isRequired value={title} setValue={setTitle} />
 
-        <label htmlFor="description">Description</label>
-        <textarea
-          rows={15}
-          cols={30}
-          id="description"
-          placeholder="Description REQUIRED"
-          value={description}
-          onChange={e => setDescription(e.target.value)}
-          required
-        />
-        <br />
-
-        <fieldset>
-          <legend>Address</legend>
-          <label htmlFor="line1">Address Line 1: </label>
-          <input
-            id="line1"
-            type="text"
-            placeholder="Line 1 REQUIRED"
+          <TextArea
+            label="Description"
+            value={description}
+            setValue={setDescription}
+            isRequired
+          />
+        </section>
+        <section className={styles.inputsAddress}>
+          {/* <fieldset> */}
+          <Input
+            label="Address Line 1"
+            isRequired
             value={line1}
-            onChange={e => setLine1(e.target.value)}
-            required
+            setValue={setLine1}
           />
-          <br />
-          <label htmlFor="line2">Address Line 2: </label>
-          <input
-            type="text"
-            id="line2"
-            placeholder="Line 2 OPTIONAL"
-            value={line2}
-            onChange={e => setLine2(e.target.value)}
-          />
-          <br />
-          <label htmlFor="town">Town: </label>
-          <input
-            id="town"
-            type="text"
-            placeholder="Town REQUIRED"
-            value={town}
-            onChange={e => setTown(e.target.value)}
-            required
-          />
-          <br />
-          <label htmlFor="postCode">Post Code: </label>
-          <input
-            type="text"
-            id="postCode"
-            placeholder="Post Code REQUIRED"
+          <Input label="Address Line 2" value={line2} setValue={setLine2} />
+          <Input label="Town" isRequired value={town} setValue={setTown} />
+          <Input
+            label="Post Code"
+            isRequired
             value={postCode}
-            onChange={e => setPostCode(e.target.value)}
-            required
+            setValue={setPostCode}
           />
-          <br />
-          <label htmlFor="country">Country: </label>
-          <input
-            type="text"
-            id="country"
-            placeholder="Country REQUIRED"
+
+          <Input
+            isReadOnly
+            isDisabled
+            label="Country"
+            // isRequired
             value={country}
-            readOnly
-            disabled={true}
           />
-        </fieldset>
-        <br />
-        <label htmlFor="price">Price: </label>
-        <input
-          type="number"
-          id="price"
-          placeholder="Price REQUIRED"
-          value={price}
-          onChange={e => setPrice(parseFloat(e.target.value))}
-          min={0}
-          required
-        />
-        <br />
-        <label htmlFor="numberOfRooms">Number of Rooms: </label>
-        <input
-          type="number"
-          id="numberOfRooms"
-          placeholder="Number of Rooms REQUIRED"
-          value={numberOfRooms}
-          onChange={e => setNumberOfRooms(parseFloat(e.target.value))}
-          min={0}
-          max={10}
-          required
-        />
-        <br />
-        <label htmlFor="type">Type: </label>
-        <select
-          id="type"
-          value={accommodationType}
-          onChange={e => setAccommodationType(e.target.value)}
-        >
-          <option value={"Flat"}>Flat</option>
-          <option value={"Detached"}>Detached House</option>
-          <option value={"Semi-detached"}>Semi-detached House</option>
-          <option value={"Terraced"}>Terraced House</option>
-          <option value={"Bungalows"}>Bungalows</option>
-        </select>
-        <br />
+          {/* </fieldset> */}
+        </section>
+        <section className={styles.inputs}>
+          <Input
+            label="Price"
+            isRequired
+            value={price}
+            setValue={v => setPrice(parseFloat(v))}
+            isNumber
+          />
+          <Input
+            label="Number of Rooms"
+            isRequired
+            value={numberOfRooms}
+            setValue={v => setNumberOfRooms(parseFloat(v))}
+            isNumber
+            limits={{ min: 0, max: 10 }}
+          />
 
-        {!editExistingListing && (
-          <div>
-            <label htmlFor="photos">Photos:{""}</label>
-            <input
-              type="file"
-              onChange={e => {
-                if (e.target.files != null) {
-                  handleFileInput(e);
-                  setPhotos(Array.from(e.target.files));
-                }
-              }}
-              id="photos"
-              accept="image/*"
-              multiple
-              required
-            />
-          </div>
-        )}
-        <br />
-        {/* disable the button if all required fields are not filled in */}
-        <button type="button" onClick={preview} disabled={!checkInputs()}>
-          Preview
-        </button>
+          <label className={styles.label} htmlFor="type">
+            Type <span>*</span>
+          </label>
+          <select
+            id="type"
+            value={accommodationType}
+            onChange={e => setAccommodationType(e.target.value)}
+          >
+            <option value={"Flat"}>Flat</option>
+            <option value={"Detached"}>Detached House</option>
+            <option value={"Semi-detached"}>Semi-detached House</option>
+            <option value={"Terraced"}>Terraced House</option>
+            <option value={"Bungalows"}>Bungalows</option>
+          </select>
 
-        <br />
-        <button>Add</button>
+          {!editExistingListing && (
+            <div className={styles.fileUploadCon}>
+              <label className={styles.label}>
+                Picture <span>*</span>{" "}
+                <span className={styles.details}>
+                  {"(from 1 to 15 photos)"}
+                </span>
+              </label>
+              <label className={styles.labelBtn} htmlFor="photos">
+                <img src="/icons/upload.svg" /> Upload photo
+              </label>
+              <input
+                type="file"
+                onChange={e => {
+                  if (e.target.files != null) {
+                    handleFileInput(e);
+                    setPhotos(Array.from(e.target.files));
+                  }
+                }}
+                id="photos"
+                accept="image/*"
+                multiple
+                required
+              />
+            </div>
+          )}
+        </section>
+
+        <section className={styles.btnCon}>
+          {/* disable the button if all required fields are not filled in */}
+          <button
+            className={styles.previewBtn}
+            type="button"
+            onClick={preview}
+            disabled={!checkInputs()}
+          >
+            Preview
+          </button>
+
+          <button className={styles.addBtn}>
+            {editExistingListing ? "Save" : "Create"}
+          </button>
+        </section>
       </form>
     </div>
   );

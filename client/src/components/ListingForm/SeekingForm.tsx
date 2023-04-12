@@ -126,7 +126,13 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
 
           {!editExistingListing && (
             <div className={styles.fileUploadCon}>
-              <label htmlFor="photos">
+              <label className={styles.label}>
+                Picture <span></span>{" "}
+                <span className={styles.details}>
+                  {"(from 0 to 15 photos)"}
+                </span>
+              </label>
+              <label className={styles.labelBtn} htmlFor="photos">
                 <img src="/icons/upload.svg" /> Upload photo
               </label>
               <input
@@ -153,7 +159,9 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
           >
             Preview
           </button>
-          <button className={styles.addBtn}>Add</button>
+          <button className={styles.addBtn}>
+            {editExistingListing ? "Save" : "Create"}
+          </button>
         </section>
       </form>
     </div>

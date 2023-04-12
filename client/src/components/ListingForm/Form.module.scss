@@ -5,6 +5,7 @@
   -moz-box-shadow: 0px 10px 30px 0px rgba(202, 201, 251, 0.8);
   box-shadow: 0px 10px 30px 0px rgba(202, 201, 251, 0.8);
   padding: 16px;
+  padding-bottom: 64px;
   position: relative;
   .title {
     font-size: 24px;
@@ -22,10 +23,19 @@
       flex-direction: column;
       gap: 8px;
     }
+    section.inputsAddress {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
 
     .fileUploadCon {
       margin-top: 19px;
-      label {
+      .label {
+      }
+      .labelBtn {
+        margin-top: 12px;
         display: inline-block;
         background-color: #4285f4;
         color: #fff;
@@ -40,6 +50,10 @@
       }
       input[type="file"] {
         display: none;
+      }
+      .details {
+        color: #afafafe1;
+        font-size: 14px;
       }
     }
     .btnCon {
@@ -83,6 +97,27 @@
           transform: translateY(2px);
         }
       }
+    }
+  }
+  .label {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 4px;
+    span {
+      color: red;
+    }
+  }
+  select {
+    border: 1px #4286f49a solid;
+    border-radius: 4px;
+    outline: none;
+    padding: 4px 8px;
+    width: 100%;
+    margin-bottom: 12px;
+    &:focus {
+      border: 1px #4285f4 solid;
+
+      box-shadow: 0 0 2px #4285f4;
     }
   }
 }
