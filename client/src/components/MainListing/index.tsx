@@ -9,11 +9,11 @@ import { AccommodationSearchResultsInner } from "@/generated";
 
 const MainListings = () => {
   const [location, setLocation] = useState("");
-  const [radius, setRadius] = useState<number | null>(null);
+  const [radius, setRadius] = useState<number>(1);
   const [sources, setSources] = useState<{ [key: string]: boolean }>({});
   const [maxPrice, setMaxPrice] = useState<number | undefined>();
   const { apiManager } = useApi();
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  // const [isSubmitted, setIsSubmitted] = useState(false);
 
   const [selectedTab, setSelectedTab] = useState(0);
   const tabs = ["Accommodations", "Seeking list"];
@@ -25,6 +25,8 @@ const MainListings = () => {
   const [pageNumber, setPageNumber] = React.useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [isFirst, setIsFirst] = useState(true);
+
   useEffect(() => {
     apiManager.apiV1SourcesAccommodationGet().then(sources => {
       const tmp = sources.reduce(
@@ -35,11 +37,9 @@ const MainListings = () => {
     });
   }, []);
 
-  const search = (location: string, radius: number) => {
-    setLocation(location);
-    setRadius(radius);
-    setIsSubmitted(true);
-  };
+  useEffect(() => {
+    if (pageNumber > 0) getData();
+  }, [pageNumber]);
 
   const applyFilters = (
     sources: { [key: string]: boolean },
@@ -49,8 +49,9 @@ const MainListings = () => {
     setMaxPrice(maxPrice);
   };
 
-  const getData = async () => {
+  const getData = async (setPage?: number) => {
     setIsLoading(true);
+    setIsFirst(false);
     apiManager
       .apiV1ListingsAccommodationGet({
         location,
@@ -58,8 +59,8 @@ const MainListings = () => {
         maxPrice,
         sources: Object.keys(sources).filter(s => sources[s]),
         sortBy: "newest",
-        page: pageNumber,
-        size: 15,
+        page: setPage || pageNumber,
+        size: 5,
       })
       .then(res => {
         console.log(res);
@@ -77,6 +78,11 @@ const MainListings = () => {
       .finally(() => {
         setIsLoading(false);
       });
+  };
+
+  const initData = () => {
+    setData([]);
+    getData(0);
   };
 
   return (
@@ -101,20 +107,23 @@ const MainListings = () => {
             maxPrice={maxPrice}
             handleApply={applyFilters}
           />
-          <SearchComponent handleSubmit={getData} />
+          <SearchComponent
+            location={location}
+            setLocation={setLocation}
+            radius={radius}
+            setRadius={setRadius}
+            handleSubmit={initData}
+          />
         </div>
       </div>
       <main className={styles.main}>
-        {/* {isSubmitted && (
-          <Listing
-            sources={Object.keys(sources).filter(s => sources[s])}
-            location={location}
-            radius={radius ?? 20}
-            maxPrice={maxPrice}
-          />
-        )} */}
-
-        <Listing data={data} isLoading={isLoading} />
+        <Listing
+          isEnded={isEnded}
+          data={data}
+          isLoading={isLoading}
+          setPageNumber={setPageNumber}
+          isFirst={isFirst}
+        />
       </main>
     </div>
   );

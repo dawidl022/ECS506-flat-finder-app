@@ -26,52 +26,14 @@ interface AccommodationDetailsProps {
 //   sortBy,
 //   size = 9,
 // })
-const Listing: FC<any> = ({ data, isLoading }) => {
-  // const [data, setData] = useState<Array<AccommodationSearchResultsInner>>([]);
-  // CHANGE
-  // const [isLoading, setIsLoading] = useState(true);
-  // const { apiManager } = useApi();
-  const [pageNumber, setPageNumber] = React.useState(0);
-  const [isEnded, setIsEnded] = React.useState(false);
-
-  // React.useEffect(() => {
-  //   getData();
-  // }, [pageNumber]);
-
-  // React.useEffect(() => {
-  //   setPageNumber(0);
-  //   setIsEnded(false);
-  // }, [location, radius, maxPrice, sources, sortBy]);
-
-  // const getData = async () => {
-  //   setIsLoading(true);
-  //   apiManager
-  //     .apiV1ListingsAccommodationGet({
-  //       location,
-  //       radius,
-  //       maxPrice,
-  //       sources,
-  //       sortBy,
-  //       page: pageNumber,
-  //       size: 15,
-  //     })
-  //     .then(res => {
-  //       if (res.searchResults.length === 0) {
-  //         // alert("No");
-  //         setIsEnded(true);
-  //       }
-  //       setData(prev => {
-  //         const prevIds = prev.map(listing => listing.accommodation.id);
-  //         const finalResult = res.searchResults.filter(
-  //           result => !prevIds.includes(result.accommodation.id)
-  //         );
-  //         return [...prev, ...finalResult];
-  //       });
-  //     })
-  //     .finally(() => {
-  //       setIsLoading(false);
-  //     });
-  // };
+const Listing: FC<any> = ({
+  data,
+  isLoading,
+  setPageNumber,
+  isEnded,
+  isFirst,
+}) => {
+  // const [isEnded, setIsEnded] = React.useState(false);
 
   return (
     <>
@@ -88,14 +50,21 @@ const Listing: FC<any> = ({ data, isLoading }) => {
         {isLoading ? (
           <LoadingSpinner conStyles={{ paddingTop: 60 }} />
         ) : isEnded ? (
-          <p>No more data</p>
-        ) : (
+          data.length > 0 ? (
+            <p>No more data</p>
+          ) : (
+            <p>No data</p>
+          )
+        ) : !isFirst ? (
           <button
-            // onClick={() => setPageNumber(prev => prev + 1)}
+            onClick={() => setPageNumber((prev: number) => prev + 1)}
             className={styles.loadBtn}
           >
             Load more
           </button>
+        ) : (
+          // TODO: Frontend
+          <p>Start searching</p>
         )}
       </div>
     </>

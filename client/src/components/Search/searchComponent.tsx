@@ -3,16 +3,27 @@ import { FC, useState, FormEvent } from "react";
 import styles from "./Search.module.scss";
 
 interface Search {
-  handleSubmit: (location: string, radius: number) => void;
+  // handleSubmit: (location: string, radius: number) => void;
+  location: string;
+  setLocation: (v: string) => void;
+  radius: number;
+  setRadius: (v: number) => void;
+  handleSubmit: () => void;
 }
 
-const SearchComponent: FC<Search> = ({ handleSubmit }) => {
-  const [location, setTargetLocation] = useState("");
-  const [radius, setTargetRadius] = useState(0);
+const SearchComponent: FC<Search> = ({
+  location,
+  setLocation,
+  radius,
+  setRadius,
+  handleSubmit,
+}) => {
+  // const [location, setTargetLocation] = useState("");
+  // const [radius, setTargetRadius] = useState(0);
 
   const submitInputs = (e: FormEvent) => {
     e.preventDefault();
-    handleSubmit(location, radius);
+    handleSubmit();
   };
 
   return (
@@ -25,7 +36,7 @@ const SearchComponent: FC<Search> = ({ handleSubmit }) => {
           type="text"
           placeholder="location"
           value={location}
-          onChange={e => setTargetLocation(e.target.value)}
+          onChange={e => setLocation(e.target.value)}
           required
         />
         <label htmlFor="radius">Radius:</label>
@@ -33,12 +44,14 @@ const SearchComponent: FC<Search> = ({ handleSubmit }) => {
           className={styles.select}
           id="radius"
           value={radius}
-          onChange={e => setTargetRadius(parseFloat(e.target.value))}
+          onChange={e => setRadius(parseFloat(e.target.value))}
         >
           <option value={0}>This postcode only</option>
           <option value={0.25}>Within 1/4 km</option>
           <option value={0.5}>Within 1/2 km</option>
-          <option value={1}>Within 1 km</option>
+          <option defaultChecked value={1}>
+            Within 1 km
+          </option>
           <option value={3}>Within 3 km</option>
           <option value={5}>Within 5 km</option>
           <option value={10}>Within 10 km</option>
