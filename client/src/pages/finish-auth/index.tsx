@@ -34,9 +34,10 @@ const FinishAuth = () => {
       .apiV1UsersUserIdProfilePut({
         userId: user?.id as string,
         userProfileForm: {
-          name: userProfile.firstName + " " + userProfile.lastName,
+          name:
+            userProfile.firstName.trim() + " " + userProfile.lastName.trim(),
           contactDetails: {
-            phoneNumber: userProfile.phone,
+            phoneNumber: userProfile.phone.trim(),
           },
         },
       })
