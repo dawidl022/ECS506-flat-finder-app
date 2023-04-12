@@ -40,7 +40,7 @@ const Filter: FC<FilterProps> = ({ sources, maxPrice, handleApply }) => {
         />
 
         <fieldset>
-          <legend>Sources</legend>
+          <legend>Sources:</legend>
           {chooseSources &&
             Object.keys(chooseSources).map((source, index) => {
               return (

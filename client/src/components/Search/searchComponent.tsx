@@ -1,4 +1,4 @@
-import { FC, useState, FormEvent } from "react";
+import { FC, FormEvent } from "react";
 
 import styles from "./Search.module.scss";
 
@@ -18,9 +18,6 @@ const SearchComponent: FC<Search> = ({
   setRadius,
   handleSubmit,
 }) => {
-  // const [location, setTargetLocation] = useState("");
-  // const [radius, setTargetRadius] = useState(0);
-
   const submitInputs = (e: FormEvent) => {
     e.preventDefault();
     handleSubmit();
@@ -59,7 +56,6 @@ const SearchComponent: FC<Search> = ({
           <option value={20}>Within 20 km</option>
           <option value={30}>Within 30 km</option>
           <option value={40}>Within 40 km</option>
-          <option value={50}>Within 50 km</option>
         </select>
 
         <button type="submit">Search</button>
