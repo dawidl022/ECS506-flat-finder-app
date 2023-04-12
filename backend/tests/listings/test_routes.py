@@ -9,7 +9,7 @@ import uuid
 from flask.testing import FlaskClient
 from app.listings.exceptions import ListingNotFoundError
 from app.listings.dtos import AccommodationSearchParams, AccommodationForm, SeekingForm, SeekingSearchParams
-from app.listings.models import AccommodationListing, AccommodationSearchResult, AccommodationSummary, Coordinates, ExternalAccommodationListing, InternalAccommodationSummary, ListingSummary, Location, SeekingListing, SeekingSearchResult, Source, UKAddress, InternalAccommodationListing
+from app.listings.models import AccommodationListing, AccommodationSearchResult, AccommodationSummary, Coordinates, ExternalAccommodationListing, InternalAccommodationSummary, ListingSummary, Location, SeekingListing, SeekingSearchResult, Source, UKAddress, InternalAccommodationListing, Photo
 
 from app.listings.service import BaseListingsService, SearchResult
 from app.clients.APIException import APIException
@@ -77,6 +77,15 @@ class MockListingService(BaseListingsService):
         if user_email == model_listing.author_email:
             return [model_listing_summary]
         return []
+    
+    def upload_listing_photo(self, listing_id: uuid.UUID, blob: bytes) -> Photo:
+        raise NotImplementedError()
+
+    def get_listing_photo(self, listing_id: uuid.UUID, photo_id: uuid.UUID) -> Photo:
+        raise NotImplementedError()
+
+    def delete_listing_photo(self, listing_id: uuid.UUID, photo_id: uuid.UUID) -> None:
+        raise NotImplementedError()
 
     def get_seeking_listing(self, listing_id: uuid.UUID) -> SeekingListing | None:
         raise NotImplementedError()
