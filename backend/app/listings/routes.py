@@ -388,7 +388,7 @@ def delete_seeking_listing(
 @bp.post("/<listing_id>/photos")
 @jwt_required()
 def upload_listing_photo(listing_id: str,
-                         blob: bytes,
+                         blob: bytes,  # TODO this is likely not the way to get the uploaded photo
                          listing_service: BaseListingsService
                          ) -> Response:
     listing = get_accommodation_listing_authored_by_current_user(
