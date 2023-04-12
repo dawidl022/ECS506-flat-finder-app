@@ -260,13 +260,14 @@ const AccommodationForm: FC<FormProps> = ({
               type="file"
               onChange={e => {
                 if (e.target.files != null) {
-                  handleFileInput(e); // TODO rename function
+                  handleFileInput(e); 
                   setPhotos(Array.from(e.target.files));
                 }
               }}
               id="photos"
               accept="image/*"
               multiple
+              required
             />
           </div>
         )}

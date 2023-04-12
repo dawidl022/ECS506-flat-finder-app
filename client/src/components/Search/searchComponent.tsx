@@ -59,7 +59,6 @@ const SearchComponent: FC<Search> = ({
           <option value={20}>Within 20 km</option>
           <option value={30}>Within 30 km</option>
           <option value={40}>Within 40 km</option>
-          <option value={50}>Within 50 km</option>
         </select>
 
         <button type="submit">Search</button>
