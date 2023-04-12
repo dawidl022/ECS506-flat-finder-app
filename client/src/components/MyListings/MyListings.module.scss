@@ -1,5 +1,13 @@
-.listingsWrapper {
-  display: flex;
-  align-items: center;
-  gap: 24px;
+.section {
+  margin-bottom: 56px;
+  .sectionTitle {
+    margin-bottom: 24px;
+    font-size: 24px;
+  }
+
+  .listingsWrapper {
+    overflow-y: hidden;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 }

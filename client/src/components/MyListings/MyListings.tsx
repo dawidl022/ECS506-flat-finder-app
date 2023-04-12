@@ -56,8 +56,8 @@ const MyListings: FC = () => {
       ) : (
         <>
           {Object.entries(listingByType || {}).map(([type, listings]) => (
-            <div key={type}>
-              <h3>
+            <section className={styles.section} key={type}>
+              <h3 className={styles.sectionTitle}>
                 {type.charAt(0).toUpperCase() + type.slice(1) + " listings"}
               </h3>
               <div className={styles.listingsWrapper}>
@@ -69,7 +69,7 @@ const MyListings: FC = () => {
                     />
                   ))}
               </div>
-            </div>
+            </section>
           ))}
         </>
       )}
