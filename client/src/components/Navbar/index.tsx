@@ -9,8 +9,7 @@ const Navbar = () => {
   const [isActive, setIsActive] = React.useState(false);
 
   const changeBackground = () => {
-    // console.log(window.scrollY);
-    if (window.scrollY >= 60) setIsActive(true);
+    if (window.scrollY >= 30) setIsActive(true);
     else setIsActive(false);
   };
 

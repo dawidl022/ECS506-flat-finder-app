@@ -14,10 +14,17 @@ const AccommodationSummaryTile: FC<AccommodationSummaryProps> = ({
   return (
     <div className={styles.wrapper}>
       <Link href={`/listings/accommodation/${accommodation.id}`}>
-        <img
-          src={accommodation.thumbnailUrl}
-          alt={`listing ${accommodation.id}`}
-        />
+        <div className={styles.imgCon}>
+          {accommodation.thumbnailUrl ? (
+            <img
+              className={styles.accImg}
+              src={accommodation.thumbnailUrl}
+              alt={`listing ${accommodation.id}`}
+            />
+          ) : (
+            <img className={styles.imgPlc} src={"./plchld.svg"} />
+          )}
+        </div>
         <div className={styles.body}>
           <div className={styles.header}>
             <p className={styles.title}>{accommodation.title}</p>
@@ -26,7 +33,7 @@ const AccommodationSummaryTile: FC<AccommodationSummaryProps> = ({
           {/* <p> {accommodation.shortDescription} </p> */}
           <div className={styles.moreDetails}>
             <p>
-              <span>Accommodation type:</span> {accommodation.accommodationType}{" "}
+              <span>type:</span> {accommodation.accommodationType}{" "}
             </p>
             <p>
               <span>rooms number:</span> {accommodation.numberOfRooms}{" "}
