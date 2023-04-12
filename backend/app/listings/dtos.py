@@ -118,14 +118,14 @@ class AccommodationForm(Schemable):
     accommodation_type: str
     number_of_rooms: int
     price: int
-    address: str | Address
+    address: str
 
     @property
     def decoded_address(self) -> Address:
         address = cast(
             dict[str, str],
             CamelCaseDecoder.snake_casify(
-            json.loads(self.address) if isinstance(self.address, str) else self.address
+                json.loads(self.address)
             )
         )
         country = address["country"]
@@ -136,6 +136,21 @@ class AccommodationForm(Schemable):
                                         config=dacite.Config(cast=[StrEnum]))
 
         raise ValueError("Unexpected country")
+
+    def to_dict(self) -> dict[str, Any]:
+        d = vars(self).copy()
+        del d["address"]
+        return d
+
+
+@dataclass(frozen=True)
+class EditAccommodationForm(Schemable):
+    title: str
+    description: str
+    accommodation_type: str
+    number_of_rooms: int
+    price: int
+    address: Address
 
     def to_dict(self) -> dict[str, Any]:
         d = vars(self).copy()
