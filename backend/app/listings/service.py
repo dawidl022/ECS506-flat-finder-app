@@ -424,7 +424,12 @@ class ListingsService(BaseListingsService, ListingsCleanupService):
                           photo_id: uuid.UUID
                           ) -> Photo:
         # get listing if exists
-        listing = self.accommodation_listing_repo.get_listing_by_id(listing_id)
+        listing: SeekingListing | InternalAccommodationListing | None = \
+            self.accommodation_listing_repo.get_listing_by_id(listing_id)
+
+        if listing is None:
+            listing = self.seeking_listing_repo.get_listing_by_id(listing_id)
+
         if listing is None:
             raise ListingNotFoundError()
 
