@@ -9,6 +9,7 @@ import {
   AccommodationSearchResultsInner,
   SeekingSearchResultsInner,
 } from "@/generated";
+import SeekingListing from "./Listing/SeekingListing";
 
 const MainListings = () => {
   const [location, setLocation] = useState("");
@@ -105,17 +106,17 @@ const MainListings = () => {
         size: 15,
       })
       .then(res => {
-        console.log(res);
-        if (res.length === 0) {
-          setIsEnded(true);
-        }
-        setSeekingData(prev => {
-          const prevIds = prev.map(listing => listing.seeking.id);
-          const finalResult = res.filter(
-            result => !prevIds.includes(result.seeking.id)
-          );
-          return [...prev, ...finalResult];
-        });
+        console.log("MAIN", res);
+        // if (res.length === 0) {
+        //   setIsEnded(true);
+        // }
+        // setSeekingData(prev => {
+        //   const prevIds = prev.map(listing => listing.seeking.id);
+        //   const finalResult = res.filter(
+        //     result => !prevIds.includes(result.seeking.id)
+        //   );
+        //   return [...prev, ...finalResult];
+        // });
       })
       .finally(() => {
         setIsLoading(false);
@@ -170,7 +171,7 @@ const MainListings = () => {
             isFirst={isFirst}
           />
         ) : (
-          <p>Seeking list component #todo</p>
+          <SeekingListing data={seekingData} />
         )}
       </main>
     </div>
