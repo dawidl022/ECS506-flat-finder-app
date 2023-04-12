@@ -20,7 +20,11 @@ const AccommodationSummaryTile: FC<AccommodationSummaryProps> = ({
           {accommodation.thumbnailUrl ? (
             <img
               className={styles.accImg}
-              src={accommodation.thumbnailUrl}
+              src={
+                accommodation.source === "zoopla"
+                  ? accommodation.thumbnailUrl
+                  : `http://127.0.0.1:5000${accommodation.thumbnailUrl}`
+              }
               alt={`listing ${accommodation.id}`}
             />
           ) : (
@@ -35,16 +39,16 @@ const AccommodationSummaryTile: FC<AccommodationSummaryProps> = ({
           {/* <p> {accommodation.shortDescription} </p> */}
           <div className={styles.moreDetails}>
             <p>
-              <span>type:</span> {accommodation.accommodationType}{" "}
+              <span>type:</span> {accommodation.accommodationType}
             </p>
             <p>
-              <span>rooms number:</span> {accommodation.numberOfRooms}{" "}
+              <span>rooms number:</span> {accommodation.numberOfRooms}
             </p>
             <p>
-              <span>postcode:</span> {accommodation.postCode}{" "}
+              <span>postcode:</span> {accommodation.postCode}
             </p>
             <p>
-              <span>source:</span> {accommodation.source}{" "}
+              <span>source:</span> {accommodation.source}
             </p>
           </div>
         </div>

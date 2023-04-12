@@ -53,7 +53,8 @@ const MyListingCard: FC<UserListingProps> = ({ listingInner }) => {
 
   return (
     <div className={style.wrapper}>
-      <img src={listing.thumbnailUrl} />
+      <img src={`http://127.0.0.1:5000${listing.thumbnailUrl}`} />
+      <p>{listing.id}</p>
       <p>{listing.title}</p>
       <p>{listing.postCode}</p>
       <p>{`£${listing.price}`}</p>
@@ -65,3 +66,6 @@ const MyListingCard: FC<UserListingProps> = ({ listingInner }) => {
 };
 
 export default MyListingCard;
+
+// internal_aa8fc213-2b87-4df4-95e6-7efc1fb401f1
+//          aa8fc213-2b87-4df4-95e6-7efc1fb401f1

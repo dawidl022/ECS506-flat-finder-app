@@ -404,26 +404,16 @@ def upload_listing_photo(listing_id: str,
     return make_response("", CREATED)
 
 
-@bp.get("/<listing_id>/photos/<uuid:photo_id>")
-@jwt_required()
-def get_listing_photo(listing_id: str,
+@bp.get("/<uuid:listing_id>/photos/<uuid:photo_id>")
+def get_listing_photo(listing_id: uuid.UUID,
                       photo_id: uuid.UUID,
                       listing_service: BaseListingsService
                       ) -> Response:
-    source, listing_uuid = extract_listing_id_and_source(listing_id)
-
-    if source != Source.internal:
-        abort(make_response(
-            {"source": f"photos not available for {source}"},
-            NOT_FOUND))
 
     try:
         photo = listing_service.get_listing_photo(
-            uuid.UUID(listing_uuid), photo_id)
+            listing_id, photo_id)
 
-    except ValueError:
-        abort(make_response(
-            {'msg': "invalid ids given"}, BAD_REQUEST))
     except ListingNotFoundError:
         abort(make_response(
             {'listingId': "listing not found"}, NOT_FOUND))
