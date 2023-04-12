@@ -42,16 +42,12 @@ class GeocodingService(BaseGeocodingService):
         """
         TODO turn address into coordinates using geopy module
         """
-        geolocator = Nominatim(user_agent="flatfinder-app")
-        location = geolocator.geocode(addr.full_address)
         return Coordinates(0, 0)
 
     def search_coords(self, location_query: str) -> Coordinates:
         """
         TODO turn address into coordinates using geopy module
         """
-        geolocator = Nominatim(user_agent="flatfinder-app")
-        location = geolocator.geocode(location_query)
         return Coordinates(0, 0)
 
     def calc_distance(self, c1: Coordinates, c2: Coordinates) -> float:
