@@ -87,7 +87,7 @@ class InMemoryAccommodationListingsRepository(AccommodationListingRepository):
 
     def __init__(self) -> None:
         self.listings: dict[UUID, InternalAccommodationListing] = {}
-        self.listings_by_author: dict[str, 
+        self.listings_by_author: dict[str,
                                       dict[UUID, InternalAccommodationListing]
                                       ] = defaultdict(dict)
 
@@ -124,20 +124,17 @@ class InMemoryAccommodationListingsRepository(AccommodationListingRepository):
 class InMemorySeekingListingsRepository(SeekingListingRepository):
     def __init__(self) -> None:
         self.listings: dict[UUID, SeekingListing] = {}
-        self.listings_by_author: dict[str, 
-                                      dict[UUID, InternalAccommodationListing]
-                                      ] = defaultdict(dict)
 
     def get_listing_by_id(self, listing_id: UUID) -> SeekingListing | None:
         return self.listings.get(listing_id)
 
     def get_listings_authored_by(self, user_email: str
                                  ) -> tuple[SeekingListing, ...]:
-        return tuple(self.listings_by_author.get(user_email, {}).values())
+        return tuple(listing for listing in self.listings.values()
+                     if listing.author_email == user_email)
 
     def save_listing(self, listing: SeekingListing) -> None:
         self.listings[listing.id] = listing
-        self.listings_by_author[listing.author_email][listing.id] = listing
 
     def delete_listing(self, listing_id: UUID) -> None:
         try:
