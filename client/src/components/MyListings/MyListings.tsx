@@ -15,17 +15,20 @@ interface ListingByType {
   [key: string]: UserListingModel[];
 }
 
-const MyListings: FC = () => {
+interface MyListingsProps {
+  userId: string;
+}
+
+const MyListings: FC<MyListingsProps> = ({ userId }) => {
   const [data, setData] = useState<UserListingModel[] | null>(null);
   const [error, setError] = useState(false);
-  const { user } = useUser();
   const { apiManager } = useApi();
 
   useEffect(() => {
-    if (user?.id) {
+    if (userId) {
       apiManager
         .apiV1UsersUserIdListingsGet({
-          userId: user?.id as string,
+          userId: userId,
         })
         .then(res => {
           setData(res);
@@ -35,7 +38,7 @@ const MyListings: FC = () => {
           setError(true);
         });
     }
-  }, [user]);
+  }, [userId]);
 
   const listingByType: ListingByType | null =
     data &&

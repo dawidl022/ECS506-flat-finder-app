@@ -49,7 +49,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ userData, isMe = false }) => {
       <section className={styles.listingsCon}>
         {/* <h2 className={styles.title}>Listings:</h2> */}
         <div className={styles.listings}>
-          <MyListings />
+          <MyListings userId={userData.id} />
         </div>
       </section>
     </div>
