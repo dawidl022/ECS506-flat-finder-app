@@ -95,6 +95,10 @@ const MainListings = () => {
       });
   };
 
+  React.useEffect(() => {
+    setIsFirst(true);
+  }, [tabs]);
+
   const getSeekingData = async (setPage?: number) => {
     setIsLoading(true);
     setIsFirst(false);
@@ -107,16 +111,16 @@ const MainListings = () => {
       })
       .then(res => {
         console.log("MAIN", res);
-        // if (res.length === 0) {
-        //   setIsEnded(true);
-        // }
-        // setSeekingData(prev => {
-        //   const prevIds = prev.map(listing => listing.seeking.id);
-        //   const finalResult = res.filter(
-        //     result => !prevIds.includes(result.seeking.id)
-        //   );
-        //   return [...prev, ...finalResult];
-        // });
+        if (res.length === 0) {
+          setIsEnded(true);
+        }
+        setSeekingData(prev => {
+          const prevIds = prev.map(listing => listing.seeking.id);
+          const finalResult = res.filter(
+            result => !prevIds.includes(result.seeking.id)
+          );
+          return [...prev, ...finalResult];
+        });
       })
       .finally(() => {
         setIsLoading(false);

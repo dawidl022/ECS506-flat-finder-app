@@ -3,7 +3,6 @@ import Link from "next/link";
 import { AccommodationSummary } from "@/generated/models/AccommodationSummary";
 
 import styles from "./Tile.module.scss";
-import PhotoGallery from "../PhotoGallery";
 
 interface AccommodationSummaryProps {
   accommodation: AccommodationSummary;

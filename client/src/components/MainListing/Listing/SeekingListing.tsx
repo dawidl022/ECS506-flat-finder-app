@@ -5,7 +5,7 @@ import SeekingSummaryTile from "@/components/Summary/SeekingSummaryTile";
 import { SeekingSearchResultsInner } from "@/generated";
 
 interface SeekingListingProps {
-  data: any[];
+  data: SeekingSearchResultsInner[];
 }
 
 const SeekingListing: FC<SeekingListingProps> = ({ data }) => {
@@ -14,7 +14,7 @@ const SeekingListing: FC<SeekingListingProps> = ({ data }) => {
       {data.map((item, index: number) => {
         return (
           <div key={index}>
-            <SeekingSummaryTile seekingAccomodation={item} />
+            <SeekingSummaryTile seekingAccomodation={item.seeking} />
           </div>
         );
       })}
