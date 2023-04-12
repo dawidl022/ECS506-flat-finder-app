@@ -1,7 +1,7 @@
 import { UserProfile } from "@/generated";
 import React, { FC, useState } from "react";
 import MyListings from "@/components/MyListings/MyListings";
-
+import { useRouter } from "next/router";
 import styles from "./ProfileCard.module.scss";
 import AvatarPlaceholder from "../AvatarPlaceholder";
 import EditingButton from "./EditingButtonComponent";
@@ -16,7 +16,7 @@ interface ProfileCardProps {
 const ProfileCard: FC<ProfileCardProps> = ({ userData, isMe = false }) => {
   const [user, setUser] = useState<UserProfile>(userData);
   const [isEditing, setIsEditing] = useState(false);
-
+  const router = useRouter();
   const { apiManager } = useApi();
 
   const getUserProfile = () => {
@@ -50,12 +50,14 @@ const ProfileCard: FC<ProfileCardProps> = ({ userData, isMe = false }) => {
       </div>
 
       {/* If user has listings */}
-      <section className={styles.listingsCon}>
-        {/* <h2 className={styles.title}>Listings:</h2> */}
-        <div className={styles.listings}>
-          <MyListings userId={userData.id} />
-        </div>
-      </section>
+      {router.pathname.startsWith("/profile/") && (
+        <section className={styles.listingsCon}>
+          {/* <h2 className={styles.title}>Listings:</h2> */}
+          <div className={styles.listings}>
+            <MyListings userId={userData.id} />
+          </div>
+        </section>
+      )}
     </div>
   );
 };

@@ -39,6 +39,7 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
           setTitle(res.title);
           setDescription(res.description);
           setLocation(res.preferredLocation);
+          setPhotos(res.photoUrls?.map(url => new Blob([url])) ?? []);
         })
         .catch(err => {
           alert(
@@ -76,7 +77,6 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
     };
 
     if (!editExistingListing) {
-      console.log(photos);
       api
         .apiV1ListingsSeekingPost({
           ...baseForm,
