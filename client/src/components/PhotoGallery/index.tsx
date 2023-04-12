@@ -14,7 +14,8 @@ const PhotoGallery: FC<PhotoGalleryProps> = ({
   width = "350px",
 }) => {
   return (
-    <div style={{ width: width }}>
+    // style={{ width: width }}
+    <div className={styles.body}>
       <Slide transitionDuration={200}>
         {photoUrls.map((photoUrls, index) => (
           <div className={styles.wrapper} key={index}>

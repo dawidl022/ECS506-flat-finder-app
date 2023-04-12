@@ -1,7 +1,15 @@
 // Default settings for the slider component.
-.wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-size: cover;
+
+.body {
+  flex: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  .wrapper {
+    height: 550px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    object-fit: cover;
+  }
 }
