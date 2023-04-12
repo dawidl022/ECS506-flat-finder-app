@@ -404,17 +404,22 @@ def upload_listing_photo(listing_id: str,
     return make_response("", CREATED)
 
 
-@bp.get("/<listing_id>/photos/<photo_id>")
+@bp.get("/<listing_id>/photos/<uuid:photo_id>")
 @jwt_required()
 def get_listing_photo(listing_id: str,
-                      photo_id: str,
+                      photo_id: uuid.UUID,
                       listing_service: BaseListingsService
                       ) -> Response:
+    source, listing_uuid = extract_listing_id_and_source(listing_id)
+
+    if source != Source.internal:
+        abort(make_response(
+            {"source": f"photos not available for {source}"},
+            NOT_FOUND))
+
     try:
         photo = listing_service.get_listing_photo(
-            uuid.UUID(listing_id), uuid.UUID(photo_id))
-
-        return jsonify(id=photo.id, blob=photo.blob)
+            uuid.UUID(listing_uuid), photo_id)
 
     except ValueError:
         abort(make_response(
@@ -425,6 +430,10 @@ def get_listing_photo(listing_id: str,
     except PhotoNotFoundError:
         abort(make_response(
             {'photoId': "photo not found"}, NOT_FOUND))
+
+    response = make_response(photo.blob)
+    response.headers.set('Content-Type', 'image')
+    return response
 
 
 @bp.delete("/<listing_id>/photos/<photo_id>")
