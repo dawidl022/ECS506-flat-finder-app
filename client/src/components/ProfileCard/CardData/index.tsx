@@ -4,7 +4,7 @@ import Link from "next/link";
 import styles from "./CardData.module.scss";
 import useApi from "@/hooks/useApi";
 import { User } from "@/generated";
-
+import { useRouter } from "next/router";
 interface CardDataProps {
   userData: UserProfile;
   isEditing: boolean;
@@ -19,6 +19,7 @@ const CardData: React.FC<CardDataProps> = ({
   updateUser,
 }) => {
   const { apiManager } = useApi();
+  const router = useRouter();
   const [users, setUsers] = React.useState<User[]>([]);
   const [newUserData, setNewUserData] = React.useState({
     name: userData.name,
@@ -129,7 +130,7 @@ const CardData: React.FC<CardDataProps> = ({
         </div>
       </div>
 
-      {users.map(user => {
+      {router.pathname.startsWith("/listings/") && users.map(user => {
         if (user.id === userData.id) {
           return (
             <Link
