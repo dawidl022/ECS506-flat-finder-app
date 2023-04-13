@@ -3,7 +3,6 @@ import { Seeking } from "@/generated/models/Seeking";
 import PhotoGallery from "../PhotoGallery";
 import ProfileCard from "../ProfileCard";
 import styles from "./AccommodationListing.module.scss";
-import UserProfile from "@/pages/profile/[userId]";
 interface SeekingDetailsProps {
   seeking: Seeking;
 }
