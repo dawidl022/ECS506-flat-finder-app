@@ -65,7 +65,7 @@ const AccommodationDetails: FC<AccommodationDetailsProps> = ({
       </div>
 
       <div>
-        <ProfileCard userData={user} />
+        <ProfileCard userData={user} showLink={true} />
       </div>
     </div>
   );

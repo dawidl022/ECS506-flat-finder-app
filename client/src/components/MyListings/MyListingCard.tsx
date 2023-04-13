@@ -15,9 +15,14 @@ import { toast } from "react-toastify";
 interface UserListingProps {
   listingInner: UserListingsInner;
   fetchData: () => void;
+  isMe?: boolean;
 }
 
-const MyListingCard: FC<UserListingProps> = ({ listingInner, fetchData }) => {
+const MyListingCard: FC<UserListingProps> = ({
+  listingInner,
+  fetchData,
+  isMe = false,
+}) => {
   const router = useRouter();
   const listing = listingInner.listing;
   const { apiManager } = useApi();
@@ -108,19 +113,21 @@ const MyListingCard: FC<UserListingProps> = ({ listingInner, fetchData }) => {
             <span>description: </span> {listing.shortDescription}
           </p>
 
-          <div className={styles.btnCon}>
-            <button className={styles.editBtn} onClick={handleEdit}>
-              Edit
-            </button>
-            <button
-              className={styles.deleteBtn}
-              onClick={() => {
-                handleDelete();
-              }}
-            >
-              Delete
-            </button>
-          </div>
+          {isMe && (
+            <div className={styles.btnCon}>
+              <button className={styles.editBtn} onClick={handleEdit}>
+                Edit
+              </button>
+              <button
+                className={styles.deleteBtn}
+                onClick={() => {
+                  handleDelete();
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          )}
         </div>
       </Link>
     </div>

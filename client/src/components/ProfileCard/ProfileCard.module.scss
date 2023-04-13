@@ -40,3 +40,19 @@
     }
   }
 }
+
+.viewProfileBtn {
+  background-color: #4285f4;
+  color: #fff;
+  padding: 8px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.1s ease-in-out;
+
+  &:hover {
+    background-color: lighten(#4285f4, 5%);
+  }
+  &:active {
+    transform: translateY(2px);
+  }
+}

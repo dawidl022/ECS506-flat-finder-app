@@ -7,13 +7,19 @@ import AvatarPlaceholder from "../AvatarPlaceholder";
 import EditingButton from "./EditingButtonComponent";
 import CardData from "./CardData";
 import useApi from "@/hooks/useApi";
+import Link from "next/link";
 
 interface ProfileCardProps {
   userData: UserProfile;
   isMe?: boolean;
+  showLink?: boolean;
 }
 
-const ProfileCard: FC<ProfileCardProps> = ({ userData, isMe = false }) => {
+const ProfileCard: FC<ProfileCardProps> = ({
+  userData,
+  isMe = false,
+  showLink = false,
+}) => {
   const [user, setUser] = useState<UserProfile>(userData);
   const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
@@ -47,6 +53,14 @@ const ProfileCard: FC<ProfileCardProps> = ({ userData, isMe = false }) => {
           isEditing={isEditing}
           setIsEditing={setIsEditing}
         />
+        {showLink && (
+          <Link
+            href={`/profile/${userData.id}`}
+            className={styles.viewProfileBtn}
+          >
+            View all listings by this user
+          </Link>
+        )}
       </div>
 
       {/* If user has listings */}

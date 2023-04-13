@@ -21,6 +21,7 @@ interface MyListingsProps {
 
 const MyListings: FC<MyListingsProps> = ({ userId }) => {
   const [data, setData] = useState<UserListingModel[] | null>(null);
+  const { user } = useUser();
   const [error, setError] = useState(false);
   const { apiManager } = useApi();
 
@@ -74,6 +75,7 @@ const MyListings: FC<MyListingsProps> = ({ userId }) => {
                       fetchData={fetchData}
                       key={listingInner.listing.id}
                       listingInner={listingInner}
+                      isMe={userId === user?.id}
                     />
                   ))}
               </div>
