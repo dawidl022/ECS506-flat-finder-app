@@ -11,7 +11,7 @@ const SeekingDetails: FC<SeekingDetailsProps> = ({ seeking }) => {
   const setPhotoUrls = () => {
     return (
       seeking.photoUrls?.map(photo => `http://127.0.0.1:5000/${photo}`) ?? [
-        "placeholder.webp",
+        "/placeholder.webp",
       ]
     );
   };

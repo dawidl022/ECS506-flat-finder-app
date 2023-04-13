@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import { FC, useState } from "react";
 import { useRouter } from "next/router";
 import {
@@ -84,39 +84,45 @@ const MyListingCard: FC<UserListingProps> = ({ listingInner, fetchData }) => {
 
   return (
     <div className={styles.wrapper}>
-      <img src={`http://127.0.0.1:5000${listing.thumbnailUrl}`} />
-      <div className={styles.content}>
-        <div className={styles.header}>
-          <p className={styles.title}>{listing.title}</p>
-          {listingInner.type !== "seeking" && (
-            <p className={styles.price}>{`£${listing.price}`}</p>
-          )}
-        </div>
-        {listingInner.type !== "seeking" && (
-          <p className={styles.value}>
-            <span>postcode: </span>
-            {listing.postCode}
-          </p>
+      <Link href={`/listings/${listingInner.type}/${listing.id}`}>
+        {listing.thumbnailUrl && listing.thumbnailUrl !== null ? (
+          <img src={`http://127.0.0.1:5000${listing.thumbnailUrl}`} />
+        ) : (
+          <img src="/placeholder.webp" />
         )}
+        <div className={styles.content}>
+          <div className={styles.header}>
+            <p className={styles.title}>{listing.title}</p>
+            {listingInner.type !== "seeking" && (
+              <p className={styles.price}>{`£${listing.price}`}</p>
+            )}
+          </div>
+          {listingInner.type !== "seeking" && (
+            <p className={styles.value}>
+              <span>postcode: </span>
+              {listing.postCode}
+            </p>
+          )}
 
-        <p className={styles.value}>
-          <span>description: </span> {listing.shortDescription}
-        </p>
+          <p className={styles.value}>
+            <span>description: </span> {listing.shortDescription}
+          </p>
 
-        <div className={styles.btnCon}>
-          <button className={styles.editBtn} onClick={handleEdit}>
-            Edit
-          </button>
-          <button
-            className={styles.deleteBtn}
-            onClick={() => {
-              handleDelete();
-            }}
-          >
-            Delete
-          </button>
+          <div className={styles.btnCon}>
+            <button className={styles.editBtn} onClick={handleEdit}>
+              Edit
+            </button>
+            <button
+              className={styles.deleteBtn}
+              onClick={() => {
+                handleDelete();
+              }}
+            >
+              Delete
+            </button>
+          </div>
         </div>
-      </div>
+      </Link>
     </div>
   );
 };
