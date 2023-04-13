@@ -277,16 +277,6 @@ const AccommodationForm: FC<FormProps> = ({
         </section>
 
         <section className={styles.btnCon}>
-          {/* disable the button if all required fields are not filled in */}
-          <button
-            className={styles.previewBtn}
-            type="button"
-            onClick={preview}
-            disabled={!checkInputs()}
-          >
-            Preview
-          </button>
-
           <button className={styles.addBtn}>
             {editExistingListing ? "Save" : "Create"}
           </button>

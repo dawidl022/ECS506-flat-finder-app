@@ -177,14 +177,6 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
           )}
         </section>
         <section className={styles.btnCon}>
-          <button
-            className={styles.previewBtn}
-            type="button"
-            onClick={preview}
-            disabled={!checkInputs()}
-          >
-            Preview
-          </button>
           <button className={styles.addBtn}>
             {editExistingListing ? "Save" : "Create"}
           </button>
