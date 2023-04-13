@@ -19,6 +19,8 @@ from app.clients.ListingAPIClient import ListingAPIClient
 from app.clients.APIException import APIException
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
+from app.listings.dtos import EditAccommodationForm
+from app.listings.models import AccommodationSummary, SeekingSummary
 
 
 class BaseGeocodingService(abc.ABC):
@@ -40,17 +42,13 @@ class GeocodingService(BaseGeocodingService):
         """
         TODO turn address into coordinates using geopy module
         """
-        geolocator = Nominatim(user_agent="flatfinder-app")
-        location = geolocator.geocode(addr.full_address)
-        return Coordinates(location.lat, location.long)
+        return Coordinates(0, 0)
 
     def search_coords(self, location_query: str) -> Coordinates:
         """
         TODO turn address into coordinates using geopy module
         """
-        geolocator = Nominatim(user_agent="flatfinder-app")
-        location = geolocator.geocode(location_query)
-        return Coordinates(location.lat, location.long)
+        return Coordinates(0, 0)
 
     def calc_distance(self, c1: Coordinates, c2: Coordinates) -> float:
         """
@@ -269,7 +267,7 @@ class ListingsService(BaseListingsService, ListingsCleanupService):
         raise ValueError("Unknown source for accommodation listing")
 
     def update_accommodation_listing(
-        self, listing_id: uuid.UUID, form: AccommodationForm
+        self, listing_id: uuid.UUID, form: EditAccommodationForm
     ) -> AccommodationListing:
         listing = self.accommodation_listing_repo.get_listing_by_id(listing_id)
 
@@ -297,11 +295,12 @@ class ListingsService(BaseListingsService, ListingsCleanupService):
 
     def get_listings_authored_by(self, user_email: str
                                  ) -> list[ListingSummary]:
-        # TODO fetch user's seeking listings too and sort by latest
         return [
             listing.summarise()
             for listing in
             self.accommodation_listing_repo.get_listings_authored_by(
+                user_email
+            ) + self.seeking_listing_repo.get_listings_authored_by(
                 user_email
             )
         ]
@@ -389,10 +388,11 @@ class ListingsService(BaseListingsService, ListingsCleanupService):
 
         for listing in user_listings:
             try:
-                if isinstance(listing, InternalAccommodationListing):
-                    self.delete_accommodation_listing(listing.id)
+                if isinstance(listing, AccommodationSummary):
+                    self.delete_accommodation_listing(uuid.UUID(listing.id))
 
-                # TODO clean up seeking listings too
+                elif isinstance(listing, SeekingSummary):
+                    self.delete_seeking_listing(listing.id)
             except ListingNotFoundError:
                 pass
 
@@ -420,7 +420,12 @@ class ListingsService(BaseListingsService, ListingsCleanupService):
                           photo_id: uuid.UUID
                           ) -> Photo:
         # get listing if exists
-        listing = self.accommodation_listing_repo.get_listing_by_id(listing_id)
+        listing: SeekingListing | InternalAccommodationListing | None = \
+            self.accommodation_listing_repo.get_listing_by_id(listing_id)
+
+        if listing is None:
+            listing = self.seeking_listing_repo.get_listing_by_id(listing_id)
+
         if listing is None:
             raise ListingNotFoundError()
 

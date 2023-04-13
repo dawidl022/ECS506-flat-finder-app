@@ -1,22 +1,28 @@
 import { UserProfile } from "@/generated";
 import React, { FC, useState } from "react";
 import MyListings from "@/components/MyListings/MyListings";
-
+import { useRouter } from "next/router";
 import styles from "./ProfileCard.module.scss";
 import AvatarPlaceholder from "../AvatarPlaceholder";
 import EditingButton from "./EditingButtonComponent";
 import CardData from "./CardData";
 import useApi from "@/hooks/useApi";
+import Link from "next/link";
 
 interface ProfileCardProps {
   userData: UserProfile;
   isMe?: boolean;
+  showLink?: boolean;
 }
 
-const ProfileCard: FC<ProfileCardProps> = ({ userData, isMe = false }) => {
+const ProfileCard: FC<ProfileCardProps> = ({
+  userData,
+  isMe = false,
+  showLink = false,
+}) => {
   const [user, setUser] = useState<UserProfile>(userData);
   const [isEditing, setIsEditing] = useState(false);
-
+  const router = useRouter();
   const { apiManager } = useApi();
 
   const getUserProfile = () => {
@@ -25,13 +31,17 @@ const ProfileCard: FC<ProfileCardProps> = ({ userData, isMe = false }) => {
       .then(res => setUser(res));
   };
 
+  React.useEffect(() => {
+    setUser(userData);
+  }, [userData]);
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.card}>
-        <p style={{ position: "absolute", left: 12 }}>
+        {/* <p style={{ position: "absolute", left: 12 }}>
           DEBUG: <br /> is my profile: {isMe ? "True" : "False"} <br />
           is editing: {isEditing ? "True" : "False"}
-        </p>
+        </p> */}
         {isMe && !isEditing && <EditingButton setIsEditing={setIsEditing} />}
 
         <div className={styles.avaCon}>
@@ -43,15 +53,25 @@ const ProfileCard: FC<ProfileCardProps> = ({ userData, isMe = false }) => {
           isEditing={isEditing}
           setIsEditing={setIsEditing}
         />
+        {showLink && (
+          <Link
+            href={`/profile/${userData.id}`}
+            className={styles.viewProfileBtn}
+          >
+            View all listings by this user
+          </Link>
+        )}
       </div>
 
       {/* If user has listings */}
-      <section className={styles.listingsCon}>
-        {/* <h2 className={styles.title}>Listings:</h2> */}
-        <div className={styles.listings}>
-          <MyListings />
-        </div>
-      </section>
+      {router.pathname.startsWith("/profile/") && (
+        <section className={styles.listingsCon}>
+          {/* <h2 className={styles.title}>Listings:</h2> */}
+          <div className={styles.listings}>
+            <MyListings userId={userData.id} />
+          </div>
+        </section>
+      )}
     </div>
   );
 };

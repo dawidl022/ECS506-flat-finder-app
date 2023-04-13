@@ -3,11 +3,22 @@ import Image from "next/image";
 import { Inter } from "@next/font/google";
 import styles from "@/styles/Home.module.scss";
 import Tabs from "@/components/Tabs";
-import ListingForm from "@/components/ListingForm/ListingForm";
-
+import Filter from "@/components/Filter/Filter";
+import InfiniteListings from "@/components/InfiniteListings";
+import Pagination from "@/components/Pagination";
+import MainListings from "@/components/MainListing";
+import useUser from "@/hooks/useUser";
+import React from "react";
+import { useRouter } from "next/router";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+  const { user, isLoading } = useUser();
+  const router = useRouter();
+
+  React.useEffect(() => {
+    if ((!user || !user?.name) && !isLoading) router.push("/login");
+  }, [isLoading, user]);
   return (
     <>
       <Head>
@@ -19,8 +30,7 @@ export default function Home() {
 
       <main>
         <div className="container">
-          <h2>Hello</h2>
-          <ListingForm />
+          <div>{user?.name && <MainListings />}</div>
         </div>
       </main>
     </>

@@ -36,4 +36,4 @@ class Config:
             "GOOGLE_AUTH_CLIENT_SECRET")
         self.FRONTEND_URL = must_get_env("FRONTEND_URL")
         self.ZOOPLA_API_KEY = must_get_env('ZOOPLA_API_KEY')
-        # TODO SUPERUSER_EMAIL for initial admin access
+        self.SUPERUSER_EMAIL = os.getenv("SUPERUSER_EMAIL")

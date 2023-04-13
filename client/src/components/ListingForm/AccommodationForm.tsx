@@ -1,4 +1,4 @@
-import { FC, useState, FormEvent, ChangeEvent } from "react";
+import { FC, useState, FormEvent, ChangeEvent, useEffect } from "react";
 import { useRouter } from "next/router";
 import { handleFileInput } from "./handleFileInput";
 import {
@@ -6,6 +6,15 @@ import {
   Configuration,
   DefaultApi,
 } from "@/generated";
+import useApi from "@/hooks/useApi";
+
+import Input from "../Input";
+import TextArea from "../TextArea";
+
+import styles from "./Form.module.scss";
+import useUser from "@/hooks/useUser";
+
+import { toast } from "react-toastify";
 
 interface FormProps {
   listingId: string;
@@ -24,14 +33,15 @@ const AccommodationForm: FC<FormProps> = ({
   const [town, setTown] = useState("");
   const [postCode, setPostCode] = useState("");
   const [country] = useState("United Kingdom");
+  const { user } = useUser();
 
-  const [accommodationType, setAccommodationType] = useState("");
-  const [numberOfRooms, setNumberOfRooms] = useState(0);
-  const [price, setPrice] = useState(0);
+  const [accommodationType, setAccommodationType] = useState("Flat");
+  const [numberOfRooms, setNumberOfRooms] = useState("");
+  const [price, setPrice] = useState("");
 
-  const api = new DefaultApi(
-    new Configuration({ basePath: "http://127.0.0.1:5000" })
-  );
+  const [photos, setPhotos] = useState<Blob[]>();
+
+  const { apiManager: api } = useApi();
 
   const baseForm = {
     title,
@@ -44,29 +54,33 @@ const AccommodationForm: FC<FormProps> = ({
       country: AccommodationAddressCountryEnum.Uk,
     },
     accommodationType,
-    numberOfRooms,
-    price,
+    numberOfRooms: parseInt(numberOfRooms),
+    price: parseInt(price),
   };
 
-  if (editExistingListing) {
-    api
-      .apiV1ListingsAccommodationListingIdGet({ listingId })
-      .then(res => {
-        setTitle(res.accommodation.title);
-        setDescription(res.accommodation.description);
-        setLine1(res.accommodation.address.line1);
-        //as line2 is optional, check if there is an input
-        setLine2(res.accommodation.address.line2 ?? "");
-        setTown(res.accommodation.address.town);
-        setPostCode(res.accommodation.address.postCode);
-        setAccommodationType(res.accommodation.accommodationType);
-        setNumberOfRooms(res.accommodation.numberOfRooms);
-        setPrice(res.accommodation.price);
-      })
-      .catch(err => {
-        alert(`Could not find listing with ID:  ${listingId} \nError:  ${err}`);
-      });
-  }
+  useEffect(() => {
+    if (editExistingListing) {
+      api
+        .apiV1ListingsAccommodationListingIdGet({ listingId })
+        .then(res => {
+          setTitle(res.title);
+          setDescription(res.description);
+          setLine1(res.address.line1);
+          //as line2 is optional, check if there is an input
+          setLine2(res.address.line2 ?? "");
+          setTown(res.address.town);
+          setPostCode(res.address.postCode);
+          setAccommodationType(res.accommodationType);
+          setNumberOfRooms(res.numberOfRooms.toString());
+          setPrice(res.price.toString());
+        })
+        .catch(err => {
+          alert(
+            `Could not find listing with ID:  ${listingId} \nError:  ${err}`
+          );
+        });
+    }
+  }, []);
 
   const preview = () => {
     router.push({
@@ -108,15 +122,28 @@ const AccommodationForm: FC<FormProps> = ({
       api
         .apiV1ListingsAccommodationPost({
           ...baseForm,
-          photos: Array<Blob>(),
+          photos: photos ?? [],
         })
+        .then(() => {
+          toast.success("Listing is added", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+          router.push({ pathname: `/profile/${user?.id}` });
+        })
+
         .catch(err =>
           alert(
             "Accommodation listing failed to be published. \nError: " +
               err.message
           )
-        )
-        .then(() => router.push({ pathname: "/myListings" }));
+        );
     } else {
       api
         .apiV1ListingsAccommodationListingIdPut({
@@ -125,7 +152,19 @@ const AccommodationForm: FC<FormProps> = ({
             ...baseForm,
           },
         })
-        .then(() => router.push({ pathname: "/myListings" }))
+        .then(() => {
+          toast.success("Listing is changed", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+          router.push({ pathname: `/profile/${user?.id}` });
+        })
         .catch(err => {
           alert("Error whilst updating listing. \nError: " + err);
         });
@@ -133,140 +172,113 @@ const AccommodationForm: FC<FormProps> = ({
   };
 
   return (
-    <div>
-      Accommodation Form
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="title">Title: </label>
-        <input
-          type="text"
-          placeholder="Title REQUIRED"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-          required
-        />
-        <br />
+    <div className={styles.wrapper}>
+      <h2 className={styles.title}>Accommodation Form</h2>
+      <form className={styles.form} onSubmit={handleSubmit}>
+        <section className={styles.inputs}>
+          <Input label="Title" isRequired value={title} setValue={setTitle} />
 
-        <label htmlFor="description">Description</label>
-        <textarea
-          rows={15}
-          cols={30}
-          id="description"
-          placeholder="Description REQUIRED"
-          value={description}
-          onChange={e => setDescription(e.target.value)}
-          required
-        />
-        <br />
-
-        <fieldset>
-          <legend>Address</legend>
-          <label htmlFor="line1">Address Line 1: </label>
-          <input
-            id="line1"
-            type="text"
-            placeholder="Line 1 REQUIRED"
+          <TextArea
+            label="Description"
+            value={description}
+            setValue={setDescription}
+            isRequired
+          />
+        </section>
+        <section className={styles.inputsAddress}>
+          {/* <fieldset> */}
+          <Input
+            label="Address Line 1"
+            isRequired
             value={line1}
-            onChange={e => setLine1(e.target.value)}
-            required
+            setValue={setLine1}
           />
-          <br />
-          <label htmlFor="line2">Address Line 2: </label>
-          <input
-            type="text"
-            id="line2"
-            placeholder="Line 2 OPTIONAL"
-            value={line2}
-            onChange={e => setLine2(e.target.value)}
-          />
-          <br />
-          <label htmlFor="town">Town: </label>
-          <input
-            id="town"
-            type="text"
-            placeholder="Town REQUIRED"
-            value={town}
-            onChange={e => setTown(e.target.value)}
-            required
-          />
-          <br />
-          <label htmlFor="postCode">Post Code: </label>
-          <input
-            type="text"
-            id="postCode"
-            placeholder="Post Code REQUIRED"
+          <Input label="Address Line 2" value={line2} setValue={setLine2} />
+          <Input label="Town" isRequired value={town} setValue={setTown} />
+          <Input
+            label="Post Code"
+            isRequired
             value={postCode}
-            onChange={e => setPostCode(e.target.value)}
-            required
+            setValue={setPostCode}
           />
-          <br />
-          <label htmlFor="country">Country: </label>
-          <input
-            type="text"
-            id="country"
-            placeholder="Country REQUIRED"
+
+          <Input
+            isReadOnly
+            isDisabled
+            label="Country"
+            // isRequired
             value={country}
-            readOnly
-            disabled={true}
           />
-        </fieldset>
-        <br />
-        <label htmlFor="price">Price: </label>
-        <input
-          type="number"
-          id="price"
-          placeholder="Price REQUIRED"
-          value={price}
-          onChange={e => setPrice(parseFloat(e.target.value))}
-          min={0}
-          required
-        />
-        <br />
-        <label htmlFor="numberOfRooms">Number of Rooms: </label>
-        <input
-          type="number"
-          id="numberOfRooms"
-          placeholder="Number of Rooms REQUIRED"
-          value={numberOfRooms}
-          onChange={e => setNumberOfRooms(parseFloat(e.target.value))}
-          min={0}
-          max={10}
-          required
-        />
-        <br />
-        <label htmlFor="type">Type: </label>
-        <select
-          id="type"
-          value={accommodationType}
-          onChange={e => setAccommodationType(e.target.value)}
-        >
-          <option value={"Detached"}>Detached House</option>
-          <option value={"Semi-detached"}>Semi-detached House</option>
-          <option value={"Terraced"}>Terraced House</option>
-          <option value={"Flats"}>Flats</option>
-          <option value={"Bungalows"}>Bungalows</option>
-        </select>
-        <br />
+          {/* </fieldset> */}
+        </section>
+        <section className={styles.inputs}>
+          <Input
+            label="Price"
+            isRequired
+            value={price}
+            setValue={v => setPrice(v)}
+            isNumber
+          />
+          <Input
+            label="Number of Rooms"
+            isRequired
+            value={numberOfRooms}
+            setValue={v => setNumberOfRooms(v)}
+            isNumber
+            limits={{ min: 0, max: 10 }}
+          />
 
-        {!editExistingListing && (
-          <div>
-            <label htmlFor="photos">Photos:{""}</label>
-            <input
-              type="file"
-              onChange={handleFileInput}
-              id="photos"
-              accept="image/*"
-              multiple
-            />
-          </div>
-        )}
-        <br />
-        {/* disable the button if all required fields are not filled in */}
-        <button type="button" onClick={preview} disabled={!checkInputs()}>
-          Preview
-        </button>
+          <label className={styles.label} htmlFor="type">
+            Type <span>*</span>
+          </label>
+          <select
+            id="type"
+            value={accommodationType}
+            onChange={e => setAccommodationType(e.target.value)}
+          >
+            <option value={"Flat"}>Flat</option>
+            <option value={"Detached"}>Detached House</option>
+            <option value={"Semi-detached"}>Semi-detached House</option>
+            <option value={"Terraced"}>Terraced House</option>
+            <option value={"Bungalows"}>Bungalows</option>
+          </select>
 
-        <br />
-        <button>Add</button>
+          {!editExistingListing && (
+            <div className={styles.fileUploadCon}>
+              <label className={styles.label}>
+                Picture <span>*</span>{" "}
+                <span className={styles.details}>
+                  {"(from 1 to 15 photos)"}
+                </span>
+              </label>
+              <label className={styles.labelBtn} htmlFor="photos">
+                <img src="/icons/upload.svg" /> Upload photo
+              </label>
+              <input
+                type="file"
+                onChange={e => {
+                  if (e.target.files != null) {
+                    handleFileInput(e);
+                    setPhotos(Array.from(e.target.files));
+                  }
+                }}
+                id="photos"
+                accept="image/*"
+                multiple
+                required
+              />
+              {photos && photos.length > 0 && (
+                <p>Uploaded photos: {photos.length}</p>
+              )}
+            </div>
+          )}
+        </section>
+
+        <section className={styles.btnCon}>
+          <button className={styles.addBtn}>
+            {editExistingListing ? "Save" : "Create"}
+          </button>
+        </section>
       </form>
     </div>
   );

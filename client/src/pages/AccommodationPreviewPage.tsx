@@ -22,7 +22,7 @@ const AccommodationPreviewPage: FC = ({}) => {
     description,
     accommodationType,
     numberOfRooms,
-    photoUrls: [],
+    photoUrls: ["placeholder.webp"],
     source: "preview",
     author: {
       name: "Preview User",

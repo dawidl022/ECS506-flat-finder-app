@@ -124,13 +124,53 @@ class AccommodationForm(Schemable):
     def decoded_address(self) -> Address:
         address = cast(
             dict[str, str],
-            CamelCaseDecoder.snake_casify(json.loads(self.address))
+            CamelCaseDecoder.snake_casify(
+                json.loads(self.address)
+            )
         )
         country = address["country"]
 
         match Country(country):
             case Country.UK:
                 return dacite.from_dict(data_class=UKAddress, data=address,
+                                        config=dacite.Config(cast=[StrEnum]))
+
+        raise ValueError("Unexpected country")
+
+    def to_dict(self) -> dict[str, Any]:
+        d = vars(self).copy()
+        del d["address"]
+        return d
+
+
+class EditAccommodationFormSchema(Schema):
+    title = fields.Str(required=True)
+    description = fields.Str(required=True)
+    accommodation_type = fields.Str(required=True)
+    number_of_rooms = fields.Int(required=True, validate=Range(min=1))
+    price = fields.Int(validate=Range(min=0))
+    address = fields.Field(required=True)
+
+
+@dataclass(frozen=True)
+class EditAccommodationForm(Schemable):
+    schema = EditAccommodationFormSchema()
+
+    title: str
+    description: str
+    accommodation_type: str
+    number_of_rooms: int
+    price: int
+    address: dict[str, Any]
+
+    @property
+    def decoded_address(self) -> Address:
+
+        country = self.address["country"]
+
+        match Country(country):
+            case Country.UK:
+                return dacite.from_dict(data_class=UKAddress, data=self.address,
                                         config=dacite.Config(cast=[StrEnum]))
 
         raise ValueError("Unexpected country")
@@ -222,7 +262,7 @@ class SeekingListingDTO:
         self.title = listing.title
         self.description = listing.description
         self.photo_urls = self.get_photo_urls(listing)
-        self.preferred_location = listing.location
+        self.preferred_location = listing.location.name
         self.author = AuthorDTO(author)
         self.contact_info = ContactInfoDTO(author)
 
@@ -301,11 +341,14 @@ class ListingSummaryDTO:
     listing: AccommodationSummaryDTO | SeekingSummaryDTO
 
     def __init__(self, summary: ListingSummary):
-        if isinstance(summary, AccommodationSummary):
+        print(summary)
+        if isinstance(summary, SeekingSummary):
+            self.type = ListingType.seeking
+            self.listing = SeekingSummaryDTO(summary)
+        else:
             self.type = ListingType.accommodation
             self.listing = AccommodationSummaryDTO(summary)
-        else:
-            raise TypeError("unsupported ListingSummary subtype")
+        #     raise TypeError("unsupported ListingSummary subtype")
 
 
 @dataclass(frozen=True)
@@ -337,9 +380,9 @@ class SearchResultDTO:
 class SeekingSearchResultDTO:
     distance: float
     is_favourite: bool
-    accommodation: SeekingSummaryDTO
+    seeking: SeekingSummaryDTO
 
     def __init__(self, result: SeekingSearchResult):
         self.distance = result.distance
         self.is_favourite = result.is_favourite
-        self.accommodation = SeekingSummaryDTO(result.seeking)
+        self.seeking = SeekingSummaryDTO(result.seeking)

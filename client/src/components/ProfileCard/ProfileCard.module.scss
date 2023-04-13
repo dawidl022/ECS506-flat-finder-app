@@ -8,8 +8,8 @@
     -moz-box-shadow: 0px 10px 30px 0px rgba(202, 201, 251, 0.8);
     box-shadow: 0px 10px 30px 0px rgba(202, 201, 251, 0.8);
     padding: 16px;
-    min-height: 250px;
-    // max-width: 350px;
+    padding-bottom: 24px;
+    max-width: 600px;
     min-width: 288px;
     margin: 0 auto;
     display: flex;
@@ -38,5 +38,21 @@
       font-size: 20px;
       font-weight: bold;
     }
+  }
+}
+
+.viewProfileBtn {
+  background-color: #4285f4;
+  color: #fff;
+  padding: 8px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.1s ease-in-out;
+
+  &:hover {
+    background-color: lighten(#4285f4, 5%);
+  }
+  &:active {
+    transform: translateY(2px);
   }
 }

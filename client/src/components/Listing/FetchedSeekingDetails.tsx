@@ -1,18 +1,20 @@
 import { FC, useState, useEffect } from "react";
 import { DefaultApi } from "@/generated/apis/DefaultApi";
-import { SeekingDetails as SeekingDetailsModel } from "@/generated/models/SeekingDetails";
 import SeekingDetails from "./SeekingDetails";
+import { Seeking } from "@/generated";
+import useApi from "@/hooks/useApi";
 
 interface SeekingDetailsProps {
   listingId: string;
 }
 
 const FetchedSeekingDetails: FC<SeekingDetailsProps> = ({ listingId }) => {
-  const [data, setData] = useState<SeekingDetailsModel | null>(null);
+  const [data, setData] = useState<Seeking | null>(null);
   const [error, setError] = useState(false);
+  const { apiManager } = useApi();
 
   useEffect(() => {
-    new DefaultApi()
+    apiManager
       .apiV1ListingsSeekingListingIdGet({
         listingId: listingId,
       })
@@ -27,7 +29,7 @@ const FetchedSeekingDetails: FC<SeekingDetailsProps> = ({ listingId }) => {
       ) : !data ? (
         <p>Loading</p>
       ) : (
-        data.seeking && <SeekingDetails seeking={data.seeking} />
+        data && <SeekingDetails seeking={data} />
       )}
     </div>
   );

@@ -82,6 +82,7 @@ FRONTEND_URL=<frontend-url>
 GOOGLE_AUTH_CLIENT_ID=<your-auth-client-id>
 GOOGLE_AUTH_CLIENT_SECRET=<your-auth-client-secret>
 ZOOPLA_API_KEY=<your-zoopla-api-key>
+SUPERUSER_EMAIL=<test-admin-email>
 ```
 
 Inside this directory, run
@@ -96,6 +97,10 @@ hence share cookies without extra configuration. This URL will be used to
 redirect the user back to the frontend after SSO authentication.
 
 [Instructions to obtain the Zoopla API key](../docs/API-details/APIdetails.md#getting-api-key)
+
+The `SUPERUSER_EMAIL` is the email of the first admin of the system, needed to
+make other users admin. Upon registering a user with that email address,
+they get admin rights.
 
 You should see output similar to the following:
 

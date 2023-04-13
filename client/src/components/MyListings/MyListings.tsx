@@ -9,24 +9,41 @@ import MyListingCard from "./MyListingCard";
 import useUser from "@/hooks/useUser";
 import useApi from "@/hooks/useApi";
 
+import styles from "./MyListings.module.scss";
+
 interface ListingByType {
   [key: string]: UserListingModel[];
 }
 
-const MyListings: FC = () => {
+interface MyListingsProps {
+  userId: string;
+}
+
+const MyListings: FC<MyListingsProps> = ({ userId }) => {
   const [data, setData] = useState<UserListingModel[] | null>(null);
-  const [error, setError] = useState(false);
   const { user } = useUser();
+  const [error, setError] = useState(false);
   const { apiManager } = useApi();
 
   useEffect(() => {
-    apiManager
-      .apiV1UsersUserIdListingsGet({
-        userId: user?.id as string,
-      })
-      .then(res => setData(res))
-      .catch(() => setError(true));
-  }, []);
+    fetchData();
+  }, [userId]);
+
+  const fetchData = () => {
+    if (userId) {
+      apiManager
+        .apiV1UsersUserIdListingsGet({
+          userId: userId,
+        })
+        .then(res => {
+          setData(res);
+        })
+        .catch(err => {
+          console.log(err);
+          setError(true);
+        });
+    }
+  };
 
   const listingByType: ListingByType | null =
     data &&
@@ -47,18 +64,22 @@ const MyListings: FC = () => {
       ) : (
         <>
           {Object.entries(listingByType || {}).map(([type, listings]) => (
-            <div key={type}>
-              <h3>
+            <section className={styles.section} key={type}>
+              <h3 className={styles.sectionTitle}>
                 {type.charAt(0).toUpperCase() + type.slice(1) + " listings"}
               </h3>
-              {listings.length > 0 &&
-                listings.map(listingInner => (
-                  <MyListingCard
-                    key={listingInner.listing.id}
-                    listingInner={listingInner}
-                  />
-                ))}
-            </div>
+              <div className={styles.listingsWrapper}>
+                {listings.length > 0 &&
+                  listings.map(listingInner => (
+                    <MyListingCard
+                      fetchData={fetchData}
+                      key={listingInner.listing.id}
+                      listingInner={listingInner}
+                      isMe={userId === user?.id}
+                    />
+                  ))}
+              </div>
+            </section>
           ))}
         </>
       )}

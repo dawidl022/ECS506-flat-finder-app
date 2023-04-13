@@ -17,10 +17,9 @@ import * as runtime from '../runtime';
 import type {
   Accommodation,
   AccommodationAddress,
-  AccommodationDetails,
   AccommodationFormBase,
   AccommodationSearch,
-  SeekingDetails,
+  Seeking,
   SeekingFormBase,
   SeekingSearchResultsInner,
   User,
@@ -33,14 +32,12 @@ import {
     AccommodationToJSON,
     AccommodationAddressFromJSON,
     AccommodationAddressToJSON,
-    AccommodationDetailsFromJSON,
-    AccommodationDetailsToJSON,
     AccommodationFormBaseFromJSON,
     AccommodationFormBaseToJSON,
     AccommodationSearchFromJSON,
     AccommodationSearchToJSON,
-    SeekingDetailsFromJSON,
-    SeekingDetailsToJSON,
+    SeekingFromJSON,
+    SeekingToJSON,
     SeekingFormBaseFromJSON,
     SeekingFormBaseToJSON,
     SeekingSearchResultsInnerFromJSON,
@@ -393,7 +390,7 @@ export class DefaultApi extends runtime.BaseAPI {
     /**
      * Get the details of an accommodation listing
      */
-    async apiV1ListingsAccommodationListingIdGetRaw(requestParameters: ApiV1ListingsAccommodationListingIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccommodationDetails>> {
+    async apiV1ListingsAccommodationListingIdGetRaw(requestParameters: ApiV1ListingsAccommodationListingIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Accommodation>> {
         if (requestParameters.listingId === null || requestParameters.listingId === undefined) {
             throw new runtime.RequiredError('listingId','Required parameter requestParameters.listingId was null or undefined when calling apiV1ListingsAccommodationListingIdGet.');
         }
@@ -417,13 +414,13 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AccommodationDetailsFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => AccommodationFromJSON(jsonValue));
     }
 
     /**
      * Get the details of an accommodation listing
      */
-    async apiV1ListingsAccommodationListingIdGet(requestParameters: ApiV1ListingsAccommodationListingIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccommodationDetails> {
+    async apiV1ListingsAccommodationListingIdGet(requestParameters: ApiV1ListingsAccommodationListingIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Accommodation> {
         const response = await this.apiV1ListingsAccommodationListingIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -432,7 +429,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * Update specified accommodation listing if owner is currently logged in user. Does not allow for updating photos to save bandwidth. Use dedicated photos endpoint for this use case.
      * Update an accommodation listing
      */
-    async apiV1ListingsAccommodationListingIdPutRaw(requestParameters: ApiV1ListingsAccommodationListingIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccommodationDetails>> {
+    async apiV1ListingsAccommodationListingIdPutRaw(requestParameters: ApiV1ListingsAccommodationListingIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Accommodation>> {
         if (requestParameters.listingId === null || requestParameters.listingId === undefined) {
             throw new runtime.RequiredError('listingId','Required parameter requestParameters.listingId was null or undefined when calling apiV1ListingsAccommodationListingIdPut.');
         }
@@ -459,14 +456,14 @@ export class DefaultApi extends runtime.BaseAPI {
             body: AccommodationFormBaseToJSON(requestParameters.accommodationFormBase),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AccommodationDetailsFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => AccommodationFromJSON(jsonValue));
     }
 
     /**
      * Update specified accommodation listing if owner is currently logged in user. Does not allow for updating photos to save bandwidth. Use dedicated photos endpoint for this use case.
      * Update an accommodation listing
      */
-    async apiV1ListingsAccommodationListingIdPut(requestParameters: ApiV1ListingsAccommodationListingIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccommodationDetails> {
+    async apiV1ListingsAccommodationListingIdPut(requestParameters: ApiV1ListingsAccommodationListingIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Accommodation> {
         const response = await this.apiV1ListingsAccommodationListingIdPutRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -805,7 +802,7 @@ export class DefaultApi extends runtime.BaseAPI {
     /**
      * Get the details of a seeking listing
      */
-    async apiV1ListingsSeekingListingIdGetRaw(requestParameters: ApiV1ListingsSeekingListingIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SeekingDetails>> {
+    async apiV1ListingsSeekingListingIdGetRaw(requestParameters: ApiV1ListingsSeekingListingIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Seeking>> {
         if (requestParameters.listingId === null || requestParameters.listingId === undefined) {
             throw new runtime.RequiredError('listingId','Required parameter requestParameters.listingId was null or undefined when calling apiV1ListingsSeekingListingIdGet.');
         }
@@ -829,13 +826,13 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => SeekingDetailsFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => SeekingFromJSON(jsonValue));
     }
 
     /**
      * Get the details of a seeking listing
      */
-    async apiV1ListingsSeekingListingIdGet(requestParameters: ApiV1ListingsSeekingListingIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SeekingDetails> {
+    async apiV1ListingsSeekingListingIdGet(requestParameters: ApiV1ListingsSeekingListingIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Seeking> {
         const response = await this.apiV1ListingsSeekingListingIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -844,7 +841,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * Update specified seeking listing if owner is currently logged in user. Does not allow for updating photos to save bandwidth. Use dedicated photos endpoint for this use case.
      * Update an seeking listing
      */
-    async apiV1ListingsSeekingListingIdPutRaw(requestParameters: ApiV1ListingsSeekingListingIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SeekingDetails>> {
+    async apiV1ListingsSeekingListingIdPutRaw(requestParameters: ApiV1ListingsSeekingListingIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Seeking>> {
         if (requestParameters.listingId === null || requestParameters.listingId === undefined) {
             throw new runtime.RequiredError('listingId','Required parameter requestParameters.listingId was null or undefined when calling apiV1ListingsSeekingListingIdPut.');
         }
@@ -871,14 +868,14 @@ export class DefaultApi extends runtime.BaseAPI {
             body: SeekingFormBaseToJSON(requestParameters.seekingFormBase),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => SeekingDetailsFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => SeekingFromJSON(jsonValue));
     }
 
     /**
      * Update specified seeking listing if owner is currently logged in user. Does not allow for updating photos to save bandwidth. Use dedicated photos endpoint for this use case.
      * Update an seeking listing
      */
-    async apiV1ListingsSeekingListingIdPut(requestParameters: ApiV1ListingsSeekingListingIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SeekingDetails> {
+    async apiV1ListingsSeekingListingIdPut(requestParameters: ApiV1ListingsSeekingListingIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Seeking> {
         const response = await this.apiV1ListingsSeekingListingIdPutRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -887,7 +884,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * Create an seeking listing as the currently logged in user. Listing will be made visible to other users.
      * Create a new seeking listing
      */
-    async apiV1ListingsSeekingPostRaw(requestParameters: ApiV1ListingsSeekingPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SeekingDetails>> {
+    async apiV1ListingsSeekingPostRaw(requestParameters: ApiV1ListingsSeekingPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Seeking>> {
         if (requestParameters.title === null || requestParameters.title === undefined) {
             throw new runtime.RequiredError('title','Required parameter requestParameters.title was null or undefined when calling apiV1ListingsSeekingPost.');
         }
@@ -954,14 +951,14 @@ export class DefaultApi extends runtime.BaseAPI {
             body: formParams,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => SeekingDetailsFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => SeekingFromJSON(jsonValue));
     }
 
     /**
      * Create an seeking listing as the currently logged in user. Listing will be made visible to other users.
      * Create a new seeking listing
      */
-    async apiV1ListingsSeekingPost(requestParameters: ApiV1ListingsSeekingPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SeekingDetails> {
+    async apiV1ListingsSeekingPost(requestParameters: ApiV1ListingsSeekingPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Seeking> {
         const response = await this.apiV1ListingsSeekingPostRaw(requestParameters, initOverrides);
         return await response.value();
     }

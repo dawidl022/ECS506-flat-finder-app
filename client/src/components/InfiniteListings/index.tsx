@@ -6,6 +6,7 @@ import {
 } from "@/generated/apis/DefaultApi";
 import AccommodationSummaryTile from "@/components/Summary/AccomodationSummaryTile";
 import { AccommodationSearchResultsInner } from "@/generated/models/AccommodationSearchResultsInner";
+import useApi from "@/hooks/useApi";
 
 interface AccommodationDetailsProps {
   location: string;
@@ -16,6 +17,9 @@ interface AccommodationDetailsProps {
   page?: number;
   size?: number;
 }
+// 35263013 - 0
+// 29646891 - 5
+// 38454096 - 11
 
 const InfiniteListings: FC<AccommodationDetailsProps> = ({
   location,
@@ -28,26 +32,51 @@ const InfiniteListings: FC<AccommodationDetailsProps> = ({
 }) => {
   const [data, setData] = useState<Array<AccommodationSearchResultsInner>>([]);
   const [error, setError] = useState(false);
-  var pointer = size;
+  const [pointer, setPointer] = useState(0);
+  const [actualPage, setPage] = useState(page);
+  const [endOfResults, setEndOfResults] = useState(false);
+
+  const { apiManager } = useApi();
 
   const getMoreAccommodation = async () => {
-    await new DefaultApi()
+    console.log(`FETCHING: page:${actualPage}, pointer: ${pointer}`);
+    apiManager
       .apiV1ListingsAccommodationGet({
         location,
         radius,
         maxPrice,
         sources,
         sortBy,
-        page,
+        page: actualPage,
         size,
       })
       .then(res => {
-        setData(res.searchResults);
+        if (res.searchResults.length === 0) {
+          console.log("end of results");
+          setEndOfResults(true);
+        }
+        setData(prev => {
+          const prevIds = prev.map(listing => listing.accommodation.id);
+          return [
+            ...prev,
+            ...res.searchResults.filter(
+              result => !prevIds.includes(result.accommodation.id)
+            ),
+          ];
+        });
+        setPointer(prev => prev + size);
+        setPage(prev => prev + 1);
+        console.log("GET FOR PAGE ", actualPage);
       })
       .catch(() => setError(true));
-    page = page + 1;
-    pointer = pointer + size;
+    // page = page + 1;
+    // // pointer = pointer + size;
+    // setPointer(prev => prev + size);
   };
+
+  useEffect(() => {
+    getMoreAccommodation();
+  }, []);
 
   return (
     <div>
@@ -55,9 +84,9 @@ const InfiniteListings: FC<AccommodationDetailsProps> = ({
         <p>Error fetching data</p>
       ) : (
         <InfiniteScroll
-          dataLength={data.length}
+          dataLength={40000}
           next={getMoreAccommodation}
-          hasMore={pointer <= data.length}
+          hasMore={!endOfResults}
           loader={<h4>Loading...</h4>}
           endMessage={
             <p style={{ textAlign: "center" }}>

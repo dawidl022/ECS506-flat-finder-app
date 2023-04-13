@@ -2,6 +2,8 @@ import { FC } from "react";
 import Link from "next/link";
 import { AccommodationSummary } from "@/generated/models/AccommodationSummary";
 
+import styles from "./Tile.module.scss";
+
 interface AccommodationSummaryProps {
   accommodation: AccommodationSummary;
 }
@@ -10,21 +12,45 @@ const AccommodationSummaryTile: FC<AccommodationSummaryProps> = ({
   accommodation,
 }) => {
   return (
-    <div>
+    <div className={styles.wrapper}>
       <Link href={`/listings/accommodation/${accommodation.id}`}>
-        <img
-          src={accommodation.thumbnailUrl}
-          width={150}
-          height={150}
-          alt={`listing ${accommodation.id}`}
-        />
-        <p> {accommodation.title} </p>
-        <p> {`£${accommodation.price}`} </p>
-        <p> {accommodation.shortDescription} </p>
-        <p> {accommodation.accommodationType} </p>
-        <p> {accommodation.numberOfRooms} </p>
-        <p> {accommodation.postCode} </p>
-        <p> {accommodation.source} </p>
+        <div className={styles.imgCon}>
+          {/* <PhotoGallery/> */}
+          {accommodation.thumbnailUrl ? (
+            <img
+              className={styles.accImg}
+              src={
+                accommodation.source === "zoopla"
+                  ? accommodation.thumbnailUrl
+                  : `http://127.0.0.1:5000${accommodation.thumbnailUrl}`
+              }
+              alt={`listing ${accommodation.id}`}
+            />
+          ) : (
+            <img className={styles.imgPlc} src={"./plchld.svg"} />
+          )}
+        </div>
+        <div className={styles.body}>
+          <div className={styles.header}>
+            <p className={styles.title}>{accommodation.title}</p>
+            <p className={styles.price}>{`£${accommodation.price}`}</p>
+          </div>
+          {/* <p> {accommodation.shortDescription} </p> */}
+          <div className={styles.moreDetails}>
+            <p>
+              <span>type:</span> {accommodation.accommodationType}
+            </p>
+            <p>
+              <span>number of rooms:</span> {accommodation.numberOfRooms}
+            </p>
+            <p>
+              <span>postcode:</span> {accommodation.postCode}
+            </p>
+            <p>
+              <span>source:</span> {accommodation.source}
+            </p>
+          </div>
+        </div>
       </Link>
     </div>
   );

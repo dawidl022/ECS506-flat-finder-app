@@ -26,13 +26,7 @@ const SeekingPreviewPage: FC = ({}) => {
     },
     title,
     description,
-    preferredLocation: {
-      name,
-      coordinates: {
-        lat: 0,
-        _long: 0,
-      },
-    },
+    preferredLocation: name,
   };
   return (
     <div>

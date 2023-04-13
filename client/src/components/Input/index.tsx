@@ -6,8 +6,12 @@ interface InputProps {
   label?: string;
   isRequired?: boolean;
   placeholder?: string;
-  value?: string;
+  value?: string | number;
   setValue?: (val: string) => void;
+  isReadOnly?: boolean;
+  isDisabled?: boolean;
+  isNumber?: boolean;
+  limits?: { min: number; max: number };
 }
 
 const Input: React.FC<InputProps> = ({
@@ -16,6 +20,10 @@ const Input: React.FC<InputProps> = ({
   placeholder,
   value,
   setValue,
+  isReadOnly = false,
+  isDisabled = false,
+  isNumber = false,
+  limits,
 }) => {
   return (
     <div className={styles.wrapper}>
@@ -23,6 +31,12 @@ const Input: React.FC<InputProps> = ({
         {label} {isRequired && <span>*</span>}
       </label>
       <input
+        min={limits?.min}
+        max={limits?.max}
+        type={isNumber ? "number" : "text"}
+        // type=
+        readOnly={isReadOnly}
+        disabled={isDisabled}
         id={`input-${label}`}
         placeholder={placeholder}
         value={value}

@@ -11,7 +11,7 @@ from werkzeug.datastructures import FileStorage
 from app.auth.jwt import get_current_user_email, get_current_user_id
 from app.listings.exceptions import ListingNotFoundError, PhotoNotFoundError
 
-from app.util.marshmallow import get_form, get_params, get_input
+from app.util.marshmallow import get_form, get_params, get_input, get_body
 from app.util.encoding import CamelCaseEncoder
 from app.util.encoding import CamelCaseDecoder
 from app.clients.APIException import APIException
@@ -20,6 +20,7 @@ from .models import AccommodationListing, SeekingListing, Source
 from app.user.user_models import User, ContactDetails
 from app.user.user_service import BaseUserService
 from .models import AccommodationListing, InternalAccommodationListing, Source
+from .dtos import EditAccommodationForm
 
 from .dtos import (
     AccommodationForm,
@@ -268,10 +269,10 @@ def get_author(user_service, source, listing):
 @jwt_required()
 def put_accommodation_listing(
         listing_id: str,
-        listing_service: BaseListingsService,
+        listing_service: BaseListingsService, 
         user_service: BaseUserService
 ) -> Response:
-    form = validate_and_get_create_accommodation_form()
+    form = get_body(EditAccommodationForm)
 
     listing = get_accommodation_listing_authored_by_current_user(
         listing_id, listing_service, action="update")
@@ -295,7 +296,7 @@ def put_seeking_listing(
         listing_service: BaseListingsService,
         user_service: BaseUserService
 ) -> Response:
-    form = get_form(SeekingForm)
+    form = get_body(SeekingForm)
 
     listing = get_seeking_listing_authored_by_current_user(
         listing_id, listing_service, action="update")
@@ -369,10 +370,10 @@ def delete_accommodation_listing(
     return make_response("", NO_CONTENT)
 
 
-@bp.delete("/seeking/<listing_id>")
+@bp.delete("/seeking/<uuid:listing_id>")
 @jwt_required()
 def delete_seeking_listing(
-        listing_id: str, listing_service: BaseListingsService) -> Response:
+        listing_id: uuid.UUID, listing_service: BaseListingsService) -> Response:
     listing = get_seeking_listing_authored_by_current_user(
         listing_id, listing_service, action="delete")
 
@@ -404,26 +405,16 @@ def upload_listing_photo(listing_id: str,
     return make_response("", CREATED)
 
 
-@bp.get("/<listing_id>/photos/<uuid:photo_id>")
-@jwt_required()
-def get_listing_photo(listing_id: str,
+@bp.get("/<uuid:listing_id>/photos/<uuid:photo_id>")
+def get_listing_photo(listing_id: uuid.UUID,
                       photo_id: uuid.UUID,
                       listing_service: BaseListingsService
                       ) -> Response:
-    source, listing_uuid = extract_listing_id_and_source(listing_id)
-
-    if source != Source.internal:
-        abort(make_response(
-            {"source": f"photos not available for {source}"},
-            NOT_FOUND))
 
     try:
         photo = listing_service.get_listing_photo(
-            uuid.UUID(listing_uuid), photo_id)
+            listing_id, photo_id)
 
-    except ValueError:
-        abort(make_response(
-            {'msg': "invalid ids given"}, BAD_REQUEST))
     except ListingNotFoundError:
         abort(make_response(
             {'listingId': "listing not found"}, NOT_FOUND))

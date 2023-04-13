@@ -1,29 +1,35 @@
 import { FC } from "react";
 import { Seeking } from "@/generated/models/Seeking";
-import ContactDetails from "@/components/Listing/ContactDetails";
-
+import PhotoGallery from "../PhotoGallery";
+import ProfileCard from "../ProfileCard";
+import styles from "./AccommodationListing.module.scss";
 interface SeekingDetailsProps {
   seeking: Seeking;
 }
 
 const SeekingDetails: FC<SeekingDetailsProps> = ({ seeking }) => {
+  const setPhotoUrls = () => {
+    return (
+      seeking.photoUrls?.map(photo => `http://127.0.0.1:5000/${photo}`) ?? [
+        "/placeholder.webp",
+      ]
+    );
+  };
+
   return (
-    <>
-      <div>
+    <div className={styles.wrapper}>
+      <PhotoGallery photoUrls={setPhotoUrls()} />
+      <div className={styles.information}>
         <h1>{seeking.title}</h1>
         <p>{seeking.description}</p>
       </div>
 
       <div>
-        <h3>Contact Details</h3>
-        <ContactDetails
-          phoneNumber={seeking.contactInfo?.phoneNumber ?? null}
-          emailAddress={seeking.contactInfo?.email ?? null}
-        />
+        {seeking.author.userProfile?.id ? (
+          <ProfileCard userData={seeking.author.userProfile} />
+        ) : null}
       </div>
-
-      <div>{/* TODO: Author details */}</div>
-    </>
+    </div>
   );
 };
 

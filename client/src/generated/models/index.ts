@@ -2,7 +2,6 @@
 /* eslint-disable */
 export * from './Accommodation';
 export * from './AccommodationAddress';
-export * from './AccommodationDetails';
 export * from './AccommodationForm';
 export * from './AccommodationFormBase';
 export * from './AccommodationSearch';
@@ -14,7 +13,6 @@ export * from './ListingContactInfo';
 export * from './Location';
 export * from './SearchSourcesInner';
 export * from './Seeking';
-export * from './SeekingDetails';
 export * from './SeekingForm';
 export * from './SeekingFormBase';
 export * from './SeekingSearchResultsInner';

@@ -1,0 +1,31 @@
+.wrapper {
+  form {
+    .maxPriceInput {
+      border: 1px #4286f49a solid;
+      border-radius: 4px;
+      outline: none;
+      padding: 4px 8px;
+      width: 100%;
+      margin-top: 6px;
+      margin-bottom: 12px;
+      &:focus {
+        border: 1px #4285f4 solid;
+
+        box-shadow: 0 0 2px #4285f4;
+      }
+    }
+
+    fieldset {
+      margin: 10px 0;
+      //   outline: none;
+      border: none;
+    }
+
+    .checkbox {
+      accent-color: #4285f4;
+    }
+    legend {
+      margin-bottom: 6px;
+    }
+  }
+}

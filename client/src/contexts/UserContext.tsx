@@ -25,6 +25,7 @@ interface UserContextProps {
   setUser: Dispatch<SetStateAction<UserProfile | null>>;
   logout: () => void;
   refetchUser: () => void;
+  isLoading: boolean;
 }
 
 interface UserContextProviderProps {
@@ -36,6 +37,7 @@ const UserContext = createContext<UserContextProps>({
   setUser: () => null,
   logout: () => null,
   refetchUser: () => null,
+  isLoading: true,
 });
 
 const UserContextProvider = ({ children }: UserContextProviderProps) => {
@@ -84,7 +86,9 @@ const UserContextProvider = ({ children }: UserContextProviderProps) => {
   }, [router.asPath, isLoading]);
 
   return (
-    <UserContext.Provider value={{ user, setUser, logout, refetchUser }}>
+    <UserContext.Provider
+      value={{ user, setUser, logout, refetchUser, isLoading }}
+    >
       {children}
     </UserContext.Provider>
   );
