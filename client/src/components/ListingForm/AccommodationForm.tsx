@@ -14,6 +14,8 @@ import TextArea from "../TextArea";
 import styles from "./Form.module.scss";
 import useUser from "@/hooks/useUser";
 
+import { toast } from "react-toastify";
+
 interface FormProps {
   listingId: string;
   editExistingListing: Boolean;
@@ -122,7 +124,19 @@ const AccommodationForm: FC<FormProps> = ({
           ...baseForm,
           photos: photos ?? [],
         })
-        .then(() => router.push({ pathname: `/profile/${user?.id}` }))
+        .then(() => {
+          toast.success("Listing is added", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+          router.push({ pathname: `/profile/${user?.id}` });
+        })
 
         .catch(err =>
           alert(
@@ -138,7 +152,19 @@ const AccommodationForm: FC<FormProps> = ({
             ...baseForm,
           },
         })
-        .then(() => router.push({ pathname: `/profile/${user?.id}` }))
+        .then(() => {
+          toast.success("Listing is changed", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+          router.push({ pathname: `/profile/${user?.id}` });
+        })
         .catch(err => {
           alert("Error whilst updating listing. \nError: " + err);
         });
