@@ -20,7 +20,6 @@ const SeekingPreviewPage: FC = ({}) => {
         },
       },
     },
-    //link photourl to placeholder image in public folder
     photoUrls: ["placeholder.webp"],
     contactInfo: {
       phoneNumber: "Dummy Phone Number",
