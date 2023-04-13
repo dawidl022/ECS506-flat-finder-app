@@ -20,7 +20,6 @@ const SeekingPreviewPage: FC = ({}) => {
         },
       },
     },
-    photoUrls: ["placeholder.webp"],
     contactInfo: {
       phoneNumber: "Dummy Phone Number",
       email: "Dummy Email",
