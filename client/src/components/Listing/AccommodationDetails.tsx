@@ -14,7 +14,7 @@ const AccommodationDetails: FC<AccommodationDetailsProps> = ({
 }) => {
   const setPhotoUrls = () => {
     if (accommodation.source === "internal") {
-      return accommodation.photoUrls.map(
+      return accommodation.photoUrls?.map(
         photo => `http://127.0.0.1:5000/${photo}`
       );
     } else {

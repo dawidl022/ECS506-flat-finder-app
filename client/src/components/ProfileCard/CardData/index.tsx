@@ -79,7 +79,7 @@ const CardData: React.FC<CardDataProps> = ({
         <div className={styles.detailsRow}>
           <p className={styles.title}>Email:</p>
 
-          {userData.email != "N/A"  && userData.email != "Dummy Email" ? (
+          {userData.email != "N/A" && userData.email != "Dummy Email" ? (
             <a href={`mailto:${userData.email}`}>
               <p className={styles.value}>{userData.email}</p>
             </a>
@@ -116,7 +116,8 @@ const CardData: React.FC<CardDataProps> = ({
                 });
               }}
             />
-          ) : userData.contactDetails.phoneNumber != "N/A"  && userData.contactDetails.phoneNumber != "Dummy Phone Number" ? (
+          ) : userData.contactDetails.phoneNumber != "N/A" &&
+            userData.contactDetails.phoneNumber != "Dummy Phone Number" ? (
             <a href={`tel:${userData.contactDetails.phoneNumber}`}>
               <p className={styles.value}>
                 {userData.contactDetails.phoneNumber}
@@ -130,19 +131,20 @@ const CardData: React.FC<CardDataProps> = ({
         </div>
       </div>
 
-      {router.pathname.startsWith("/listings/") && users.map(user => {
-        if (user.id === userData.id) {
-          return (
-            <Link
-              className={styles.blue}
-              href="/profile/[userId]"
-              as={`/profile/${userData.id}`}
-            >
-              See more listings by this user
-            </Link>
-          );
-        }
-      })}
+      {router.pathname.startsWith("/listings/") &&
+        users.map(user => {
+          if (user.id === userData.id) {
+            return (
+              <Link
+                className={styles.blue}
+                href="/profile/[userId]"
+                as={`/profile/${userData.id}`}
+              >
+                See more listings by this user
+              </Link>
+            );
+          }
+        })}
       {isEditing && (
         <div className={styles.btnRow}>
           <button
