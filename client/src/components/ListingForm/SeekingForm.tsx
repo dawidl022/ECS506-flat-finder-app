@@ -9,6 +9,8 @@ import styles from "./Form.module.scss";
 import Input from "../Input";
 import TextArea from "../TextArea";
 
+import { toast } from "react-toastify";
+
 interface FormProps {
   listingId: string;
   editExistingListing: Boolean;
@@ -82,7 +84,19 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
           ...baseForm,
           photos: photos ?? [],
         })
-        .then(() => router.push({ pathname: `/profile/${user?.id}` }))
+        .then(() => {
+          toast.success("Listing is added", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+          router.push({ pathname: `/profile/${user?.id}` });
+        })
         .catch(err =>
           alert(
             "Seeking listing failed to be published. \nError: " + err.message
@@ -96,7 +110,19 @@ const SeekingForm: FC<FormProps> = ({ listingId, editExistingListing }) => {
             ...baseForm,
           },
         })
-        .then(() => router.push({ pathname: `/profile/${user?.id}` }))
+        .then(() => {
+          toast.success("Listing is changed", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+          router.push({ pathname: `/profile/${user?.id}` });
+        })
         .catch(err => {
           alert("Error whilst updating listing. \nError: " + err);
         });
