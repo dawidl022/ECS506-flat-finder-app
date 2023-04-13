@@ -2,6 +2,7 @@ import { FC, useState, useEffect } from "react";
 import { DefaultApi } from "@/generated/apis/DefaultApi";
 import SeekingDetails from "./SeekingDetails";
 import { Seeking } from "@/generated";
+import useApi from "@/hooks/useApi";
 
 interface SeekingDetailsProps {
   listingId: string;
@@ -10,9 +11,10 @@ interface SeekingDetailsProps {
 const FetchedSeekingDetails: FC<SeekingDetailsProps> = ({ listingId }) => {
   const [data, setData] = useState<Seeking | null>(null);
   const [error, setError] = useState(false);
+  const { apiManager } = useApi();
 
   useEffect(() => {
-    new DefaultApi()
+    apiManager
       .apiV1ListingsSeekingListingIdGet({
         listingId: listingId,
       })
