@@ -46,7 +46,9 @@
         gap: 6px;
       }
       input[type="file"] {
-        display: none;
+        height: 1px;
+        overflow: hidden;
+        opacity: 0;
       }
       .details {
         color: #afafafe1;
@@ -117,8 +119,4 @@
       box-shadow: 0 0 2px #4285f4;
     }
   }
-}
-
-.paddingTop {
-  padding-top: 0.5rem;
 }

@@ -36,8 +36,8 @@ const AccommodationForm: FC<FormProps> = ({
   const { user } = useUser();
 
   const [accommodationType, setAccommodationType] = useState("Flat");
-  const [numberOfRooms, setNumberOfRooms] = useState(0);
-  const [price, setPrice] = useState(0);
+  const [numberOfRooms, setNumberOfRooms] = useState("");
+  const [price, setPrice] = useState("");
 
   const [photos, setPhotos] = useState<Blob[]>();
 
@@ -54,8 +54,8 @@ const AccommodationForm: FC<FormProps> = ({
       country: AccommodationAddressCountryEnum.Uk,
     },
     accommodationType,
-    numberOfRooms,
-    price,
+    numberOfRooms: parseInt(numberOfRooms),
+    price: parseInt(price),
   };
 
   useEffect(() => {
@@ -71,8 +71,8 @@ const AccommodationForm: FC<FormProps> = ({
           setTown(res.address.town);
           setPostCode(res.address.postCode);
           setAccommodationType(res.accommodationType);
-          setNumberOfRooms(res.numberOfRooms);
-          setPrice(res.price);
+          setNumberOfRooms(res.numberOfRooms.toString());
+          setPrice(res.price.toString());
         })
         .catch(err => {
           alert(
@@ -216,14 +216,14 @@ const AccommodationForm: FC<FormProps> = ({
             label="Price"
             isRequired
             value={price}
-            setValue={v => setPrice(parseFloat(v))}
+            setValue={v => setPrice(v)}
             isNumber
           />
           <Input
             label="Number of Rooms"
             isRequired
             value={numberOfRooms}
-            setValue={v => setNumberOfRooms(parseFloat(v))}
+            setValue={v => setNumberOfRooms(v)}
             isNumber
             limits={{ min: 0, max: 10 }}
           />
@@ -268,9 +268,7 @@ const AccommodationForm: FC<FormProps> = ({
                 required
               />
               {photos && photos.length > 0 && (
-                <p className={styles.paddingTop}>
-                  Uploaded photos: {photos.length}
-                </p>
+                <p>Uploaded photos: {photos.length}</p>
               )}
             </div>
           )}
