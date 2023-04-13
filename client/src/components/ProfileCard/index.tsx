@@ -53,14 +53,6 @@ const ProfileCard: FC<ProfileCardProps> = ({
           isEditing={isEditing}
           setIsEditing={setIsEditing}
         />
-        {showLink && (
-          <Link
-            href={`/profile/${userData.id}`}
-            className={styles.viewProfileBtn}
-          >
-            View all listings by this user
-          </Link>
-        )}
       </div>
 
       {/* If user has listings */}

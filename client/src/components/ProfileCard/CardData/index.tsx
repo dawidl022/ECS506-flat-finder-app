@@ -140,7 +140,7 @@ const CardData: React.FC<CardDataProps> = ({
                 href="/profile/[userId]"
                 as={`/profile/${userData.id}`}
               >
-                See more listings by this user
+                View all listings by this user
               </Link>
             );
           }
