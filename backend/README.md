@@ -98,6 +98,10 @@ redirect the user back to the frontend after SSO authentication.
 
 [Instructions to obtain the Zoopla API key](../docs/API-details/APIdetails.md#getting-api-key)
 
+The `SUPERUSER_EMAIL` is the email of the first admin of the system, needed to
+make other users admin. Upon registering a user with that email address,
+they get admin rights.
+
 You should see output similar to the following:
 
 ```txt
