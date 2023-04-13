@@ -51,9 +51,9 @@ const Listing: FC<any> = ({
           <LoadingSpinner conStyles={{ paddingTop: 60 }} />
         ) : isEnded ? (
           data.length > 0 ? (
-            <p>No more data</p>
+            <p>No more results</p>
           ) : (
-            <p>No data</p>
+            <p>No results found</p>
           )
         ) : !isFirst ? (
           <button

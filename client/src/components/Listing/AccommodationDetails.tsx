@@ -58,14 +58,10 @@ const AccommodationDetails: FC<AccommodationDetailsProps> = ({
 
       <div className={styles.address}>
         <h2>Address:</h2>
-        {accommodation.address.line1 && (
-          <p>Line 1: {accommodation.address.line1}</p>
-        )}
-        {accommodation.address.line2 && (
-          <p>Line 2: {accommodation.address.line2}</p>
-        )}
-        <p>Town: {accommodation.address.town}</p>
-        <p>Post Code: {accommodation.address.postCode}</p>
+        {accommodation.address.line1 && <p>{accommodation.address.line1}</p>}
+        {accommodation.address.line2 && <p>{accommodation.address.line2}</p>}
+        <p>{accommodation.address.town}</p>
+        <p>{accommodation.address.postCode}</p>
       </div>
 
       <div>

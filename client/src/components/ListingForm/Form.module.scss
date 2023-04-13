@@ -31,9 +31,6 @@
     }
 
     .fileUploadCon {
-      margin-top: 19px;
-      .label {
-      }
       .labelBtn {
         margin-top: 12px;
         display: inline-block;
@@ -120,4 +117,8 @@
       box-shadow: 0 0 2px #4285f4;
     }
   }
+}
+
+.paddingTop {
+  padding-top: 0.5rem;
 }

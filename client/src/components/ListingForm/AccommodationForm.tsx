@@ -267,6 +267,11 @@ const AccommodationForm: FC<FormProps> = ({
                 multiple
                 required
               />
+              {photos && photos.length > 0 && (
+                <p className={styles.paddingTop}>
+                  Uploaded photos: {photos.length}
+                </p>
+              )}
             </div>
           )}
         </section>
