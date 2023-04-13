@@ -79,7 +79,7 @@ const CardData: React.FC<CardDataProps> = ({
         <div className={styles.detailsRow}>
           <p className={styles.title}>Email:</p>
 
-          {userData.email != "N/A" ? (
+          {userData.email != "N/A"  && userData.email != "Dummy Email" ? (
             <a href={`mailto:${userData.email}`}>
               <p className={styles.value}>{userData.email}</p>
             </a>
@@ -116,7 +116,7 @@ const CardData: React.FC<CardDataProps> = ({
                 });
               }}
             />
-          ) : userData.contactDetails.phoneNumber != "N/A" ? (
+          ) : userData.contactDetails.phoneNumber != "N/A"  && userData.contactDetails.phoneNumber != "Dummy Phone Number" ? (
             <a href={`tel:${userData.contactDetails.phoneNumber}`}>
               <p className={styles.value}>
                 {userData.contactDetails.phoneNumber}
