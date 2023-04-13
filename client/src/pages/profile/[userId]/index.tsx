@@ -34,12 +34,12 @@ const UserProfile: NextPage<UserProfileProps> = ({ userData }) => {
 
   return (
     <div className="container">
-      {success && <p>Successfully deleted listing</p>}
+      {/* {success && <p>Successfully deleted listing</p>}
       {error && <p>Error: could not delete listing</p>}
 
       <p style={{ marginTop: 70 }} onClick={() => setIsPopup(true)}>
         TEST
-      </p>
+      </p> */}
       <Popup visible={isPopup} setVisible={setIsPopup}>
         <h1>123</h1>
       </Popup>
@@ -47,7 +47,9 @@ const UserProfile: NextPage<UserProfileProps> = ({ userData }) => {
         <ProfileCard isMe={isMe} userData={userData} />
       ) : (
         // TODO: nice message
-        <p>No such a user</p>
+        <div className={"emptyCon"}>
+          <h1>User not found</h1>
+        </div>
       )}
     </div>
   );
@@ -66,7 +68,6 @@ export const getServerSideProps: GetServerSideProps = async (
   const config = new Configuration({ basePath, accessToken: token });
 
   const api = new DefaultApi(config);
-
   let result;
   try {
     const res = await api.apiV1UsersUserIdProfileGet({ userId });
