@@ -64,7 +64,9 @@ const Listing: FC<any> = ({
           </button>
         ) : (
           // TODO: Frontend
-          <p>Start searching</p>
+          <div className={styles.txtCon}>
+            <h1>Press search to get results</h1>
+          </div>
         )}
       </div>
     </>

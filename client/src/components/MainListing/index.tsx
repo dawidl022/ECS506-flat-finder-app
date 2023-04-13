@@ -10,6 +10,7 @@ import {
   SeekingSearchResultsInner,
 } from "@/generated";
 import SeekingListing from "./Listing/SeekingListing";
+const tabs = ["Accommodations", "Seeking list"];
 
 const MainListings = () => {
   const [location, setLocation] = useState("");
@@ -20,7 +21,6 @@ const MainListings = () => {
   // const [isSubmitted, setIsSubmitted] = useState(false);
 
   const [selectedTab, setSelectedTab] = useState(0);
-  const tabs = ["Accommodations", "Seeking list"];
 
   // LISTING
   const [isEnded, setIsEnded] = React.useState(false);
@@ -57,6 +57,10 @@ const MainListings = () => {
   };
 
   const getData = async (setPage?: number) => {
+    if (setPage === 0) {
+      setIsEnded(false);
+    }
+
     if (selectedTab === 0) {
       getAccData(setPage);
     } else {
@@ -75,7 +79,7 @@ const MainListings = () => {
         sources: Object.keys(sources).filter(s => sources[s]),
         sortBy: "newest",
         page: setPage || pageNumber,
-        size: 5,
+        size: 15,
       })
       .then(res => {
         console.log(res);
@@ -97,7 +101,7 @@ const MainListings = () => {
 
   React.useEffect(() => {
     setIsFirst(true);
-  }, [tabs]);
+  }, [selectedTab]);
 
   const getSeekingData = async (setPage?: number) => {
     setIsLoading(true);
@@ -175,7 +179,13 @@ const MainListings = () => {
             isFirst={isFirst}
           />
         ) : (
-          <SeekingListing data={seekingData} />
+          <SeekingListing
+            data={seekingData}
+            isEnded={isEnded}
+            isLoading={isLoading}
+            setPageNumber={setPageNumber}
+            isFirst={isFirst}
+          />
         )}
       </main>
     </div>
